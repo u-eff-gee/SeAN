@@ -1,0 +1,47 @@
+# Minimum and maximum energy for the calculation in eV
+3.56258e6, 3.56318e6
+# Primary beam intensity distribution
+const, 1.0
+# 0) Identifier of the target (string)
+6Li
+# 1) Resonance energies in eV (comma separated values)
+3.56288e6, 3.56290e6
+# 2) Transition widths to the ground state in eV (comma separated values)
+8., 7.5
+# 3) Total transition widths in eV (comma separated values)
+8., 7.5
+# 4) Angular momentum of the ground state
+1
+# 5) Angular momenta of the excited states (comma separated values)
+0, 3
+# 6) Model for velocity distribution
+maxwell_boltzmann, 412.5
+# 7) Nuclear mass in atomic mass units
+6.01512288742
+# 8) Mass attenuation coefficient
+Li
+# 9) Target thickness in atoms/fm^2
+0.000282
+#
+###############################################################
+#
+# 0) Identifier of the target (string)
+6Li
+# 1) Resonance energies in eV (comma separated values)
+3.56288e6, 3.56290e6
+# 2) Transition widths to the ground state in eV (comma separated values)
+8., 7.5
+# 3) Total transition widths in eV (comma separated values)
+8., 7.5
+# 4) Angular momentum of the ground state
+1
+# 5) Angular momenta of the excited states (comma separated values)
+0, 3
+# 6) Model for velocity distribution
+maxwell_boltzmann, 412.5
+# 7) Nuclear mass in atomic mass units
+6.01512288742
+# 8) Mass attenuation coefficient
+Li
+# 9) Target thickness in atoms/fm^2
+0.000282

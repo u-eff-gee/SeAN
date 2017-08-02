@@ -1,0 +1,6 @@
+# Constant beam profile (C is a normalization factor)
+const, C
+# Gaussian beam profile (C is a normalization factor)
+gauss, MU, SIGMA, C
+# Bremsstrahlung (C is a normalization factor)
+brems, E0, C

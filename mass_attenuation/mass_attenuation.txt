@@ -1,0 +1,6 @@
+# No atomic attenuation
+0
+# Elements
+H
+He
+Li

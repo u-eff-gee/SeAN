@@ -1,0 +1,6 @@
+# Absolute zero
+absolute_zero
+# Maxwell-Boltzmann distribution with effective temperature
+maxwell_boltzmann, Teff
+# Maxwell-Boltzmann distribution, where the effective temperature is calculate from the Debye approximation
+maxwell_boltzmann_debye, TD
