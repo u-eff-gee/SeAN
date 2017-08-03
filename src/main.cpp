@@ -1,7 +1,7 @@
 #include <iostream>
 #include <argp.h>
 
-#include "InputFileReader.h"
+#include "Experiment.h"
 #include "Config.h"
 
 using std::cout;
@@ -46,8 +46,9 @@ int main(int argc, char* argv[]){
 	struct arguments arguments;
 	argp_parse(&argp, argc, argv, 0, 0, &arguments);
 
-	InputFileReader inputFileReader;
+	Experiment experiment;
 
-	inputFileReader.readInputFile(arguments.inputfile);
-	inputFileReader.print();
+	experiment.readInputFile(arguments.inputfile);
+	experiment.print();
+	experiment.crossSections();
 }

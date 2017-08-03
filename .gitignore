@@ -6,3 +6,9 @@ sean
 
 # Object files
 *.o
+
+# vim .swp files
+*.swp
+
+# Plot output files
+*.pdf

@@ -7,10 +7,10 @@ CC=g++
 CFLAGS=-g -Wall -Wconversion -I$(INCDIR)
 ROOTFLAGS=`root-config --cflags --glibs`
 
-_DEPS = InputFileReader.h Config.h CrossSection.h Target.h
+_DEPS = Experiment.h Config.h CrossSection.h Target.h
 DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))
 
-_OBJ = InputFileReader.o main.o CrossSection.o Target.o
+_OBJ = Experiment.o main.o CrossSection.o Target.o
 OBJ = $(patsubst %,$(OBJDIR)/%,$(_OBJ))
 #
 #$(OBJDIR)/%.o: $(SRCDIR)/%.cpp $(DEPS)

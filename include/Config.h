@@ -27,7 +27,9 @@
 //************************************
 
 // Number of bins on the energy axis
-#define NBINS 10000
+#define NBINS_E 100
+// Number of bins on the velocity axis
+#define NBINS_V 100
 
 //************************************
 // Definitions of physical constants
@@ -40,3 +42,12 @@
 #define NA 6.022140857e23 // in particles/mole
 #define AtomicMassUnit 931.494095e6 // in eV/c^2
 #define PI 3.141592653589793
+
+//************************************
+// Parameters for plots
+//************************************
+
+#define CS_PLOT_LEGEND_X1 0.1
+#define CS_PLOT_LEGEND_X2 0.4
+#define CS_PLOT_LEGEND_Y1 0.8
+#define CS_PLOT_LEGEND_Y2 0.9

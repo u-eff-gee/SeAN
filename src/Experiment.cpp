@@ -3,7 +3,7 @@
 #include <string>
 #include <regex>
 
-#include "InputFileReader.h"
+#include "Experiment.h"
 
 using std::cout;
 using std::endl;
@@ -12,7 +12,7 @@ using std::string;
 using std::regex;
 using std::regex_replace;
 
-void InputFileReader::readInputFile(const char* filename){
+void Experiment::readInputFile(const char* filename){
 	ifname = filename;
 
 	ifstream ifile(filename);
@@ -38,6 +38,7 @@ void InputFileReader::readInputFile(const char* filename){
 			start = stop + 1;
 			stop = line.length() - 1;
 			emax = atof(line.substr(start, stop).c_str());
+
 			++nline;
 			continue;
 		}
@@ -170,9 +171,26 @@ void InputFileReader::readInputFile(const char* filename){
         }
 
 	ifile.close();
+
+	createEnergyBins(emin, emax);
 }
 
-void InputFileReader::print(){
+void Experiment::createEnergyBins(double emin, double emax){
+	double delta_e = (emax - emin)/NBINS_E;
+
+	for(int i = 0; i < NBINS_E; ++i)
+		energy_bins[i] = emin + i*delta_e;
+};
+
+void Experiment::crossSections(){
+	for(unsigned int i = 0; i < targets.size(); ++i){
+		targets[i]->calculateCrossSection(energy_bins);
+		targets[i]->calculateVelocityDistribution(vdist_bins);
+		targets[i]->plotCrossSection(energy_bins);
+	}
+};
+
+void Experiment::print(){
 	cout << "INPUT FILE '" << ifname << "'" << endl;
 	cout << "[EMIN, EMAX] = [" << emin << ", " << emax << "]" << endl;
 	cout << "BEAM = " << beam_ID;
