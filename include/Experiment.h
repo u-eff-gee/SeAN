@@ -11,7 +11,7 @@ class Experiment{
 
 private:
 	double energy_bins[NBINS_E] = {0.};
-	double vdist_bins[NBINS_V] = {0.};
+	double velocity_bins[NBINS_V] = {0.};
 
 	vector<Target*> targets;
 	vector<double> beamParams;
@@ -27,7 +27,6 @@ public:
 	~Experiment(){};
 
 	void readInputFile(const char* filename);
-	void createVDistBins();
 	void crossSections();
 	void print();
 

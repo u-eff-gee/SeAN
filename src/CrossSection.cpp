@@ -22,13 +22,49 @@ void CrossSection::breit_wigner(double (&energy_bins)[NBINS_E], double (&crossse
 	}
 }
 
-void CrossSection::plot(double (&energy_bins)[NBINS_E], double (&crosssection_bins)[NBINS_E], string title, TCanvas* canvas, TLegend* legend, string legend_entry, bool add_to_existing_canvas){
+void CrossSection::maxwell_boltzmann(double (&velocity_bins)[NBINS_V], double (&vdist_bins)[NBINS_V], vector<double> &params, double mass){
+	// Use the fact that the velocity distribution is symmetric and store only one half of the desitribution
+	double v_max = 3.*delta(params[0], mass);
+	double delta_v = v_max/NBINS_V;
+
+	double c1 = sqrt(mass/(2*PI*kB*params[0]));
+	double c2 = -1./delta(params[0], mass);
+
+
+	for(int i = 0; i < NBINS_V; ++i){
+		velocity_bins[i] = i*delta_v;
+		vdist_bins[i] = c1*exp(c2*velocity_bins[i]*velocity_bins[i]);
+	}
+}
+
+void CrossSection::maxwell_boltzmann_debye(double (&velocity_bins)[NBINS_V], double (&vdist_bins)[NBINS_V], vector<double> &params, double mass){
+	;
+}
+
+void CrossSection::plot_crosssection(double (&energy_bins)[NBINS_E], double (&crosssection_bins)[NBINS_E], string title, TCanvas* canvas, TLegend* legend, string legend_entry, bool add_to_existing_canvas){
 
 	TGraph *graph = new TGraph(NBINS_E, energy_bins, crosssection_bins);
 	graph->SetName(title.c_str());
 	graph->SetTitle(title.c_str());
 	graph->GetXaxis()->SetTitle("Energy / eV");
 	graph->GetYaxis()->SetTitle("#sigma / fm^2");
+	if(add_to_existing_canvas){
+		graph->Draw("same");
+	} else{
+		graph->Draw();
+	}
+
+	legend->AddEntry(graph->GetName(), legend_entry.c_str(), "l");
+
+}
+
+void CrossSection::plot_vdist(double (&velocity_bins)[NBINS_V], double (&vdist_bins)[NBINS_V], string title, TCanvas* canvas, TLegend* legend, string legend_entry, bool add_to_existing_canvas){
+
+	TGraph *graph = new TGraph(NBINS_V, velocity_bins, vdist_bins);
+	graph->SetName(title.c_str());
+	graph->SetTitle(title.c_str());
+	graph->GetXaxis()->SetTitle("Velocity / c");
+	graph->GetYaxis()->SetTitle("Velocity distribution");
 	if(add_to_existing_canvas){
 		graph->Draw("same");
 	} else{

@@ -20,19 +20,23 @@ public:
 	
 	~CrossSection(){};
 
-	void breit_wigner(double (&energies)[NBINS_E], double (&crosssection)[NBINS_E], vector<double> &e0, vector<double> &gamma0, vector<double> &gamma, vector<double> &jj, double j0);
+	void breit_wigner(double (&energy_bins)[NBINS_E], double (&crosssection_bins)[NBINS_V], vector<double> &e0_list, vector<double> &gamma0_list, vector<double> &gamma_list, vector<double> &jj_list, double j0);
 
-	void absolute_zero(){};
+	void maxwell_boltzmann(double (&velocity_bins)[NBINS_V], double (&vdist_bins)[NBINS_V], vector<double> &params, double mass);
 
-	void maxwell_boltzmann(double (&energies)[NBINS_E], double (&crosssection)[NBINS_E], vector<double> params);
+	void maxwell_boltzmann_debye(double (&velocity_bins)[NBINS_V], double (&vdist_bins)[NBINS_E], vector<double> &params, double mass);
 
-	void maxwell_boltzmann_debye(double (&energies)[NBINS_E], double (&crosssection)[NBINS_E], vector<double> params);
+	void plot_crosssection(double (&energies)[NBINS_E], double (&crosssection)[NBINS_E], string title, TCanvas* canvas, TLegend* legend, string legend_entry, bool add_to_existing_canvas);
 
-	void plot(double (&energies)[NBINS_E], double (&crosssection)[NBINS_E], string title, TCanvas* canvas, TLegend* legend, string legend_entry, bool add_to_existing_canvas);
+	void plot_vdist(double (&energies)[NBINS_E], double (&crosssection)[NBINS_E], string title, TCanvas* canvas, TLegend* legend, string legend_entry, bool add_to_existing_canvas);
 
 private:
 	double eGamma(double energy, double velocity){
 		return (1. + velocity)/(sqrt(1. - velocity*velocity))*energy;
+	}
+
+	double delta(double t, double mass){
+		return sqrt(2*kB*t/mass);
 	}
 };
 

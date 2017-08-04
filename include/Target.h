@@ -23,6 +23,7 @@ private:
 	double incident_beam_bins[NBINS_E] = {1.};
 	double crosssection_bins[NBINS_E] = {0.};
 	double dopplercs_bins[NBINS_E] = {0.};
+	double vdist_bins[NBINS_V] = {0.};
 	double massattenuation_bins[NBINS_E] = {0.};
 	double transmitted_beam_bins[NBINS_E] = {0.};
 
@@ -62,10 +63,14 @@ public:
 
 	void print();
 
+	// Functions to calculate histograms
 	void calculateCrossSection(double (&energy_bins)[NBINS_E]);
-	void calculateVelocityDistribution(double (&vdist_bins)[NBINS_V], string vdist_ID);
+	void calculateVelocityDistribution(double (&velocity_bins)[NBINS_V]);
 	void calculateDopplerShift();
+
+	// Functions to plot histograms
 	void plotCrossSection(double (&energy_bins)[NBINS_E]);
+	void plotVelocityDistribution(double (&velocity_bins)[NBINS_V]);
 };
 
 #endif

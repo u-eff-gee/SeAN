@@ -26,13 +26,13 @@ Li
 ###############################################################
 #
 # 0) Identifier of the target (string)
-6Li
+6Li_2
 # 1) Resonance energies in eV (comma separated values)
-3.56288e6, 3.56290e6
+3.56286e6, 3.56290e6
 # 2) Transition widths to the ground state in eV (comma separated values)
-8., 7.5
+8., 8.
 # 3) Total transition widths in eV (comma separated values)
-8., 7.5
+8., 8.
 # 4) Angular momentum of the ground state
 1
 # 5) Angular momenta of the excited states (comma separated values)
