@@ -27,9 +27,9 @@
 //************************************
 
 // Number of bins on the energy axis
-#define NBINS_E 100
+#define NBINS_E 1000
 // Number of bins on the velocity axis
-#define NBINS_V 100
+#define NBINS_V 1000
 
 //************************************
 // Definitions of physical constants
@@ -51,3 +51,8 @@
 #define CS_PLOT_LEGEND_X2 0.4
 #define CS_PLOT_LEGEND_Y1 0.8
 #define CS_PLOT_LEGEND_Y2 0.9
+
+#define V_PLOT_LEGEND_X1 0.6
+#define V_PLOT_LEGEND_X2 0.9
+#define V_PLOT_LEGEND_Y1 0.8
+#define V_PLOT_LEGEND_Y2 0.9

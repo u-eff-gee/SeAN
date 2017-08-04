@@ -23,22 +23,43 @@ void CrossSection::breit_wigner(double (&energy_bins)[NBINS_E], double (&crossse
 }
 
 void CrossSection::maxwell_boltzmann(double (&velocity_bins)[NBINS_V], double (&vdist_bins)[NBINS_V], vector<double> &params, double mass){
-	// Use the fact that the velocity distribution is symmetric and store only one half of the desitribution
-	double v_max = 3.*delta(params[0], mass);
-	double delta_v = v_max/NBINS_V;
+// Use the fact that the velocity distribution is symmetric and store only one half of the distribution
 
-	double c1 = sqrt(mass/(2*PI*kB*params[0]));
-	double c2 = -1./delta(params[0], mass);
+// Implementation with equidistant velocity bins.
+//	double v_max = 3.*delta(params[0], mass);
+//	double delta_v = v_max/NBINS_V;
+//
+//	double c1 = sqrt(mass*AtomicMassUnit/(2*PI*kB*params[0]));
+//	double c2 = -1./pow(delta(params[0], mass), 2);
+//
+//
+//	for(int i = 0; i < NBINS_V; ++i){
+//		velocity_bins[i] = i*delta_v;
+//		vdist_bins[i] = c1*exp(c2*velocity_bins[i]*velocity_bins[i]);
+//	}
 
+// Implementation where velocity_bins[i] is the velocity that is needed to shift the resonance energy E0 to E0 + delta_E, where delta_E is the distance of the energy bins
+	double c1 = sqrt(mass*AtomicMassUnit/(2*PI*kB*params[0]));
+      	double c2 = -1./pow(delta(params[0], mass), 2);
+	double energy_ratio = 1.;
 
-	for(int i = 0; i < NBINS_V; ++i){
-		velocity_bins[i] = i*delta_v;
-		vdist_bins[i] = c1*exp(c2*velocity_bins[i]*velocity_bins[i]);
-	}
+      	for(int i = 0; i < NBINS_V; ++i){
+		energy_ratio = energy_bins[i]/energy_bins[0];
+		velocity_bins[i] = (-2.+2.*energy_ratio*energy_ratio)/(2. + 2.*energy_ratio*energy_ratio);
+              	vdist_bins[i] = c1*exp(c2*velocity_bins[i]*velocity_bins[i]);
+      	}
 }
 
 void CrossSection::maxwell_boltzmann_debye(double (&velocity_bins)[NBINS_V], double (&vdist_bins)[NBINS_V], vector<double> &params, double mass){
 	;
+}
+
+void CrossSection::dopplershift(double (&dopplercs_bins)[NBINS_E], double (&energy_bins)[NBINS_E], double (&crosssection_bins)[NBINS_V], double (&velocity_bins)[NBINS_V], double (&vdist_bins)[NBINS_E]){
+	for(int i = 0; i < NBINS_E; ++i){
+		for(int j = 0; j < NBINS_V; ++j){
+			dopplercs_bins[i] += 0.;
+		}
+	}
 }
 
 void CrossSection::plot_crosssection(double (&energy_bins)[NBINS_E], double (&crosssection_bins)[NBINS_E], string title, TCanvas* canvas, TLegend* legend, string legend_entry, bool add_to_existing_canvas){

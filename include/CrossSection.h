@@ -26,6 +26,8 @@ public:
 
 	void maxwell_boltzmann_debye(double (&velocity_bins)[NBINS_V], double (&vdist_bins)[NBINS_E], vector<double> &params, double mass);
 
+	void dopplershift(double (&dopplercs_bins)[NBINS_E], double (&energy_bins)[NBINS_E], double (&crosssection_bins)[NBINS_V], double (&velocity_bins)[NBINS_V], double (&vdist_bins)[NBINS_E]);
+
 	void plot_crosssection(double (&energies)[NBINS_E], double (&crosssection)[NBINS_E], string title, TCanvas* canvas, TLegend* legend, string legend_entry, bool add_to_existing_canvas);
 
 	void plot_vdist(double (&energies)[NBINS_E], double (&crosssection)[NBINS_E], string title, TCanvas* canvas, TLegend* legend, string legend_entry, bool add_to_existing_canvas);
@@ -36,7 +38,7 @@ private:
 	}
 
 	double delta(double t, double mass){
-		return sqrt(2*kB*t/mass);
+		return sqrt(kB*t/(mass*AtomicMassUnit));
 	}
 };
 
