@@ -22,7 +22,7 @@ void CrossSection::breit_wigner(double (&energy_bins)[NBINS_E], double (&crossse
 	}
 }
 
-void CrossSection::maxwell_boltzmann(double (&velocity_bins)[NBINS_V], double (&vdist_bins)[NBINS_V], vector<double> &params, double mass){
+void CrossSection::maxwell_boltzmann(double (&energy_bins)[NBINS_E], double (&velocity_bins)[NBINS_V], double (&vdist_bins)[NBINS_V], vector<double> &params, double mass){
 // Use the fact that the velocity distribution is symmetric and store only one half of the distribution
 
 // Implementation with equidistant velocity bins.
@@ -45,12 +45,12 @@ void CrossSection::maxwell_boltzmann(double (&velocity_bins)[NBINS_V], double (&
 
       	for(int i = 0; i < NBINS_V; ++i){
 		energy_ratio = energy_bins[i]/energy_bins[0];
-		velocity_bins[i] = (-2.+2.*energy_ratio*energy_ratio)/(2. + 2.*energy_ratio*energy_ratio);
+		velocity_bins[i] = (-2. + 2.*energy_ratio*energy_ratio)/(2. + 2.*energy_ratio*energy_ratio);
               	vdist_bins[i] = c1*exp(c2*velocity_bins[i]*velocity_bins[i]);
       	}
 }
 
-void CrossSection::maxwell_boltzmann_debye(double (&velocity_bins)[NBINS_V], double (&vdist_bins)[NBINS_V], vector<double> &params, double mass){
+void CrossSection::maxwell_boltzmann_debye(double (&energy_bins)[NBINS_E], double (&velocity_bins)[NBINS_V], double (&vdist_bins)[NBINS_V], vector<double> &params, double mass){
 	;
 }
 

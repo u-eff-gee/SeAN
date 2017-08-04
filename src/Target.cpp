@@ -30,14 +30,14 @@ void Target::plotCrossSection(double (&energy_bins)[NBINS_E]){
 	delete canvas;
 }
 
-void Target::calculateVelocityDistribution(double (&velocity_bins)[NBINS_V]){
+void Target::calculateVelocityDistribution(double (&energy_bins)[NBINS_E], double (&velocity_bins)[NBINS_V]){
 	if(vDist_ID == "absolute_zero"){
 		for(int i = 0; i < NBINS_E; ++i){
 			dopplercs_bins[i] = crosssection_bins[i];
 		}
 	}
 	if(vDist_ID == "maxwell_boltzmann"){
-		crossSection->maxwell_boltzmann(velocity_bins, vdist_bins, vDistParams, mass);
+		crossSection->maxwell_boltzmann(energy_bins, velocity_bins, vdist_bins, vDistParams, mass);
 	}
 //	if(vDist_ID == "maxwell_boltzmann_debye"){
 //		crossSection->maxwell_boltzmann_debye(velocity_bins, vdist_bins, vDistParams);

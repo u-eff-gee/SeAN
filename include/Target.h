@@ -65,8 +65,8 @@ public:
 
 	// Functions to calculate histograms
 	void calculateCrossSection(double (&energy_bins)[NBINS_E]);
-	void calculateVelocityDistribution(double (&velocity_bins)[NBINS_V]);
-	void calculateDopplerShift();
+	void calculateVelocityDistribution(double (&energy_bins)[NBINS_E], double (&velocity_bins)[NBINS_V]);
+	void calculateDopplerShift(double (&energy_bins)[NBINS_E], double (&velocity_bins)[NBINS_V]);
 
 	// Functions to plot histograms
 	void plotCrossSection(double (&energy_bins)[NBINS_E]);

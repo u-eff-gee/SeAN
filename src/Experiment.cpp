@@ -185,7 +185,7 @@ void Experiment::createEnergyBins(double emin, double emax){
 void Experiment::crossSections(){
 	for(unsigned int i = 0; i < targets.size(); ++i){
 		targets[i]->calculateCrossSection(energy_bins);
-		targets[i]->calculateVelocityDistribution(velocity_bins);
+		targets[i]->calculateVelocityDistribution(energy_bins, velocity_bins);
 		targets[i]->calculateDopplerShift(velocity_bins, energy_bins);
 
 		targets[i]->plotCrossSection(energy_bins);

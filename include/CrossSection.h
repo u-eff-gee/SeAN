@@ -22,9 +22,9 @@ public:
 
 	void breit_wigner(double (&energy_bins)[NBINS_E], double (&crosssection_bins)[NBINS_V], vector<double> &e0_list, vector<double> &gamma0_list, vector<double> &gamma_list, vector<double> &jj_list, double j0);
 
-	void maxwell_boltzmann(double (&velocity_bins)[NBINS_V], double (&vdist_bins)[NBINS_V], vector<double> &params, double mass);
+	void maxwell_boltzmann(double (&energy_bins)[NBINS_E], double (&velocity_bins)[NBINS_V], double (&vdist_bins)[NBINS_V], vector<double> &params, double mass);
 
-	void maxwell_boltzmann_debye(double (&velocity_bins)[NBINS_V], double (&vdist_bins)[NBINS_E], vector<double> &params, double mass);
+	void maxwell_boltzmann_debye(double (&energy_bins)[NBINS_E], double (&velocity_bins)[NBINS_V], double (&vdist_bins)[NBINS_E], vector<double> &params, double mass);
 
 	void dopplershift(double (&dopplercs_bins)[NBINS_E], double (&energy_bins)[NBINS_E], double (&crosssection_bins)[NBINS_V], double (&velocity_bins)[NBINS_V], double (&vdist_bins)[NBINS_E]);
 
