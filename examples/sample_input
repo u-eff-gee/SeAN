@@ -1,5 +1,5 @@
 # Minimum and maximum energy for the calculation in eV
-3.56258e6, 3.56318e6
+3.56278e6, 3.56298e6
 # Primary beam intensity distribution
 const, 1.0
 # 0) Identifier of the target (string)

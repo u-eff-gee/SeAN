@@ -176,20 +176,20 @@ void Experiment::readInputFile(const char* filename){
 }
 
 void Experiment::createEnergyBins(double emin, double emax){
-	double delta_e = (emax - emin)/NBINS_E;
+	double delta_e = (emax - emin)/NBINS;
 
-	for(int i = 0; i < NBINS_E; ++i)
+	for(int i = 0; i < NBINS; ++i)
 		energy_bins[i] = emin + i*delta_e;
 };
 
 void Experiment::crossSections(){
 	for(unsigned int i = 0; i < targets.size(); ++i){
 		targets[i]->calculateCrossSection(energy_bins);
-		targets[i]->calculateVelocityDistribution(energy_bins, velocity_bins);
-		targets[i]->calculateDopplerShift(velocity_bins, energy_bins);
+		targets[i]->calculateVelocityDistribution(energy_bins);
+		targets[i]->calculateDopplerShift(energy_bins);
 
 		targets[i]->plotCrossSection(energy_bins);
-		targets[i]->plotVelocityDistribution(velocity_bins);
+		targets[i]->plotVelocityDistribution();
 	}
 };
 

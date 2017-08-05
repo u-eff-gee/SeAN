@@ -20,12 +20,13 @@ private:
 
 	CrossSection *crossSection;
 
-	double incident_beam_bins[NBINS_E] = {1.};
-	double crosssection_bins[NBINS_E] = {0.};
-	double dopplercs_bins[NBINS_E] = {0.};
-	double vdist_bins[NBINS_V] = {0.};
-	double massattenuation_bins[NBINS_E] = {0.};
-	double transmitted_beam_bins[NBINS_E] = {0.};
+	double incident_beam_bins[NBINS] = {1.};
+	double crosssection_bins[NBINS] = {0.};
+	vector< vector<double> > velocity_bins;
+	vector< vector<double> > vdist_bins;
+	double dopplercs_bins[NBINS] = {0.};
+	double massattenuation_bins[NBINS] = {0.};
+	double transmitted_beam_bins[NBINS] = {0.};
 
 	string target_name;
 	string vDist_ID;
@@ -64,13 +65,13 @@ public:
 	void print();
 
 	// Functions to calculate histograms
-	void calculateCrossSection(double (&energy_bins)[NBINS_E]);
-	void calculateVelocityDistribution(double (&energy_bins)[NBINS_E], double (&velocity_bins)[NBINS_V]);
-	void calculateDopplerShift(double (&energy_bins)[NBINS_E], double (&velocity_bins)[NBINS_V]);
+	void calculateCrossSection(double (&energy_bins)[NBINS]);
+	void calculateVelocityDistribution(double (&energy_bins)[NBINS]);
+	void calculateDopplerShift(double (&energy_bins)[NBINS]);
 
 	// Functions to plot histograms
-	void plotCrossSection(double (&energy_bins)[NBINS_E]);
-	void plotVelocityDistribution(double (&velocity_bins)[NBINS_V]);
+	void plotCrossSection(double (&energy_bins)[NBINS]);
+	void plotVelocityDistribution();
 };
 
 #endif

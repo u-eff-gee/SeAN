@@ -12,3 +12,6 @@ sean
 
 # Plot output files
 *.pdf
+
+# valgrind output
+*.out.*

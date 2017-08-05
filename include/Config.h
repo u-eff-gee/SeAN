@@ -26,10 +26,8 @@
 // Definition of parameters for the calculation
 //************************************
 
-// Number of bins on the energy axis
-#define NBINS_E 1000
-// Number of bins on the velocity axis
-#define NBINS_V 1000
+// Number of bins for the calculation
+#define NBINS 100
 
 //************************************
 // Definitions of physical constants
