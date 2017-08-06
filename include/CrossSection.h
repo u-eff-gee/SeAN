@@ -20,17 +20,19 @@ public:
 	
 	~CrossSection(){};
 
-	void breit_wigner(double (&energy_bins)[NBINS], double (&crosssection_bins)[NBINS], vector<double> &e0_list, vector<double> &gamma0_list, vector<double> &gamma_list, vector<double> &jj_list, double j0);
+	void breit_wigner(double (&energy_bins)[NBINS], vector<double> (&crosssection_bins), double e0, double gamma0, double gamma, double jj, double j0);
 
 	void maxwell_boltzmann(double (&energy_bins)[NBINS], vector<double> &velocity_bins, vector<double> &vdist_bins, vector<double> &params, double mass, double e0);
 
 	void maxwell_boltzmann_debye(double (&energy_bins)[NBINS], vector<double> &velocity_bins, vector<double> &vdist_bins, vector<double> &params, double mass, double e0);
 
-	void dopplershift(double (&dopplercs_bins)[NBINS], double (&energy_bins)[NBINS], double (&crosssection_bins)[NBINS], vector<double> &velocity_bins, vector<double> &vdist_bins);
+	void dopplershift(double (&dopplercs_bins)[NBINS], double (&energy_bins)[NBINS], vector< vector <double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &vdist_norm);
 
-	void plot_crosssection(double (&energies)[NBINS], double (&crosssection)[NBINS], string title, TCanvas* canvas, TLegend* legend, string legend_entry, bool add_to_existing_canvas);
+	void plot_crosssection(double (&energies)[NBINS], vector< vector<double> > &crosssection, string title, TCanvas* canvas, TLegend* legend, string legend_entry);
 
-	void plot_vdist(vector<double> &velocity_bins, vector<double> &vdist_bins, string title, TCanvas* canvas, TLegend* legend, string legend_entry, bool add_to_existing_canvas);
+	void plot_vdist(vector<double> &velocity_bins, vector<double> &vdist_bins, string title, TCanvas* canvas, TLegend* legend, string legend_entry);
+
+	void plot_dopplershift(double (&energy_bins)[NBINS], vector< vector<double> > &crosssection_bins, double (&dopplercs_bins)[NBINS], string title, TCanvas* canvas, TLegend* legend, string legend_entry);
 
 private:
 	double eGamma(double energy, double velocity){
@@ -39,22 +41,6 @@ private:
 
 	double delta(double t, double mass){
 		return sqrt(kB*t/(mass*AtomicMassUnit));
-	}
-
-	// Binary search to find the bin that corresponds to a given floating-point value
-	unsigned int get_bin(double d, double (&array)[NBINS]){
-		int start = 0;
-		int stop = NBINS - 1;
-
-		while(start != stop){
-			if(array[stop/2] < d){
-				stop = start;
-			} else{
-				start = stop/2;
-			}
-		}
-
-		return start;
 	}
 };
 

@@ -12,18 +12,20 @@ using std::vector;
 
 class Target{
 private:
+	vector< vector<double> > crosssection_bins;
+	vector< vector<double> > velocity_bins;
+	vector< vector<double> > vdist_bins;
+
 	vector<double> e0_list;
 	vector<double> gamma0_list;
 	vector<double> gamma_list;
 	vector<double> jj_list;
 	vector<double> vDistParams;
+	vector<double> vdist_norm;
 
 	CrossSection *crossSection;
 
 	double incident_beam_bins[NBINS] = {1.};
-	double crosssection_bins[NBINS] = {0.};
-	vector< vector<double> > velocity_bins;
-	vector< vector<double> > vdist_bins;
 	double dopplercs_bins[NBINS] = {0.};
 	double massattenuation_bins[NBINS] = {0.};
 	double transmitted_beam_bins[NBINS] = {0.};
@@ -72,6 +74,10 @@ public:
 	// Functions to plot histograms
 	void plotCrossSection(double (&energy_bins)[NBINS]);
 	void plotVelocityDistribution();
+	void plotDopplerShift(double (&energy_bins)[NBINS]);
+
+	// Debug functions
+	double normalizeVDist(int i);
 };
 
 #endif

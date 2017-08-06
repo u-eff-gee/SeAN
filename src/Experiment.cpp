@@ -190,6 +190,7 @@ void Experiment::crossSections(){
 
 		targets[i]->plotCrossSection(energy_bins);
 		targets[i]->plotVelocityDistribution();
+		targets[i]->plotDopplerShift(energy_bins);
 	}
 };
 
