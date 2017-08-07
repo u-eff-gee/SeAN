@@ -51,4 +51,5 @@ int main(int argc, char* argv[]){
 	experiment.readInputFile(arguments.inputfile);
 	experiment.print();
 	experiment.crossSections();
+	experiment.absorption();
 }

@@ -5,12 +5,12 @@ EXE=sean
 
 CC=g++
 CFLAGS=-g -Wall -Wconversion -I$(INCDIR)
-ROOTFLAGS=`root-config --cflags --glibs`
+ROOTFLAGS=`root-config --cflags --glibs` -lMathMore
 
-_DEPS = Experiment.h Config.h CrossSection.h Target.h
+_DEPS = Experiment.h Config.h CrossSection.h Target.h Absorption.h
 DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))
 
-_OBJ = Experiment.o main.o CrossSection.o Target.o
+_OBJ = Experiment.o main.o CrossSection.o Target.o Absorption.o
 OBJ = $(patsubst %,$(OBJDIR)/%,$(_OBJ))
 #
 #$(OBJDIR)/%.o: $(SRCDIR)/%.cpp $(DEPS)

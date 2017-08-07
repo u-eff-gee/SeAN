@@ -9,7 +9,6 @@
 
 using std::cout;
 using std::endl;
-using std::stringstream;
 using std::upper_bound;
 using std::max_element;
 
@@ -52,6 +51,48 @@ void CrossSection::dopplershift(double (&dopplercs_bins)[NBINS], double (&energy
 			for(int k = 0; k < NBINS - 1; ++k){
 				dopplercs_bins[j] += vdist_norm[i]*vdist_bins[i][k]*crosssection_bins[i][j + resonance_position - k]*(velocity_bins[i][k + 1] - velocity_bins[i][k]);
 			}
+		}
+	}
+}
+
+void CrossSection::maxwell_boltzmann_approximation(double (&dopplercs_bins)[NBINS], double (&energy_bins)[NBINS], vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &e0_list, vector<double> &gamma0_list, vector<double> &gamma_list, vector<double> &jj_list, double j0, vector<double> &params, double mass){
+
+// Calculate velocity distribution as in maxwell_boltzmann
+
+	for(unsigned int i = 0; i < e0_list.size(); ++i){
+		velocity_bins.push_back(vector<double> (NBINS));
+		vdist_bins.push_back(vector<double> (NBINS));
+		double c1 = sqrt(mass*AtomicMassUnit/(2*PI*kB*params[0]));
+		double c2 = -1./pow(delta(params[0], mass), 2);
+		double energy_ratio = 1.;
+
+		// Find bin of resonance energy
+		long int resonance_position = upper_bound(energy_bins, energy_bins + NBINS, e0_list[i]) - energy_bins;
+
+		for(int j = 0; j < NBINS; ++j){
+			energy_ratio = energy_bins[j]/energy_bins[resonance_position];
+			velocity_bins[i][j] = (-2. + 2.*energy_ratio*energy_ratio)/(2. + 2.*energy_ratio*energy_ratio);
+			vdist_bins[i][j] = c1*exp(c2*velocity_bins[i][j]*velocity_bins[i][j]);
+		}
+	}
+
+// Calculate doppler-shifted cross section directly
+
+	for(unsigned int i = 0; i < e0_list.size(); ++i){
+		double doppler_width = sqrt(2.*kB*params[0]/(mass*AtomicMassUnit))*e0_list[i];
+
+		if(gamma_list[i]/doppler_width > APPROXIMATION_LIMIT){
+			cout << "> Warning: CrossSection.cpp: maxwell_approximation(): Gamma/Delta = " << gamma_list[i]/doppler_width << " > " << APPROXIMATION_LIMIT << ", the applicability of the approximation for the doppler-shifted cross section may not be good." << endl;
+			cout << "\tE0 = " << e0_list[i] << " eV" << endl;
+			cout << "\tGAMMA = " << gamma_list[i] << " eV" << endl;
+			cout << "\tMASS = " << mass << " u" << endl;
+			cout << "\tTEFF= " << params[0] << " K" << endl;
+		}
+
+		double cs_max = 2.*PI*HBARC2/(e0_list[i]*e0_list[i])*(2.*jj_list[i] + 1.)/(2. * j0 + 1.)*gamma0_list[i]/gamma_list[i]*sqrt(PI)/(2.*doppler_width/gamma_list[i]);
+		
+		for(int j = 0; j < NBINS; ++j){
+			dopplercs_bins[j] += cs_max*exp(-(energy_bins[j] - e0_list[i])*(energy_bins[j] - e0_list[i])/(doppler_width*doppler_width));
 		}
 	}
 }

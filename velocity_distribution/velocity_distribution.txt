@@ -2,5 +2,7 @@
 absolute_zero
 # Maxwell-Boltzmann distribution with effective temperature
 maxwell_boltzmann, Teff
+# Same as above, but using the analytical approximation for the doppler-shifted cross section, which is valid for Gamma/Delta << 1
+maxwell_boltzmann_approximation, Teff
 # Maxwell-Boltzmann distribution, where the effective temperature is calculate from the Debye approximation
 maxwell_boltzmann_debye, TD

@@ -17,9 +17,10 @@ void Experiment::readInputFile(const char* filename){
 
 	ifstream ifile(filename);
 
-        if(!ifile.is_open())
-                cout << "Error: ReadInputFile.cc: readInputFile(): File '" << filename << "' not found." << endl;
-
+        if(!ifile.is_open()){
+                cout << "Error: Experiment.cc: readInputFile(): File '" << filename << "' not found." << endl;
+		abort();
+	}
         cout << "> Reading input file '" << filename << "'" << endl;
 
         string line;
@@ -193,6 +194,15 @@ void Experiment::crossSections(){
 		targets[i]->plotDopplerShift(energy_bins);
 	}
 };
+
+void Experiment::absorption(){
+	for(unsigned int i = 0; i < targets.size(); ++i){
+		targets[i]->calculateMassAttenuation(energy_bins);
+
+		targets[i]->plotMassAttenuation(energy_bins);
+		targets[i]->plotMu();
+	}
+}
 
 void Experiment::print(){
 	cout << "INPUT FILE '" << ifname << "'" << endl;

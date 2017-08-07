@@ -24,6 +24,8 @@ public:
 
 	void maxwell_boltzmann(double (&energy_bins)[NBINS], vector<double> &velocity_bins, vector<double> &vdist_bins, vector<double> &params, double mass, double e0);
 
+	void maxwell_boltzmann_approximation(double (&dopplercs_bins)[NBINS], double (&energy_bins)[NBINS], vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &e0_list, vector<double> &gamma0_list, vector<double> &gamma_list, vector<double> &jj_list, double j0, vector<double> &params, double mass);
+
 	void maxwell_boltzmann_debye(double (&energy_bins)[NBINS], vector<double> &velocity_bins, vector<double> &vdist_bins, vector<double> &params, double mass, double e0);
 
 	void dopplershift(double (&dopplercs_bins)[NBINS], double (&energy_bins)[NBINS], vector< vector <double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &vdist_norm);

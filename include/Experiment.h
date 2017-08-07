@@ -27,6 +27,7 @@ public:
 
 	void readInputFile(const char* filename);
 	void crossSections();
+	void absorption();
 	void print();
 
 private:

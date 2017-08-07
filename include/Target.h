@@ -6,6 +6,7 @@
 
 #include "Config.h"
 #include "CrossSection.h"
+#include "Absorption.h"
 
 using std::string;
 using std::vector;
@@ -24,6 +25,7 @@ private:
 	vector<double> vdist_norm;
 
 	CrossSection *crossSection;
+	Absorption *absorption;
 
 	double incident_beam_bins[NBINS] = {1.};
 	double dopplercs_bins[NBINS] = {0.};
@@ -45,6 +47,7 @@ public:
 		target_number = number;
 
 		crossSection = new CrossSection();
+		absorption = new Absorption();
 	};
 	
 	~Target(){
@@ -70,13 +73,16 @@ public:
 	void calculateCrossSection(double (&energy_bins)[NBINS]);
 	void calculateVelocityDistribution(double (&energy_bins)[NBINS]);
 	void calculateDopplerShift(double (&energy_bins)[NBINS]);
+	void calculateMassAttenuation(double (&energy_bins)[NBINS]);
 
 	// Functions to plot histograms
 	void plotCrossSection(double (&energy_bins)[NBINS]);
 	void plotVelocityDistribution();
 	void plotDopplerShift(double (&energy_bins)[NBINS]);
+	void plotMassAttenuation(double (&energy_bins)[NBINS]);
+	void plotMu();
 
-	// Debug functions
+private:
 	double normalizeVDist(int i);
 };
 

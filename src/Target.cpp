@@ -51,6 +51,11 @@ void Target::calculateVelocityDistribution(double (&energy_bins)[NBINS]){
 			vdist_norm.push_back(normalizeVDist(i));
 		}
 	}
+
+	if(vDist_ID == "maxwell_boltzmann_approximation"){
+		crossSection->maxwell_boltzmann_approximation(dopplercs_bins, energy_bins, velocity_bins, vdist_bins, e0_list, gamma0_list, gamma0_list, jj_list, j0, vDistParams, mass);
+	}
+
 //	if(vDist_ID == "maxwell_boltzmann_debye"){
 //		crossSection->maxwell_boltzmann_debye(velocity_bins, vdist_bins, vDistParams);
 //	}
@@ -90,8 +95,54 @@ void Target::plotDopplerShift(double (&energy_bins)[NBINS]){
 	
 }
 
+void Target::plotMassAttenuation(double (&energy_bins)[NBINS]){
+
+	stringstream filename;
+	filename << target_name << "_mass_attenuation.pdf";
+	stringstream canvasname;
+	canvasname << target_name << "_canvas";
+	TCanvas *canvas = new TCanvas(canvasname.str().c_str(), target_name.c_str(), 0, 0, 800, 500);
+	TLegend *legend = new TLegend(MU_PLOT_LEGEND_X1, MU_PLOT_LEGEND_Y1, MU_PLOT_LEGEND_X2, MU_PLOT_LEGEND_Y2);
+
+	absorption->plot_massattenuation(energy_bins, massattenuation_bins, target_name, canvas, legend, "Mass attenuation coefficient");
+
+	legend->Draw();
+	canvas->SaveAs(filename.str().c_str());
+	delete canvas;
+	
+}
+
+void Target::plotMu(){
+
+	stringstream filename;
+	filename << target_name << "_mu.pdf";
+	stringstream canvasname;
+	canvasname << target_name << "_canvas";
+	TCanvas *canvas = new TCanvas(canvasname.str().c_str(), target_name.c_str(), 0, 0, 800, 500);
+	TLegend *legend = new TLegend(MU_PLOT_LEGEND_X1, MU_PLOT_LEGEND_Y1, MU_PLOT_LEGEND_X2, MU_PLOT_LEGEND_Y2);
+
+	canvas->SetLogx();
+	canvas->SetLogy();
+
+	absorption->plot_total_massattenuation(target_name, canvas, legend, "Mass attenuation #mu");
+
+	legend->Draw();
+	canvas->SaveAs(filename.str().c_str());
+	delete canvas;
+	
+}
+
 void Target::calculateDopplerShift(double (&energy_bins)[NBINS]){
-	crossSection->dopplershift(dopplercs_bins, energy_bins, crosssection_bins, velocity_bins, vdist_bins, vdist_norm);
+	if(vDist_ID != "maxwell_boltzmann_approximation"){
+		crossSection->dopplershift(dopplercs_bins, energy_bins, crosssection_bins, velocity_bins, vdist_bins, vdist_norm);
+	}
+}
+
+void Target::calculateMassAttenuation(double (&energy_bins)[NBINS]){
+	if(massAttenuation_ID == "0"){
+	;} else{
+		absorption->read_massattenuation_NIST(energy_bins, massattenuation_bins, massAttenuation_ID, mass);
+	}
 }
 
 void Target::print(){
@@ -119,6 +170,7 @@ void Target::print(){
 	cout << "MASS ATTENUATION = " << massAttenuation_ID << endl;
 	cout << "TARGET THICKNESS = " << z << " atoms / fm^2" << endl;
 }
+
 
 double Target::normalizeVDist(int i){
 

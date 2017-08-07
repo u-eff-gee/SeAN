@@ -1,0 +1,140 @@
+# Unit test for the calculation of the doppler-shifted cross section.
+# The performance of the numerical algorithm vs. the analytical approximation is tested for different ratios of Gamma and Delta. 
+# For Gamma/Delta << 1, the analytical expression is a good approximation, and the numerical algorithm should give the same result.
+# The output file names contain the effective temperature that was used in the calculation, and the ratio Gamma/Delta.
+# Minimum and maximum energy for the calculation in eV
+4.999990e6, 5.000010e6
+# Primary beam intensity distribution
+const, 1.0
+# 0) Identifier of the target (string)
+CrossSection_Test_10K_0.74_Analytic
+# 1) Resonance energies in eV (comma separated values)
+5.e6
+# 2) Transition widths to the ground state in eV (comma separated values)
+0.5
+# 3) Total transition widths in eV (comma separated values)
+0.5
+# 4) Angular momentum of the ground state
+0
+# 5) Angular momenta of the excited states (comma separated values)
+1
+# 6) Model for velocity distribution
+maxwell_boltzmann_approximation, 10.
+# 7) Nuclear mass in atomic mass units
+100.
+# 8) Mass attenuation coefficient
+Ce
+# 9) Target thickness in atoms/fm^2
+0.0001
+#
+#############################################
+# 0) Identifier of the target (string)
+CrossSection_Test_10K_0.74_Numerical
+# 1) Resonance energies in eV (comma separated values)
+5.e6
+# 2) Transition widths to the ground state in eV (comma separated values)
+0.5
+# 3) Total transition widths in eV (comma separated values)
+0.5
+# 4) Angular momentum of the ground state
+0
+# 5) Angular momenta of the excited states (comma separated values)
+1
+# 6) Model for velocity distribution
+maxwell_boltzmann, 10.
+# 7) Nuclear mass in atomic mass units
+100.
+# 8) Mass attenuation coefficient
+0
+# 9) Target thickness in atoms/fm^2
+0.0001
+#
+#############################################
+# 0) Identifier of the target (string)
+CrossSection_Test_500K_0.10_Analytic
+# 1) Resonance energies in eV (comma separated values)
+5.e6
+# 2) Transition widths to the ground state in eV (comma separated values)
+0.5
+# 3) Total transition widths in eV (comma separated values)
+0.5
+# 4) Angular momentum of the ground state
+0
+# 5) Angular momenta of the excited states (comma separated values)
+1
+# 6) Model for velocity distribution
+maxwell_boltzmann_approximation, 500.
+# 7) Nuclear mass in atomic mass units
+100.
+# 8) Mass attenuation coefficient
+0
+# 9) Target thickness in atoms/fm^2
+0.0001
+#
+#############################################
+# 0) Identifier of the target (string)
+CrossSection_Test_500K_0.10_Numerical
+# 1) Resonance energies in eV (comma separated values)
+5.e6
+# 2) Transition widths to the ground state in eV (comma separated values)
+0.5
+# 3) Total transition widths in eV (comma separated values)
+0.5
+# 4) Angular momentum of the ground state
+0
+# 5) Angular momenta of the excited states (comma separated values)
+1
+# 6) Model for velocity distribution
+maxwell_boltzmann, 500.
+# 7) Nuclear mass in atomic mass units
+100.
+# 8) Mass attenuation coefficient
+0
+# 9) Target thickness in atoms/fm^2
+0.0001
+#
+#############################################
+# 0) Identifier of the target (string)
+CrossSection_Test_2000K_0.052_Analytic
+# 1) Resonance energies in eV (comma separated values)
+5.e6
+# 2) Transition widths to the ground state in eV (comma separated values)
+0.5
+# 3) Total transition widths in eV (comma separated values)
+0.5
+# 4) Angular momentum of the ground state
+0
+# 5) Angular momenta of the excited states (comma separated values)
+1
+# 6) Model for velocity distribution
+maxwell_boltzmann_approximation, 2000.
+# 7) Nuclear mass in atomic mass units
+100.
+# 8) Mass attenuation coefficient
+0
+# 9) Target thickness in atoms/fm^2
+0.0001
+#
+#############################################
+# 0) Identifier of the target (string)
+CrossSection_Test_2000K_0.052_Numerical
+# 1) Resonance energies in eV (comma separated values)
+5.e6
+# 2) Transition widths to the ground state in eV (comma separated values)
+0.5
+# 3) Total transition widths in eV (comma separated values)
+0.5
+# 4) Angular momentum of the ground state
+0
+# 5) Angular momenta of the excited states (comma separated values)
+1
+# 6) Model for velocity distribution
+maxwell_boltzmann, 2000.
+# 7) Nuclear mass in atomic mass units
+100.
+# 8) Mass attenuation coefficient
+0
+# 9) Target thickness in atoms/fm^2
+0.0001
+#
+#############################################
