@@ -4,6 +4,10 @@
 #include <fstream>
 #include <iostream>
 
+#include "TGraph2D.h"
+#include "TH2D.h"
+#include "TStyle.h"
+
 using std::stringstream;
 using std::ifstream;
 using std::cout;
@@ -55,6 +59,32 @@ void Absorption::read_massattenuation_NIST(double (&energy_bins)[NBINS], double 
 	}
 }
 
+void Absorption::const_beam(double (&energy_bins)[NBINS], double (&incident_beam_bins)[NBINS], vector<double> beamParams){
+
+	for(int i = 0; i < NBINS; ++i)
+		incident_beam_bins[i] = beamParams[0];	
+
+}
+
+void Absorption::gauss_beam(double (&energy_bins)[NBINS], double (&incident_beam_bins)[NBINS], vector<double> beamParams){
+
+	double c1 = beamParams[2]/sqrt(2.*PI*beamParams[1]*beamParams[1]);
+	double c2 = -1./(2.*beamParams[1]*beamParams[1]);
+
+	for(int i = 0; i < NBINS; ++i)
+		incident_beam_bins[i] = c1*exp((energy_bins[i] - beamParams[0])*(energy_bins[i] - beamParams[0])*c2);
+
+}
+
+void Absorption::photon_flux_density(double (&dopplercs_bins)[NBINS], double (&massattenuation_bins)[NBINS], double (&z_bins)[NBINS_Z], double (&photon_flux_density_bins)[NBINS][NBINS_Z]){
+
+	for(int i = 0; i < NBINS; ++i){
+		for(int j = 0; j < NBINS_Z; ++j){
+			photon_flux_density_bins[i][j] = exp(-(dopplercs_bins[i] + massattenuation_bins[i])*z_bins[j]);
+		}
+	}
+}
+
 void Absorption::plot_massattenuation(double (&energy_bins)[NBINS], double (&massattenuation_bins)[NBINS], string title, TCanvas *canvas, TLegend* legend, string legend_entry){
 
 	TGraph *graph = new TGraph(NBINS, energy_bins, massattenuation_bins);
@@ -81,3 +111,29 @@ void Absorption::plot_total_massattenuation(string title, TCanvas *canvas, TLege
 
 }
 
+void Absorption::plot_photon_flux_density(double (&energy_bins)[NBINS], double (&z_bins)[NBINS_Z], double (&photon_flux_density_bins)[NBINS][NBINS_Z], string title, TCanvas *canvas, TLegend* legend, string legend_entry){
+	TGraph2D *graph = new TGraph2D(NBINS*NBINS_Z);	
+
+	int npoint = 0;
+	for(int i = 0; i < NBINS; ++i){
+		for(int j = 0; j < NBINS_Z; ++j){
+			graph->SetPoint(npoint, energy_bins[i], z_bins[j], photon_flux_density_bins[i][j]);
+			++npoint;
+		}
+	}
+
+	graph->SetName(title.c_str());
+	graph->SetTitle(title.c_str());
+	graph->GetHistogram()->GetXaxis()->SetTitle("Energy / eV");
+	graph->GetHistogram()->GetXaxis()->SetTitleOffset(2.);
+	graph->GetHistogram()->GetYaxis()->SetTitle("z / atoms/fm^{2}");
+	graph->GetHistogram()->GetYaxis()->SetTitleOffset(2.);
+	graph->GetHistogram()->GetZaxis()->SetTitle("#Phi (E, z)");
+	gStyle->SetPalette(55);
+	graph->Draw("surf1");
+
+	canvas->SetTheta(45.);
+	canvas->SetPhi(200.);
+
+	legend->AddEntry(graph->GetName(), legend_entry.c_str(), "l");
+}

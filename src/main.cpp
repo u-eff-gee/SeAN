@@ -1,11 +1,14 @@
 #include <iostream>
 #include <argp.h>
+#include <ctime>
+#include <chrono>
 
 #include "Experiment.h"
 #include "Config.h"
 
 using std::cout;
 using std::endl;
+using namespace std::chrono;
 
 //const char *sean_program_version = "SeAN 0.0.0";
 //const char *sean_program_bug_address = "<ugayer@ikp.tu-darmstadt.de>";
@@ -46,10 +49,16 @@ int main(int argc, char* argv[]){
 	struct arguments arguments;
 	argp_parse(&argp, argc, argv, 0, 0, &arguments);
 
+	high_resolution_clock::time_point start = high_resolution_clock::now();
+
 	Experiment experiment;
 
 	experiment.readInputFile(arguments.inputfile);
 	experiment.print();
 	experiment.crossSections();
-	experiment.absorption();
+	experiment.transmission();
+
+	high_resolution_clock::time_point stop = high_resolution_clock::now();
+	duration<double> delta_t = duration_cast< duration<double>>(stop - start);
+	cout << "> main.cpp: Execution took " << delta_t.count() << " seconds" << endl;
 }

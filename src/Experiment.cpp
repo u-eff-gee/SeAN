@@ -195,12 +195,16 @@ void Experiment::crossSections(){
 	}
 };
 
-void Experiment::absorption(){
+void Experiment::transmission(){
+	targets[0]->calculateIncidentBeam(energy_bins, beam_ID, beamParams);
 	for(unsigned int i = 0; i < targets.size(); ++i){
 		targets[i]->calculateMassAttenuation(energy_bins);
+		targets[i]->calculateZBins();
+		targets[i]->calculatePhotonFluxDensity();
 
 		targets[i]->plotMassAttenuation(energy_bins);
 		targets[i]->plotMu();
+		targets[i]->plotPhotonFluxDensity(energy_bins);
 	}
 }
 

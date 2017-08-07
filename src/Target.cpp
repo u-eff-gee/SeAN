@@ -61,6 +61,41 @@ void Target::calculateVelocityDistribution(double (&energy_bins)[NBINS]){
 //	}
 }
 
+void Target::calculateIncidentBeam(double (&energy_bins)[NBINS], string beam_ID, vector<double> beamParams){
+	if(beam_ID == "const")
+		absorption->const_beam(energy_bins, incident_beam_bins, beamParams);
+
+	if(beam_ID == "gauss")
+		absorption->gauss_beam(energy_bins, incident_beam_bins, beamParams);
+}
+
+void Target::calculateZBins(){
+	
+	double delta_z = z/NBINS_Z;
+
+	for(int i = 0; i < NBINS_Z; ++i){
+		z_bins[i] = i*delta_z;
+	}
+}
+
+void Target::calculateDopplerShift(double (&energy_bins)[NBINS]){
+	if(vDist_ID != "maxwell_boltzmann_approximation"){
+		crossSection->dopplershift(dopplercs_bins, energy_bins, crosssection_bins, velocity_bins, vdist_bins, vdist_norm);
+	}
+}
+
+void Target::calculateMassAttenuation(double (&energy_bins)[NBINS]){
+	if(massAttenuation_ID == "0"){
+	;} else{
+		absorption->read_massattenuation_NIST(energy_bins, massattenuation_bins, massAttenuation_ID, mass);
+	}
+}
+
+
+void Target::calculatePhotonFluxDensity(){
+	absorption->photon_flux_density(dopplercs_bins, massattenuation_bins, z_bins, photon_flux_density_bins);
+}
+
 void Target::plotVelocityDistribution(){
 
 	stringstream filename;
@@ -132,17 +167,21 @@ void Target::plotMu(){
 	
 }
 
-void Target::calculateDopplerShift(double (&energy_bins)[NBINS]){
-	if(vDist_ID != "maxwell_boltzmann_approximation"){
-		crossSection->dopplershift(dopplercs_bins, energy_bins, crosssection_bins, velocity_bins, vdist_bins, vdist_norm);
-	}
-}
+void Target::plotPhotonFluxDensity(double (&energy_bins)[NBINS]){
 
-void Target::calculateMassAttenuation(double (&energy_bins)[NBINS]){
-	if(massAttenuation_ID == "0"){
-	;} else{
-		absorption->read_massattenuation_NIST(energy_bins, massattenuation_bins, massAttenuation_ID, mass);
-	}
+	stringstream filename;
+	filename << target_name << "_phi.pdf";
+	stringstream canvasname;
+	canvasname << target_name << "_canvas";
+	TCanvas *canvas = new TCanvas(canvasname.str().c_str(), target_name.c_str(), 0, 0, 800, 500);
+	TLegend *legend = new TLegend(MU_PLOT_LEGEND_X1, MU_PLOT_LEGEND_Y1, MU_PLOT_LEGEND_X2, MU_PLOT_LEGEND_Y2);
+
+	absorption->plot_photon_flux_density(energy_bins, z_bins, photon_flux_density_bins, target_name, canvas, legend, "Photon flux density #Phi");
+
+	legend->Draw();
+	canvas->SaveAs(filename.str().c_str());
+	delete canvas;
+	
 }
 
 void Target::print(){

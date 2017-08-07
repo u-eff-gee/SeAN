@@ -4,6 +4,8 @@
 #include <sstream>
 #include <algorithm>
 
+#include "omp.h"
+
 #include "TGraph.h"
 #include "TAxis.h"
 
@@ -47,6 +49,7 @@ void CrossSection::dopplershift(double (&dopplercs_bins)[NBINS], double (&energy
 	for(unsigned int i = 0; i < crosssection_bins.size(); ++i){
 		long int resonance_position = max_element(crosssection_bins[i].begin(), crosssection_bins[i].end()) - crosssection_bins[i].begin() + 1;
 
+		#pragma omp parallel for
 		for(int j = 0; j < NBINS; ++j){
 			for(int k = 0; k < NBINS - 1; ++k){
 				dopplercs_bins[j] += vdist_norm[i]*vdist_bins[i][k]*crosssection_bins[i][j + resonance_position - k]*(velocity_bins[i][k + 1] - velocity_bins[i][k]);

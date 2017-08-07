@@ -4,7 +4,7 @@ OBJDIR=obj
 EXE=sean
 
 CC=g++
-CFLAGS=-g -Wall -Wconversion -I$(INCDIR)
+CFLAGS=-g -Wall -Wconversion -I$(INCDIR) -fopenmp
 ROOTFLAGS=`root-config --cflags --glibs` -lMathMore
 
 _DEPS = Experiment.h Config.h CrossSection.h Target.h Absorption.h

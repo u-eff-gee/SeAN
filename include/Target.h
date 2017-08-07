@@ -27,10 +27,14 @@ private:
 	CrossSection *crossSection;
 	Absorption *absorption;
 
+	double photon_flux_density_bins[NBINS][NBINS_Z];
+
 	double incident_beam_bins[NBINS] = {1.};
 	double dopplercs_bins[NBINS] = {0.};
 	double massattenuation_bins[NBINS] = {0.};
+	double z_bins[NBINS_Z] = {0.};
 	double transmitted_beam_bins[NBINS] = {0.};
+
 
 	string target_name;
 	string vDist_ID;
@@ -74,6 +78,9 @@ public:
 	void calculateVelocityDistribution(double (&energy_bins)[NBINS]);
 	void calculateDopplerShift(double (&energy_bins)[NBINS]);
 	void calculateMassAttenuation(double (&energy_bins)[NBINS]);
+	void calculateIncidentBeam(double (&energy_bins)[NBINS], string beam_ID, vector<double> beamParams);
+	void calculateZBins();
+	void calculatePhotonFluxDensity();
 
 	// Functions to plot histograms
 	void plotCrossSection(double (&energy_bins)[NBINS]);
@@ -81,6 +88,7 @@ public:
 	void plotDopplerShift(double (&energy_bins)[NBINS]);
 	void plotMassAttenuation(double (&energy_bins)[NBINS]);
 	void plotMu();
+	void plotPhotonFluxDensity(double (&energy_bins)[NBINS]);
 
 private:
 	double normalizeVDist(int i);
