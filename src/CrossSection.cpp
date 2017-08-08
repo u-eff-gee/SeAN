@@ -120,7 +120,7 @@ void CrossSection::plot_crosssection(double (&energy_bins)[NBINS], vector< vecto
 	graph->SetName(title.c_str());
 	graph->SetTitle(title.c_str());
 	graph->GetXaxis()->SetTitle("Energy / eV");
-	graph->GetYaxis()->SetTitle("#sigma / fm^2");
+	graph->GetYaxis()->SetTitle("#sigma / fm^{2}");
 		
 	legend->AddEntry(graph->GetName(), legend_entry.c_str(), "l");
 	graph->Draw();

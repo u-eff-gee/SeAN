@@ -26,8 +26,8 @@ public:
 	~Experiment(){};
 
 	void readInputFile(const char* filename);
-	void crossSections();
-	void transmission();
+	void crossSections(bool plot);
+	void transmission(bool plot);
 	void print();
 
 private:

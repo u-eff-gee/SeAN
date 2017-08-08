@@ -91,9 +91,46 @@ void Target::calculateMassAttenuation(double (&energy_bins)[NBINS]){
 	}
 }
 
+void Target::setIncidentBeam(double &trans_beam_bins){
+	for(int i = 0; i < NBINS; ++i)
+		incident_beam_bins[i] = (&trans_beam_bins)[i];
+}
 
 void Target::calculatePhotonFluxDensity(){
-	absorption->photon_flux_density(dopplercs_bins, massattenuation_bins, z_bins, photon_flux_density_bins);
+	absorption->photon_flux_density(dopplercs_bins, massattenuation_bins, z_bins, incident_beam_bins, photon_flux_density_bins);
+}
+
+void Target::calculateTransmittedBeam(){
+	for(int i = 0; i < NBINS; ++i)
+		transmitted_beam_bins[i] = photon_flux_density_bins[i][NBINS_Z - 1];
+}
+
+void Target::calculateResonanceAbsorptionDensity(){
+	absorption->resonance_absorption_density(dopplercs_bins, photon_flux_density_bins, resonance_absorption_density_bins);
+}
+
+double Target::integrateEZHistogram(double (&energy_bins)[NBINS], double (&z_bins)[NBINS_Z], double (&ezhist)[NBINS][NBINS_Z]){
+
+	// Area of a bin in 2D plane
+	double bin_area = (energy_bins[1] - energy_bins[0])*(z_bins[1] - z_bins[0]);
+
+	// Crude implementation of the Riemann integral as a sum of bin contents times their dimension in energy- and z-direction. Since there are only NBINS-1 spaces between NBINS bins, leave out the last bin in each loop.
+	double integral = 0.;
+	for(int i = 0; i < NBINS - 1; ++i){
+		for(int j = 0; j < NBINS_Z - 1; ++j){
+			integral += bin_area*ezhist[i][j]; 
+		}
+	}
+
+	return integral;
+}
+
+void Target::calculateAbsorption(double (&energy_bins)[NBINS]){
+
+	double absorption = integrateEZHistogram(energy_bins, z_bins, resonance_absorption_density_bins);
+
+	cout << "TARGET #" << target_number << ": '" << target_name << "'" << endl;
+	cout << "INT ALPHA dE dZ = " << absorption << endl;
 }
 
 void Target::plotVelocityDistribution(){
@@ -177,6 +214,23 @@ void Target::plotPhotonFluxDensity(double (&energy_bins)[NBINS]){
 	TLegend *legend = new TLegend(MU_PLOT_LEGEND_X1, MU_PLOT_LEGEND_Y1, MU_PLOT_LEGEND_X2, MU_PLOT_LEGEND_Y2);
 
 	absorption->plot_photon_flux_density(energy_bins, z_bins, photon_flux_density_bins, target_name, canvas, legend, "Photon flux density #Phi");
+
+	legend->Draw();
+	canvas->SaveAs(filename.str().c_str());
+	delete canvas;
+	
+}
+
+void Target::plotResonanceAbsorptionDensity(double (&energy_bins)[NBINS]){
+
+	stringstream filename;
+	filename << target_name << "_alpha.pdf";
+	stringstream canvasname;
+	canvasname << target_name << "_canvas";
+	TCanvas *canvas = new TCanvas(canvasname.str().c_str(), target_name.c_str(), 0, 0, 800, 500);
+	TLegend *legend = new TLegend(MU_PLOT_LEGEND_X1, MU_PLOT_LEGEND_Y1, MU_PLOT_LEGEND_X2, MU_PLOT_LEGEND_Y2);
+
+	absorption->plot_resonance_absorption_density(energy_bins, z_bins, resonance_absorption_density_bins, target_name, canvas, legend, "Resonance absorption density #alpha");
 
 	legend->Draw();
 	canvas->SaveAs(filename.str().c_str());

@@ -183,28 +183,41 @@ void Experiment::createEnergyBins(double emin, double emax){
 		energy_bins[i] = emin + i*delta_e;
 };
 
-void Experiment::crossSections(){
+void Experiment::crossSections(bool plot){
 	for(unsigned int i = 0; i < targets.size(); ++i){
 		targets[i]->calculateCrossSection(energy_bins);
 		targets[i]->calculateVelocityDistribution(energy_bins);
 		targets[i]->calculateDopplerShift(energy_bins);
 
-		targets[i]->plotCrossSection(energy_bins);
-		targets[i]->plotVelocityDistribution();
-		targets[i]->plotDopplerShift(energy_bins);
+		if(plot){
+			targets[i]->plotCrossSection(energy_bins);
+			targets[i]->plotVelocityDistribution();
+			targets[i]->plotDopplerShift(energy_bins);
+		}
 	}
 };
 
-void Experiment::transmission(){
+void Experiment::transmission(bool plot){
 	targets[0]->calculateIncidentBeam(energy_bins, beam_ID, beamParams);
 	for(unsigned int i = 0; i < targets.size(); ++i){
 		targets[i]->calculateMassAttenuation(energy_bins);
 		targets[i]->calculateZBins();
+		if(i > 0){
+			targets[i]->setIncidentBeam(targets[i-1]->getTransmittedBeam());
+		}
 		targets[i]->calculatePhotonFluxDensity();
+		if(i == 0){
+			targets[i]->calculateTransmittedBeam();
+		}
+		targets[i]->calculateResonanceAbsorptionDensity();
+		targets[i]->calculateAbsorption(energy_bins);
 
-		targets[i]->plotMassAttenuation(energy_bins);
-		targets[i]->plotMu();
-		targets[i]->plotPhotonFluxDensity(energy_bins);
+		if(plot){
+			targets[i]->plotMassAttenuation(energy_bins);
+			targets[i]->plotMu();
+			targets[i]->plotPhotonFluxDensity(energy_bins);
+			targets[i]->plotResonanceAbsorptionDensity(energy_bins);
+		}
 	}
 }
 

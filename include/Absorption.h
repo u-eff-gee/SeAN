@@ -36,13 +36,17 @@ public:
 
 	void gauss_beam(double (&energy_bins)[NBINS], double (&incident_beam_bins)[NBINS], vector<double> beamParams);
 
-	void photon_flux_density(double (&dopplercs_bins)[NBINS], double (&massattenuation_bins)[NBINS], double (&z_bins)[NBINS_Z], double (&photon_flux_density_bins)[NBINS][NBINS_Z]);
+	void photon_flux_density(double (&dopplercs_bins)[NBINS], double (&massattenuation_bins)[NBINS], double (&z_bins)[NBINS_Z], double (&incident_beam_bins)[NBINS], double (&photon_flux_density_bins)[NBINS][NBINS_Z]);
+
+	void resonance_absorption_density(double (&dopplercs_bins)[NBINS], double (&photon_flux_density_bins)[NBINS][NBINS_Z], double (&resonance_absorption_density_bins)[NBINS][NBINS_Z]);
 
 	void plot_massattenuation(double (&energy_bins)[NBINS], double (&massattenuation_bins)[NBINS], string title, TCanvas *canvas, TLegend* legend, string legend_entry);
 
 	void plot_total_massattenuation(string title, TCanvas *canvas, TLegend* legend, string legend_entry);
 
 	void plot_photon_flux_density(double (&energy_bins)[NBINS], double (&z_bins)[NBINS_Z], double (&photon_flux_density_bins)[NBINS][NBINS_Z], string title, TCanvas *canvas, TLegend* legend, string legend_entry);
+
+	void plot_resonance_absorption_density(double (&energy_bins)[NBINS], double (&z_bins)[NBINS_Z], double (&resonance_absorption_density_bins)[NBINS][NBINS_Z], string title, TCanvas *canvas, TLegend* legend, string legend_entry);
 
 };
 

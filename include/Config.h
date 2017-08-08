@@ -84,4 +84,11 @@ const string NIST_SEPARATOR = "  ";
 #define MU_PLOT_LEGEND_Y1 0.8
 #define MU_PLOT_LEGEND_Y2 0.9
 
+// Maximum number of bins on the energy- und z-axis for plots of phi and alpha
+#define NBINS_PHI_MAX 100
+#define NBINS_Z_PHI_MAX 100
+
+#define NBINS_ALPHA_MAX 100
+#define NBINS_Z_ALPHA_MAX 100
+
 #endif
