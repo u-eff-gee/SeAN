@@ -32,7 +32,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
 
     switch (key) {
     case ARGP_KEY_ARG: arguments->inputfile = arg; break;
-    case 'p': arguments->plot = true; 
+    case 'p': arguments->plot = true; break;
     case ARGP_KEY_END:
         if(state->arg_num == 0) {
             argp_usage(state);
