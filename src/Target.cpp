@@ -122,7 +122,42 @@ double Target::integrateEZHistogram(double (&energy_bins)[NBINS], double (&z_bin
 		}
 	}
 
+	// Implementation that starts at the 1st and not the 0th bin to check the validity of this approximation
+//	double integral = 0.;
+//	for(int i = 1; i < NBINS; ++i){
+//		for(int j = 1; j < NBINS_Z; ++j){
+//			integral += bin_area*ezhist[i][j]; 
+//		}
+//	}
+
 	return integral;
+}
+
+void Target::test_integration(){
+	// Use photon_flux_density_bins to store a test function
+
+	cout << "> Integrating test function" << endl;
+
+	double en_bins[NBINS];
+	double zz_bins[NBINS_Z];
+	
+	double delta_e = 6./NBINS;
+	double delta_z = 6./NBINS_Z;
+
+	for(int i = 0; i < NBINS; ++i){
+		for(int j = 0; j < NBINS_Z; ++j){
+			en_bins[i] = i*delta_e - 3.;
+			zz_bins[j] = j*delta_z - 3.;
+			double energy = i*delta_e -3.;
+			double z = j*delta_z -3.;
+			photon_flux_density_bins[i][j] = exp(-(energy*energy + z*z));
+		}
+	}
+
+	double result = integrateEZHistogram(en_bins, zz_bins, photon_flux_density_bins);	
+
+	cout << "> Integration of test function yields " << result << endl;
+	cout << "\tExact result: 3.14145" << endl;
 }
 
 void Target::calculateAbsorption(double (&energy_bins)[NBINS]){

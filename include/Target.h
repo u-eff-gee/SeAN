@@ -102,6 +102,9 @@ public:
 	// Function to integrate over 2D histogram with the variables energy and z
 	double integrateEZHistogram(double (&energy_bins)[NBINS], double (&z_bins)[NBINS_Z], double (&ezhist)[NBINS][NBINS_Z]);
 
+	// Functions for testing
+	void test_integration();
+
 private:
 	double normalizeVDist(int i);
 };

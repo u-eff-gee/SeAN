@@ -1,0 +1,28 @@
+# Unit test for the numerical integration.
+# The code will integrate over a sum of 2D normal distributions with the expression:
+# gauss_2d(x, y) = c*exp(-(pow(x - x0, 2) + pow(y - y0, 2)/(2*sigma*sigma)))
+# Where the result can be calculated analytically
+# Minimum and maximum of x and y for the integration
+-3., 3.
+# Function to be integrated
+gauss_2d, 1.0
+# 0) Identifier of the target (string)
+Integration_Test
+# 1) Positions of the peaks (2*n numbers, where n is the number of peaks, since every peak has two coordinates)
+0., 1.
+# 2) Transition widths to the ground state in eV (comma separated values)
+1., 1.
+# 3) Total transition widths in eV (comma separated values)
+0.5, 0.5
+# 4) Angular momentum of the ground state
+0
+# 5) Angular momenta of the excited states (comma separated values)
+1
+# 6) Model for velocity distribution
+maxwell_boltzmann, 10.
+# 7) Nuclear mass in atomic mass units
+100.
+# 8) Mass attenuation coefficient
+0
+# 9) Target thickness in atoms/fm^2
+0.

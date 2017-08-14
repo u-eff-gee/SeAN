@@ -19,12 +19,14 @@ static char args_doc[] = "INPUTFILE";
 static struct argp_option options[] = {
   { 0, 'p', 0, 0, "Create plots of all calculated quantities" },
   { 0, 'o', 0, 0, "Create output files for all calculated quantities" },
+  { 0, 't', 0, 0, "Run tests" },
   { 0 }
 };
 
 struct arguments{
         char *inputfile;
 	bool plot = false;
+	bool test = false;
 };
 
 static error_t parse_opt(int key, char *arg, struct argp_state *state) {
@@ -33,6 +35,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     switch (key) {
     case ARGP_KEY_ARG: arguments->inputfile = arg; break;
     case 'p': arguments->plot = true; break;
+    case 't': arguments->test = true; break;
     case ARGP_KEY_END:
         if(state->arg_num == 0) {
             argp_usage(state);
@@ -57,12 +60,19 @@ int main(int argc, char* argv[]){
 
 	Experiment experiment;
 
+	if(arguments.test){
+		experiment.runTests();
+	} else{
+
 	experiment.readInputFile(arguments.inputfile);
 	experiment.print();
 	experiment.crossSections(arguments.plot);
 	experiment.transmission(arguments.plot);
 
+	}
+
 	high_resolution_clock::time_point stop = high_resolution_clock::now();
 	duration<double> delta_t = duration_cast< duration<double>>(stop - start);
+
 	cout << "> main.cpp: Execution took " << delta_t.count() << " seconds" << endl;
 }

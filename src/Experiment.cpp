@@ -176,6 +176,12 @@ void Experiment::readInputFile(const char* filename){
 	createEnergyBins(emin, emax);
 }
 
+void Experiment::runTests(){
+
+	targets.push_back(new Target("Test", 0));
+	targets[0]->test_integration();
+}
+
 void Experiment::createEnergyBins(double emin, double emax){
 	double delta_e = (emax - emin)/NBINS;
 

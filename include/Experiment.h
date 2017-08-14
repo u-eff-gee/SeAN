@@ -29,6 +29,7 @@ public:
 	void crossSections(bool plot);
 	void transmission(bool plot);
 	void print();
+	void runTests();
 
 private:
 	void createEnergyBins(double emin, double emax);
