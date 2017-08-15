@@ -117,7 +117,6 @@ double Target::integrateEZHistogram(double (&energy_bins)[NBINS], double (&z_bin
 	// Crude implementation of the Riemann integral as a sum of bin contents times their dimension in energy- and z-direction. Since there are only NBINS-1 spaces between NBINS bins, leave out the last bin in each loop.
 	double integral = 0.;
 
-	#pragma omp parallel for
 	for(int i = 0; i < NBINS - 1; ++i){
 		for(int j = 0; j < NBINS_Z - 1; ++j){
 			integral += bin_area*ezhist[i][j]; 

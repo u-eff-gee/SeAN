@@ -42,7 +42,7 @@ private:
 	}
 
 	double delta(double t, double mass){
-		return sqrt(kB*t/(mass*AtomicMassUnit));
+		return sqrt(2.*kB*t/(mass*AtomicMassUnit));
 	}
 };
 

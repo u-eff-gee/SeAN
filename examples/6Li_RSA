@@ -1,11 +1,11 @@
 # Minimum and maximum energy for the calculation in eV
-3.56078e6, 3.56498e6
+3.562080e6, 3.563680e6
 # Primary beam intensity distribution
 const, 1.0
 # 0) Identifier of the target (string)
 6Li_RSA_absorber
 # 1) Resonance energies in eV (comma separated values)
-3.56288e6
+3.562880e6
 # 2) Transition widths to the ground state in eV (comma separated values)
 8.16
 # 3) Total transition widths in eV (comma separated values)
