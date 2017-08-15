@@ -27,8 +27,8 @@ private:
 	CrossSection *crossSection;
 	Absorption *absorption;
 
-	double photon_flux_density_bins[NBINS][NBINS_Z];
-	double resonance_absorption_density_bins[NBINS][NBINS_Z];
+	double photon_flux_density_bins[NBINS][NBINS_Z] = {{0.}, {0.}};
+	double resonance_absorption_density_bins[NBINS][NBINS_Z] = {{0.}, {0.}};
 
 	double incident_beam_bins[NBINS] = {1.};
 	double dopplercs_bins[NBINS] = {0.};
@@ -44,10 +44,10 @@ private:
 	double mass;
 	double z;
 
-	int target_number;
+	unsigned int target_number;
 
 public:	
-	Target(string name, int number){
+	Target(string name, unsigned int number){
 		target_name = name;
 		target_number = number;
 
@@ -59,6 +59,7 @@ public:
 		delete crossSection;
 	};
 
+	// Functions to set private member variables
 	void addEnergy(double e){ e0_list.push_back(e); };
 	void addGamma0(double g0){ gamma0_list.push_back(g0); };
 	void addGamma(double g){ gamma_list.push_back(g); };
@@ -72,6 +73,10 @@ public:
 
 	void setMassAttenuation(string mAtt){ massAttenuation_ID = mAtt; };
 
+	// Functions to return private member variables
+	string getName(){ return target_name; };
+
+	// Function to print information to the command line
 	void print();
 
 	// Functions to calculate histograms
@@ -93,6 +98,7 @@ public:
 	void plotMassAttenuation(double (&energy_bins)[NBINS]);
 	void plotMu();
 	void plotPhotonFluxDensity(double (&energy_bins)[NBINS]);
+	void plotTestIntegration(double (&energy_bins)[NBINS]);
 	void plotResonanceAbsorptionDensity(double (&energy_bins)[NBINS]);
 
 	// Function to set the incident beam and return the transmitted beam
@@ -103,10 +109,10 @@ public:
 	double integrateEZHistogram(double (&energy_bins)[NBINS], double (&z_bins)[NBINS_Z], double (&ezhist)[NBINS][NBINS_Z]);
 
 	// Functions for testing
-	void test_integration();
+	void testIntegration(double (&energy_bins)[NBINS], vector<double> beamParams);
 
 private:
-	double normalizeVDist(int i);
+	double normalizeVDist(unsigned int i);
 };
 
 #endif

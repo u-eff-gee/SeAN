@@ -18,7 +18,7 @@ void CrossSection::breit_wigner(double (&energy_bins)[NBINS], vector<double> (&c
 
 	double cs_max = PI*0.5*HBARC2/(e0*e0)*(2.*jj + 1.)/(2. * j0 + 1.)*gamma0*gamma;
 	
-	for(int j = 0; j < NBINS; ++j){
+	for(unsigned int j = 0; j < NBINS; ++j){
 		crosssection_bins[NBINS + j] += cs_max / ((energy_bins[j] - e0)*(energy_bins[j] - e0) + 0.25*gamma*gamma);
 	}
 }
@@ -33,7 +33,7 @@ void CrossSection::maxwell_boltzmann(double (&energy_bins)[NBINS], vector<double
 	// Find bin of resonance energy
 	long int resonance_position = upper_bound(energy_bins, energy_bins + NBINS, e0) - energy_bins;
 
-      	for(int i = 0; i < NBINS; ++i){
+      	for(unsigned int i = 0; i < NBINS; ++i){
 		energy_ratio = energy_bins[i]/energy_bins[resonance_position];
 		velocity_bins[i] = (-2. + 2.*energy_ratio*energy_ratio)/(2. + 2.*energy_ratio*energy_ratio);
               	vdist_bins[i] = c1*exp(c2*velocity_bins[i]*velocity_bins[i]);
@@ -47,11 +47,11 @@ void CrossSection::maxwell_boltzmann_debye(double (&energy_bins)[NBINS], vector<
 void CrossSection::dopplershift(double (&dopplercs_bins)[NBINS], double (&energy_bins)[NBINS], vector<vector<double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector<vector<double> > &vdist_bins, vector<double> &vdist_norm){
 
 	for(unsigned int i = 0; i < crosssection_bins.size(); ++i){
-		long int resonance_position = max_element(crosssection_bins[i].begin(), crosssection_bins[i].end()) - crosssection_bins[i].begin() + 1;
+		unsigned long int resonance_position = (unsigned long int) (max_element(crosssection_bins[i].begin(), crosssection_bins[i].end()) - crosssection_bins[i].begin() + 1);
 
 		#pragma omp parallel for
-		for(int j = 0; j < NBINS; ++j){
-			for(int k = 0; k < NBINS - 1; ++k){
+		for(unsigned int j = 0; j < NBINS; ++j){
+			for(unsigned int k = 0; k < NBINS - 1; ++k){
 				dopplercs_bins[j] += vdist_norm[i]*vdist_bins[i][k]*crosssection_bins[i][j + resonance_position - k]*(velocity_bins[i][k + 1] - velocity_bins[i][k]);
 			}
 		}
@@ -72,7 +72,7 @@ void CrossSection::maxwell_boltzmann_approximation(double (&dopplercs_bins)[NBIN
 		// Find bin of resonance energy
 		long int resonance_position = upper_bound(energy_bins, energy_bins + NBINS, e0_list[i]) - energy_bins;
 
-		for(int j = 0; j < NBINS; ++j){
+		for(unsigned int j = 0; j < NBINS; ++j){
 			energy_ratio = energy_bins[j]/energy_bins[resonance_position];
 			velocity_bins[i][j] = (-2. + 2.*energy_ratio*energy_ratio)/(2. + 2.*energy_ratio*energy_ratio);
 			vdist_bins[i][j] = c1*exp(c2*velocity_bins[i][j]*velocity_bins[i][j]);
@@ -107,8 +107,8 @@ void CrossSection::plot_crosssection(double (&energy_bins)[NBINS], vector< vecto
 
 	for(unsigned int i = 0; i < crosssection_bins.size(); ++i){
 		graphs.push_back(new TGraph(NBINS));
-		for(int j = 0; j < NBINS; ++j){
-			graphs[i]->SetPoint(j, energy_bins[j], crosssection_bins[i][NBINS + j]);
+		for(unsigned int j = 0; j < NBINS; ++j){
+			graphs[i]->SetPoint((Int_t) j, energy_bins[j], crosssection_bins[i][NBINS + j]);
 			total_crosssection_bins[j] += crosssection_bins[i][NBINS + j];
 		}
 
@@ -132,8 +132,8 @@ void CrossSection::plot_crosssection(double (&energy_bins)[NBINS], vector< vecto
 void CrossSection::plot_vdist(vector<double> &velocity_bins, vector<double> &vdist_bins, string title, TCanvas* canvas, TLegend* legend, string legend_entry){
 
 	TGraph *graph = new TGraph(NBINS);
-	for(int i = 0; i < NBINS; ++i){
-		graph->SetPoint(i, velocity_bins[i], vdist_bins[i]);
+	for(unsigned int i = 0; i < NBINS; ++i){
+		graph->SetPoint((Int_t) i, velocity_bins[i], vdist_bins[i]);
 	}
 	graph->SetName(title.c_str());
 	graph->SetTitle(title.c_str());
@@ -150,7 +150,7 @@ void CrossSection::plot_dopplershift(double (&energy_bins)[NBINS], vector< vecto
 	double total_crosssection_bins[NBINS] = {0.};
 
 	for(unsigned int i = 0; i < crosssection_bins.size(); ++i){
-		for(int j = 0; j < NBINS; ++j){
+		for(unsigned int j = 0; j < NBINS; ++j){
 			total_crosssection_bins[j] += crosssection_bins[i][NBINS + j];
 		}
 	}

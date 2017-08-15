@@ -108,7 +108,7 @@ void Absorption::plot_massattenuation(double (&energy_bins)[NBINS], double (&mas
 
 void Absorption::plot_total_massattenuation(string title, TCanvas *canvas, TLegend* legend, string legend_entry){
 
-	TGraph *graph = new TGraph(nbins_matt, &matt[0][0], &matt[1][0]);
+	TGraph *graph = new TGraph((Int_t) nbins_matt, &matt[0][0], &matt[1][0]);
 	
 	graph->SetName(title.c_str());
 	graph->SetTitle(title.c_str());
@@ -124,9 +124,9 @@ void Absorption::plot_photon_flux_density(double (&energy_bins)[NBINS], double (
 	
 	// Saveguard for the number of bins used for plotting phi. TGraph2D uses up a lot of memory if the dimension of the matrix for phi is too large.
 	int nbins_plot = NBINS;
-	int nbins_skip = 0;
+	int nbins_skip = 1;
 	int nbins_z_plot = NBINS_Z;
-	int nbins_z_skip = 0;
+	int nbins_z_skip = 1;
 
 	if(NBINS > NBINS_PHI_MAX){
 		nbins_skip = NBINS/NBINS_PHI_MAX + 1;
@@ -144,7 +144,6 @@ void Absorption::plot_photon_flux_density(double (&energy_bins)[NBINS], double (
 	}
 
 	TGraph2D *graph = new TGraph2D(nbins_plot*nbins_z_plot);	
-
 	int npoint = 0;
 	for(int i = 0; i < NBINS; i += nbins_skip){
 		for(int j = 0; j < NBINS_Z; j += nbins_z_skip){
@@ -173,9 +172,9 @@ void Absorption::plot_resonance_absorption_density(double (&energy_bins)[NBINS],
 	
 	// Saveguard for the number of bins used for plotting phi. TGraph2D uses up a lot of memory if the dimension of the matrix for phi is too large.
 	int nbins_plot = NBINS;
-	int nbins_skip = 0;
+	int nbins_skip = 1;
 	int nbins_z_plot = NBINS_Z;
-	int nbins_z_skip = 0;
+	int nbins_z_skip = 1;
 
 	if(NBINS > NBINS_ALPHA_MAX){
 		nbins_skip = NBINS/NBINS_ALPHA_MAX + 1;

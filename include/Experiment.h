@@ -25,11 +25,16 @@ public:
 	Experiment(){};
 	~Experiment(){};
 
+	// Functions to manage the calculation process
 	void readInputFile(const char* filename);
+	void testIntegration(bool plot);
 	void crossSections(bool plot);
 	void transmission(bool plot);
 	void print();
 	void runTests();
+
+	// Functions to return private members
+	Target* getTarget(unsigned int i){ return targets[i]; };
 
 private:
 	void createEnergyBins(double emin, double emax);

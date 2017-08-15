@@ -24,8 +24,8 @@ void Experiment::readInputFile(const char* filename){
         cout << "> Reading input file '" << filename << "'" << endl;
 
         string line;
-	int n = 0;
-	int nline = 0;
+	unsigned int n = 0;
+	unsigned int nline = 0;
 	size_t start, stop;
 
         while(getline(ifile, line)){
@@ -52,14 +52,14 @@ void Experiment::readInputFile(const char* filename){
 
 			beam_ID = regex_replace(line.substr(start, stop), regex("\\s+"), "");
 
-			start = stop + 1;
+			start += stop + 1;
 
 			do{
 				stop = line.substr(start, line.length()).find(",");
 				if(stop == string::npos)
 					stop = line.length();
 				beamParams.push_back(atof(line.substr(start, stop).c_str()));
-				start = stop + 1;
+				start += stop + 1;
 			} while( stop != line.length());
 			++nline;
 			continue;
@@ -78,7 +78,7 @@ void Experiment::readInputFile(const char* filename){
 				if(stop == string::npos)
 					stop = line.length();
 				targets[n]->addEnergy(atof(line.substr(start, stop).c_str()));
-				start = stop + 1;
+				start += stop + 1;
 			} while( stop != line.length());
 			++nline;
 			continue;
@@ -91,7 +91,7 @@ void Experiment::readInputFile(const char* filename){
 				if(stop == string::npos)
 					stop = line.length();
 				targets[n]->addGamma0(atof(line.substr(start, stop).c_str()));
-				start = stop + 1;
+				start += stop + 1;
 			} while( stop != line.length());
 			++nline;
 			continue;
@@ -104,7 +104,7 @@ void Experiment::readInputFile(const char* filename){
 				if(stop == string::npos)
 					stop = line.length();
 				targets[n]->addGamma(atof(line.substr(start, stop).c_str()));
-				start = stop + 1;
+				start += stop + 1;
 			} while( stop != line.length());
 			++nline;
 			continue;
@@ -117,7 +117,7 @@ void Experiment::readInputFile(const char* filename){
 				if(stop == string::npos)
 					stop = line.length();
 				targets[n]->addJJ(atof(line.substr(start, stop).c_str()));
-				start = stop + 1;
+				start += stop + 1;
 			} while( stop != line.length());
 			++nline;
 			continue;
@@ -137,14 +137,14 @@ void Experiment::readInputFile(const char* filename){
 
 			targets[n]->setVDist(regex_replace(line.substr(start, stop), regex("\\s+"), ""));
 
-			start = stop + 1;
+			start += stop + 1;
 
 			do{
 				stop = line.substr(start, line.length()).find(",");
 				if(stop == string::npos)
 					stop = line.length();
 				targets[n]->addVDistParameter(atof(line.substr(start, stop).c_str()));
-				start = stop + 1;
+				start += stop + 1;
 			} while( stop != line.length());
 			++nline;
 			continue;
@@ -176,10 +176,12 @@ void Experiment::readInputFile(const char* filename){
 	createEnergyBins(emin, emax);
 }
 
-void Experiment::runTests(){
-
-	targets.push_back(new Target("Test", 0));
-	targets[0]->test_integration();
+void Experiment::testIntegration(bool plot){
+	createEnergyBins(emin, emax);
+	targets[0]->testIntegration(energy_bins, beamParams);
+	if(plot){
+		targets[0]->plotTestIntegration(energy_bins);
+	}
 }
 
 void Experiment::createEnergyBins(double emin, double emax){

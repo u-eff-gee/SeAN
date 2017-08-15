@@ -36,7 +36,7 @@ void Target::plotCrossSection(double (&energy_bins)[NBINS]){
 
 void Target::calculateVelocityDistribution(double (&energy_bins)[NBINS]){
 	if(vDist_ID == "absolute_zero"){
-		for(int i = 0; i < NBINS; ++i){
+		for(unsigned int i = 0; i < NBINS; ++i){
 			for(unsigned int j = 0; j < crosssection_bins.size(); ++j){
 				dopplercs_bins[i] = crosssection_bins[i][j];
 			}
@@ -116,6 +116,8 @@ double Target::integrateEZHistogram(double (&energy_bins)[NBINS], double (&z_bin
 
 	// Crude implementation of the Riemann integral as a sum of bin contents times their dimension in energy- and z-direction. Since there are only NBINS-1 spaces between NBINS bins, leave out the last bin in each loop.
 	double integral = 0.;
+
+	#pragma omp parallel for
 	for(int i = 0; i < NBINS - 1; ++i){
 		for(int j = 0; j < NBINS_Z - 1; ++j){
 			integral += bin_area*ezhist[i][j]; 
@@ -133,31 +135,46 @@ double Target::integrateEZHistogram(double (&energy_bins)[NBINS], double (&z_bin
 	return integral;
 }
 
-void Target::test_integration(){
-	// Use photon_flux_density_bins to store a test function
+void Target::testIntegration(double (&energy_bins)[NBINS], vector<double> beamParams){
 
-	cout << "> Integrating test function" << endl;
+	cout << "> Test of integration ..." << endl;
+	cout << "[EMIN, EMAX] = [" << energy_bins[0] << ", " << energy_bins[NBINS - 1] << "]" << endl;
+	cout << "c\tx0\ty0\tsigma" << endl;
 
-	double en_bins[NBINS];
-	double zz_bins[NBINS_Z];
-	
-	double delta_e = 6./NBINS;
-	double delta_z = 6./NBINS_Z;
+	for(unsigned int i = 0; i < gamma0_list.size(); ++i){
+		cout << beamParams[i] << "\t" << e0_list[2*i] << "\t" << e0_list[2*i + 1] << "\t" << gamma0_list[i] << endl;
+	}
+
+	double denominator = 1.;
 
 	for(int i = 0; i < NBINS; ++i){
 		for(int j = 0; j < NBINS_Z; ++j){
-			en_bins[i] = i*delta_e - 3.;
-			zz_bins[j] = j*delta_z - 3.;
-			double energy = i*delta_e -3.;
-			double z = j*delta_z -3.;
-			photon_flux_density_bins[i][j] = exp(-(energy*energy + z*z));
+			photon_flux_density_bins[i][j] = 0.;
+			// Use photon_flux_density_bins to store the test function
+			for(unsigned int k = 0; k < beamParams.size(); ++k){
+				denominator = 1./(2.*gamma0_list[k]*gamma0_list[k]);
+				photon_flux_density_bins[i][j] += beamParams[k]*exp(-denominator*(energy_bins[i] - e0_list[2*k])*(energy_bins[i] - e0_list[2*k]))*exp(-denominator*(energy_bins[j] - e0_list[2*k + 1])*(energy_bins[j] - e0_list[2*k + 1]));
+			}
 		}
 	}
 
-	double result = integrateEZHistogram(en_bins, zz_bins, photon_flux_density_bins);	
+	//plotTestIntegration(energy_bins);
+
+	double result = integrateEZHistogram(energy_bins, energy_bins, photon_flux_density_bins);
 
 	cout << "> Integration of test function yields " << result << endl;
-	cout << "\tExact result: 3.14145" << endl;
+	double exact_result = 0.;
+
+	for(unsigned int i = 0; i < gamma0_list.size(); ++i){
+		exact_result += beamParams[i]*(
+				sqrt(PI/2.)*gamma0_list[i]*erf((energy_bins[NBINS - 1] - e0_list[2*i])/(sqrt(2)*gamma0_list[i])) - 
+				sqrt(PI/2.)*gamma0_list[i]*erf((energy_bins[0] - e0_list[2*i])/(sqrt(2)*gamma0_list[i]))) * 
+				(
+			 	sqrt(PI/2.)*gamma0_list[i]*erf((energy_bins[NBINS - 1] - e0_list[2*i + 1])/(sqrt(2)*gamma0_list[i])) - 
+				sqrt(PI/2.)*gamma0_list[i]*erf((energy_bins[0] - e0_list[2*i + 1])/(sqrt(2)*gamma0_list[i])));
+	}	
+
+	cout << "\tExact result: " << exact_result << " (" << ((result - exact_result)/exact_result*100.) << " %)" << endl;
 }
 
 void Target::calculateAbsorption(double (&energy_bins)[NBINS]){
@@ -253,7 +270,22 @@ void Target::plotPhotonFluxDensity(double (&energy_bins)[NBINS]){
 	legend->Draw();
 	canvas->SaveAs(filename.str().c_str());
 	delete canvas;
-	
+}
+
+void Target::plotTestIntegration(double (&energy_bins)[NBINS]){
+
+	stringstream filename;
+	filename << target_name << "_function.pdf";
+	stringstream canvasname;
+	canvasname << target_name << "_canvas";
+	TCanvas *canvas = new TCanvas(canvasname.str().c_str(), target_name.c_str(), 0, 0, 800, 500);
+	TLegend *legend = new TLegend(MU_PLOT_LEGEND_X1, MU_PLOT_LEGEND_Y1, MU_PLOT_LEGEND_X2, MU_PLOT_LEGEND_Y2);
+
+	absorption->plot_photon_flux_density(energy_bins, energy_bins, photon_flux_density_bins, target_name, canvas, legend, "Function inside the integral, ignore axis labels");
+
+	legend->Draw();
+	canvas->SaveAs(filename.str().c_str());
+	delete canvas;
 }
 
 void Target::plotResonanceAbsorptionDensity(double (&energy_bins)[NBINS]){
@@ -300,11 +332,11 @@ void Target::print(){
 }
 
 
-double Target::normalizeVDist(int i){
+double Target::normalizeVDist(unsigned int i){
 
 	double sum = 0.;
 
-	for(int j = 0; j < NBINS-1; j++){
+	for(unsigned int j = 0; j < NBINS-1; j++){
 		sum += vdist_bins[i][j]*(velocity_bins[i][j + 1] - velocity_bins[i][j]);
 	}
 
