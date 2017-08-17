@@ -22,3 +22,5 @@ maxwell_boltzmann, 412.5
 0
 # 9) Target thickness in atoms/fm^2
 0.000282
+# 10) Velocity of the target along the beam direction in m/s
+0.
