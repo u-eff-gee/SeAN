@@ -17,21 +17,16 @@ using std::regex;
 void Target::readAME(string isotope){
 	unsigned int separator = 0;
 
-	cout << isotope.length() << endl;
-	for(unsigned int i = 1; i < isotope.length(); ++i){
-		cout << isotope.substr(0, i) << endl;
+	for(unsigned int i = 1; i <= isotope.length(); ++i){
 		if(regex_search(isotope.substr(0,i), regex("[a-zA-Z]"))){
-			separator = i;
+			separator = i - 1;
 			break;
 		}
 	}
 
-	cout << separator << endl;
-
 	int mass_number = atoi(isotope.substr(0,separator).c_str());
-	string isotope_name = isotope.substr(separator, isotope.length() - separator);
-
-	cout << mass_number << " " << isotope_name << endl;
+	string string_mass_number = isotope.substr(0,separator);
+	string isotope_name = isotope.substr(separator, isotope.length() - separator + 1);
 
 	stringstream filename;
 	filename << MASS_DIR << "mass_list.txt";
@@ -49,9 +44,8 @@ void Target::readAME(string isotope){
 
         while(getline(ifile, line)){
 		if(nline > AME_HEADER_LENGTH){
-			//cout << line.substr(AME_MASS_NUMBER, 3) << " " << line.substr(AME_ISOTOPE, 2) << " " << line.substr(AME_MASS_START, AME_MASS_LENGTH) << endl;
-			if(atoi(line.substr(AME_MASS_NUMBER, 3).c_str()) == mass_number && regex_search(line.substr(AME_ISOTOPE, 2), regex(isotope_name))){
-				cout << atof(regex_replace(line.substr(AME_MASS_START, AME_MASS_LENGTH), regex("\\s+"), "").c_str())*1.0e-6 << endl;
+			if(atoi(line.substr(AME_MASS_NUMBER, 3).c_str()) == mass_number && regex_replace(line.substr(AME_ISOTOPE, 2), regex("\\s+"), "") == isotope_name){
+				mass = atof(regex_replace(line.substr(AME_MASS_START, AME_MASS_LENGTH), regex("\\s+"), "").c_str())*1.0e-6;
 				break;
 
 			}
