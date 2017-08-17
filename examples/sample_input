@@ -3,7 +3,7 @@
 # Primary beam intensity distribution
 const, 1.0
 # 0) Identifier of the target (string)
-6Li
+6Li_1
 # 1) Resonance energies in eV (comma separated values)
 3.56288e6, 3.56290e6
 # 2) Transition widths to the ground state in eV (comma separated values)
@@ -22,17 +22,17 @@ maxwell_boltzmann, 412.5
 Li
 # 9) Target thickness in atoms/fm^2
 0.000282
-#
-###############################################################
-#
+# 10) Velocity of the target along the beam direction in m/s
+#1500.
+5000.
 # 0) Identifier of the target (string)
 6Li_2
 # 1) Resonance energies in eV (comma separated values)
-3.56286e6, 3.56290e6
+3.56288e6, 3.56290e6
 # 2) Transition widths to the ground state in eV (comma separated values)
-8., 8.
+8., 7.5
 # 3) Total transition widths in eV (comma separated values)
-8., 8.
+8., 7.5
 # 4) Angular momentum of the ground state
 1
 # 5) Angular momenta of the excited states (comma separated values)
@@ -45,3 +45,5 @@ maxwell_boltzmann, 412.5
 Li
 # 9) Target thickness in atoms/fm^2
 0.000282
+# 10) Velocity of the target along the beam direction in m/s
+0.

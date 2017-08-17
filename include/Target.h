@@ -17,6 +17,7 @@ private:
 	vector< vector<double> > velocity_bins;
 	vector< vector<double> > vdist_bins;
 
+	vector<double> e0_at_rest_list;
 	vector<double> e0_list;
 	vector<double> gamma0_list;
 	vector<double> gamma_list;
@@ -43,6 +44,7 @@ private:
 	double j0;
 	double mass;
 	double z;
+	double vz;
 
 	unsigned int target_number;
 
@@ -61,17 +63,22 @@ public:
 
 	// Functions to set private member variables
 	void addEnergy(double e){ e0_list.push_back(e); };
+	void addEnergyAtRest(double e){ e0_at_rest_list.push_back(e); };
 	void addGamma0(double g0){ gamma0_list.push_back(g0); };
 	void addGamma(double g){ gamma_list.push_back(g); };
 	void addJJ(double j){ jj_list.push_back(j); };
 	void setJ0(double j){ j0 = j; };
 	void setMass(double m){ mass = m; };
 	void setZ(double zz){ z = zz; };
+	void setVZ(double vvz){ vz = vvz; };
 
 	void setVDist(string vDist){vDist_ID = vDist; };
 	void addVDistParameter(double p){ vDistParams.push_back(p); };
 
 	void setMassAttenuation(string mAtt){ massAttenuation_ID = mAtt; };
+
+	// Function to modify resonance energies due to Doppler shift
+	void boost();
 
 	// Functions to return private member variables
 	string getName(){ return target_name; };

@@ -10,9 +10,15 @@ using std::cout;
 using std::endl;
 using std::stringstream;
 
+void Target::boost(){
+	double beta = vz/SPEEDOFLIGHT;
+	for(unsigned int i = 0; i < e0_at_rest_list.size(); ++i)
+		e0_list.push_back((1. + beta)/sqrt(1. - beta*beta)*e0_at_rest_list[i]);
+}
+
 void Target::calculateCrossSection(double (&energy_bins)[NBINS]){
 	for(unsigned int i = 0; i < e0_list.size(); ++i){
-		// The vector of cross section bins is 3 times as large as the required energy range, because 
+		// The vector of cross section bins is 3 times as large as the required energy range, because of the folding procedure
 		crosssection_bins.push_back(vector <double>(3*NBINS, 0.));
 		crossSection->breit_wigner(energy_bins, crosssection_bins[i], e0_list[i], gamma0_list[i], gamma_list[i], jj_list[i], j0);
 	}
@@ -334,10 +340,10 @@ void Target::print(){
 	cout << "TARGET #" << target_number << ": '" << target_name << "'" << endl;
 	cout << "GROUND STATE J = " << j0 << endl;
 	cout << "RESONANCES:" << endl;
-	cout << "E0/eV\tGAMMA0\tGAMMA\tJ" << endl;
+	cout << "E0 AT REST/eV\tE0 BOOSTED/eV\tGAMMA0\tGAMMA\tJ" << endl;
 	
 	for(unsigned int i = 0; i < e0_list.size(); ++i)
-		cout << e0_list[i] << "\t" << gamma0_list[i] << "\t" << gamma_list[i] << "\t" << jj_list[i] << endl;
+		cout << e0_at_rest_list[i] << "\t" << e0_list[i] << "\t" << gamma0_list[i] << "\t" << gamma_list[i] << "\t" << jj_list[i] << endl;
 
 	cout << "VELOCITY DISTRIBUTION = " << vDist_ID;
 
@@ -354,6 +360,7 @@ void Target::print(){
 	cout << "MASS = " << mass << " u" << endl;
 	cout << "MASS ATTENUATION = " << massAttenuation_ID << endl;
 	cout << "TARGET THICKNESS = " << z << " atoms / fm^2" << endl;
+	cout << "TARGET VELOCITY = " << vz << " m/s" << endl;
 }
 
 

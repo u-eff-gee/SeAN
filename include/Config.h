@@ -25,7 +25,7 @@ const string NIST_SEPARATOR = "  ";
 //************************************
 
 // Number of parameters required for a single calculation
-#define NPARAMETERS 10
+#define NPARAMETERS 11
 
 // Length of the header of the input file, where EMIN and EMAX are set
 #define INPUT_HEADER 1
@@ -40,6 +40,7 @@ const string NIST_SEPARATOR = "  ";
 #define M 8
 #define MU 9
 #define Z 10
+#define VZ 11
 
 //************************************
 // Definition of parameters for the calculation
@@ -58,7 +59,7 @@ const string NIST_SEPARATOR = "  ";
 
 #define HBARC 197.3269788e6 // in eVfm
 #define HBARC2 3.89379366e16 // in eV^2fm^2
-#define C 299792458. // in m/s
+#define SPEEDOFLIGHT 299792458. // in m/s
 #define kB 8.6173303e-5 // in eV/K
 #define NA 6.022140857e23 // in particles/mole
 #define AtomicMassUnit 931.494095e6 // in eV/c^2

@@ -77,7 +77,7 @@ void Experiment::readInputFile(const char* filename){
 				stop = line.substr(start, line.length()).find(",");
 				if(stop == string::npos)
 					stop = line.length();
-				targets[n]->addEnergy(atof(line.substr(start, stop).c_str()));
+				targets[n]->addEnergyAtRest(atof(line.substr(start, stop).c_str()));
 				start += stop + 1;
 			} while( stop != line.length());
 			++nline;
@@ -165,6 +165,13 @@ void Experiment::readInputFile(const char* filename){
 		if(nline - INPUT_HEADER == n*NPARAMETERS + Z){
 			targets[n]->setZ(atof(line.c_str()));
 			++nline;
+			continue;
+		}
+
+		if(nline - INPUT_HEADER == n*NPARAMETERS + VZ){
+			targets[n]->setVZ(atof(line.c_str()));
+			targets[n]->boost();
+			++nline;
 			++n;
 			continue;
 		}
@@ -249,4 +256,3 @@ void Experiment::print(){
 		targets[i]->print();
 	}
 }
-
