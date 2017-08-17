@@ -151,7 +151,11 @@ void Experiment::readInputFile(const char* filename){
 		}
 		
 		if(nline - INPUT_HEADER == n*NPARAMETERS + M){
-			targets[n]->setMass(atof(line.c_str()));
+			if(regex_search(line, regex("[a-zA-Z]"))){
+				targets[n]->readAME(line);
+			} else{
+				targets[n]->setMass(atof(line.c_str()));
+			}
 			++nline;
 			continue;
 		}

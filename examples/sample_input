@@ -16,8 +16,8 @@ const, 1.0
 0, 3
 # 6) Model for velocity distribution
 maxwell_boltzmann, 412.5
-# 7) Nuclear mass in atomic mass units
-6.01512288742
+# 7) Nuclear mass in atomic mass units or isotope in the notation AXy, for example 208Pb or 11B
+6Li
 # 8) Mass attenuation coefficient
 Li
 # 9) Target thickness in atoms/fm^2

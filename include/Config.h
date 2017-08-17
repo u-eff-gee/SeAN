@@ -16,6 +16,14 @@ using std::string;
 #define V_DIR "velocity_distribution/"
 #define MU_DIR "mass_attenuation/"
 #define BEAM_DIR "beam/"
+#define MASS_DIR "atomic_mass/"
+
+// Coordinates in AME file
+#define AME_HEADER_LENGTH 38
+#define AME_MASS_NUMBER 16
+#define AME_ISOTOPE 20
+#define AME_MASS_START 96
+#define AME_MASS_LENGTH 13
 
 // Separator between columns in a NIST x-ray attenuation file
 const string NIST_SEPARATOR = "  ";
@@ -47,8 +55,8 @@ const string NIST_SEPARATOR = "  ";
 //************************************
 
 // Number of bins for the calculation
-#define NBINS 5000
-#define NBINS_Z 5000
+#define NBINS 500
+#define NBINS_Z 500
 
 // Limit for the applicability of the approximation for the doppler-shifted cross section (Gamma << Delta). The code will output a warning if the ratio Gamma/Delta is larger than APPROXIMATION_LIMIT.
 #define APPROXIMATION_LIMIT 0.1 // Arbitrary choice
