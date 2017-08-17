@@ -91,4 +91,6 @@ const string NIST_SEPARATOR = "  ";
 #define NBINS_ALPHA_MAX 100
 #define NBINS_Z_ALPHA_MAX 100
 
+#define NBINS_F_MAX 100
+
 #endif

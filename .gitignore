@@ -15,3 +15,9 @@ sean
 
 # valgrind output
 *.out.*
+
+# Input folder
+input/*
+
+# .json files
+*.json

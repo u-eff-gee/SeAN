@@ -87,6 +87,7 @@ public:
 	void calculateIncidentBeam(double (&energy_bins)[NBINS], string beam_ID, vector<double> beamParams);
 	void calculateTransmittedBeam();
 	void calculateZBins();
+	void calculateZBins(double z0, double z1);
 	void calculatePhotonFluxDensity();
 	void calculateResonanceAbsorptionDensity();
 	void calculateAbsorption(double (&energy_bins)[NBINS]);
@@ -105,11 +106,12 @@ public:
 	double& getTransmittedBeam(){ return transmitted_beam_bins[0]; };
 	void setIncidentBeam(double &trans_beam_bins);
 
-	// Function to integrate over 2D histogram with the variables energy and z
+	// Functions to integrate over 2D histograms
 	double integrateEZHistogram(double (&energy_bins)[NBINS], double (&z_bins)[NBINS_Z], double (&ezhist)[NBINS][NBINS_Z]);
+	double integrateEEHistogram(double (&energy_bins)[NBINS], double (&eehist)[NBINS][NBINS]);
 
 	// Functions for testing
-	void testIntegration(double (&energy_bins)[NBINS], vector<double> beamParams);
+	void testIntegration(double emin, double emax, double (&energy_bins)[NBINS], vector<double> beamParams);
 
 private:
 	double normalizeVDist(unsigned int i);

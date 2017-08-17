@@ -78,6 +78,15 @@ void Target::calculateZBins(){
 	}
 }
 
+void Target::calculateZBins(double z0, double z1){
+	
+	double delta_z = (z1-z0)/NBINS_Z;
+
+	for(int i = 0; i < NBINS_Z; ++i){
+		z_bins[i] = i*delta_z + z0;
+	}
+}
+
 void Target::calculateDopplerShift(double (&energy_bins)[NBINS]){
 	if(vDist_ID != "maxwell_boltzmann_approximation"){
 		crossSection->dopplershift(dopplercs_bins, energy_bins, crosssection_bins, velocity_bins, vdist_bins, vdist_norm);
@@ -134,7 +143,24 @@ double Target::integrateEZHistogram(double (&energy_bins)[NBINS], double (&z_bin
 	return integral;
 }
 
-void Target::testIntegration(double (&energy_bins)[NBINS], vector<double> beamParams){
+double Target::integrateEEHistogram(double (&energy_bins)[NBINS], double (&eehist)[NBINS][NBINS]){
+
+	// Area of a bin in 2D plane
+	double bin_area = (energy_bins[1] - energy_bins[0])*(energy_bins[1] - energy_bins[0]);
+
+	// Crude implementation of the Riemann integral as a sum of bin contents times their dimension in energy- and z-direction. Since there are only NBINS-1 spaces between NBINS bins, leave out the last bin in each loop.
+	double integral = 0.;
+
+	for(int i = 0; i < NBINS - 1; ++i){
+		for(int j = 0; j < NBINS - 1; ++j){
+			integral += bin_area*eehist[i][j]; 
+		}
+	}
+
+	return integral;
+}
+
+void Target::testIntegration(double emin, double emax, double (&energy_bins)[NBINS], vector<double> beamParams){
 
 	cout << "> Test of integration ..." << endl;
 	cout << "[EMIN, EMAX] = [" << energy_bins[0] << ", " << energy_bins[NBINS - 1] << "]" << endl;
@@ -144,22 +170,22 @@ void Target::testIntegration(double (&energy_bins)[NBINS], vector<double> beamPa
 		cout << beamParams[i] << "\t" << e0_list[2*i] << "\t" << e0_list[2*i + 1] << "\t" << gamma0_list[i] << endl;
 	}
 
+	calculateZBins(emin, emax);
+
 	double denominator = 1.;
 
 	for(int i = 0; i < NBINS; ++i){
 		for(int j = 0; j < NBINS_Z; ++j){
-			photon_flux_density_bins[i][j] = 0.;
-			// Use photon_flux_density_bins to store the test function
 			for(unsigned int k = 0; k < beamParams.size(); ++k){
 				denominator = 1./(2.*gamma0_list[k]*gamma0_list[k]);
-				photon_flux_density_bins[i][j] += beamParams[k]*exp(-denominator*(energy_bins[i] - e0_list[2*k])*(energy_bins[i] - e0_list[2*k]))*exp(-denominator*(energy_bins[j] - e0_list[2*k + 1])*(energy_bins[j] - e0_list[2*k + 1]));
+				photon_flux_density_bins[i][j] += beamParams[k]
+					*exp(-denominator*(energy_bins[i] - e0_list[2*k])*(energy_bins[i] - e0_list[2*k]))
+					*exp(-denominator*(z_bins[j] - e0_list[2*k + 1])*(z_bins[j] - e0_list[2*k + 1]));
 			}
 		}
 	}
 
-	//plotTestIntegration(energy_bins);
-
-	double result = integrateEZHistogram(energy_bins, energy_bins, photon_flux_density_bins);
+	double result = integrateEZHistogram(energy_bins, z_bins, photon_flux_density_bins);
 
 	cout << "> Integration of test function yields " << result << endl;
 	double exact_result = 0.;
@@ -169,8 +195,8 @@ void Target::testIntegration(double (&energy_bins)[NBINS], vector<double> beamPa
 				sqrt(PI/2.)*gamma0_list[i]*erf((energy_bins[NBINS - 1] - e0_list[2*i])/(sqrt(2)*gamma0_list[i])) - 
 				sqrt(PI/2.)*gamma0_list[i]*erf((energy_bins[0] - e0_list[2*i])/(sqrt(2)*gamma0_list[i]))) * 
 				(
-			 	sqrt(PI/2.)*gamma0_list[i]*erf((energy_bins[NBINS - 1] - e0_list[2*i + 1])/(sqrt(2)*gamma0_list[i])) - 
-				sqrt(PI/2.)*gamma0_list[i]*erf((energy_bins[0] - e0_list[2*i + 1])/(sqrt(2)*gamma0_list[i])));
+			 	sqrt(PI/2.)*gamma0_list[i]*erf((z_bins[NBINS_Z- 1] - e0_list[2*i + 1])/(sqrt(2)*gamma0_list[i])) - 
+				sqrt(PI/2.)*gamma0_list[i]*erf((z_bins[0] - e0_list[2*i + 1])/(sqrt(2)*gamma0_list[i])));
 	}	
 
 	cout << "\tExact result: " << exact_result << " (" << ((result - exact_result)/exact_result*100.) << " %)" << endl;
@@ -280,7 +306,7 @@ void Target::plotTestIntegration(double (&energy_bins)[NBINS]){
 	TCanvas *canvas = new TCanvas(canvasname.str().c_str(), target_name.c_str(), 0, 0, 800, 500);
 	TLegend *legend = new TLegend(MU_PLOT_LEGEND_X1, MU_PLOT_LEGEND_Y1, MU_PLOT_LEGEND_X2, MU_PLOT_LEGEND_Y2);
 
-	absorption->plot_photon_flux_density(energy_bins, energy_bins, photon_flux_density_bins, target_name, canvas, legend, "Function inside the integral, ignore axis labels");
+	absorption->plot_test_integration(energy_bins, z_bins, photon_flux_density_bins, target_name, canvas, legend, "Function inside the integral, ignore axis labels");
 
 	legend->Draw();
 	canvas->SaveAs(filename.str().c_str());

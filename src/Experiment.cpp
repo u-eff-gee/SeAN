@@ -178,7 +178,7 @@ void Experiment::readInputFile(const char* filename){
 
 void Experiment::testIntegration(bool plot){
 	createEnergyBins(emin, emax);
-	targets[0]->testIntegration(energy_bins, beamParams);
+	targets[0]->testIntegration(emin, emax, energy_bins, beamParams);
 	if(plot){
 		targets[0]->plotTestIntegration(energy_bins);
 	}
