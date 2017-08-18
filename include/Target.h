@@ -114,10 +114,10 @@ public:
 
 	// Functions to write histograms to file
 	void write(double (&energy_bins)[NBINS]);
-	void print1DArray(double *array, unsigned int n, string c1, string filename);
-	void print2DArray(double &array, unsigned int n1, unsigned int n2, string c1, string c2, string filename);
-	void print1DVector(vector<double> &vec, string c1, string filename);
-	void print2DVector(vector<vector<double> > &vec, string c1, string c2, string filename);
+	void print1DArray(double *array, unsigned int n, string column, string filename);
+	void print2DArray(double (&array)[NBINS][NBINS_Z], string column, string filename);
+	void print1DVector(vector<double> (&vec), string column, string filename);
+	void print2DVector(vector<vector<double> > (&vec), string column, string filename);
 
 	// Function to set the incident beam and return the transmitted beam
 	double& getTransmittedBeam(){ return transmitted_beam_bins[0]; };

@@ -213,9 +213,6 @@ void Experiment::crossSections(bool plot, bool write){
 			targets[i]->plotVelocityDistribution();
 			targets[i]->plotDopplerShift(energy_bins);
 		}
-		if(write){
-			targets[i]->write(energy_bins);
-		}
 	}
 };
 
@@ -228,9 +225,7 @@ void Experiment::transmission(bool plot, bool output){
 			targets[i]->setIncidentBeam(targets[i-1]->getTransmittedBeam());
 		}
 		targets[i]->calculatePhotonFluxDensity();
-		if(i == 0){
-			targets[i]->calculateTransmittedBeam();
-		}
+		targets[i]->calculateTransmittedBeam();
 		targets[i]->calculateResonanceAbsorptionDensity();
 		targets[i]->calculateAbsorption(energy_bins);
 
@@ -239,6 +234,9 @@ void Experiment::transmission(bool plot, bool output){
 			targets[i]->plotMu();
 			targets[i]->plotPhotonFluxDensity(energy_bins);
 			targets[i]->plotResonanceAbsorptionDensity(energy_bins);
+		}
+		if(write){
+			targets[i]->write(energy_bins);
 		}
 	}
 }

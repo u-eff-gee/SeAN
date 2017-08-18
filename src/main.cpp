@@ -8,6 +8,7 @@
 
 using std::cout;
 using std::endl;
+using std::cin;
 using namespace std::chrono;
 
 //const char *sean_program_version = "SeAN 0.0.0";
@@ -19,6 +20,7 @@ static char args_doc[] = "INPUTFILE";
 static struct argp_option options[] = {
   { 0, 'p', 0, 0, "Create plots of all calculated quantities" },
   { 0, 'w', 0, 0, "Create text output files for all calculated quantities" },
+  { 0, 'W', 0, 0, "Create text output files for all calculated quantities (ignore warnings)" },
   { 0 }
 };
 
@@ -26,6 +28,7 @@ struct arguments{
         char *inputfile;
 	bool plot = false;
 	bool write = false;
+	bool sudowrite = false;
 };
 
 static error_t parse_opt(int key, char *arg, struct argp_state *state) {
@@ -35,6 +38,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     case ARGP_KEY_ARG: arguments->inputfile = arg; break;
     case 'p': arguments->plot = true; break;
     case 'w': arguments->write = true; break;
+    case 'W': arguments->sudowrite = true; break;
     case ARGP_KEY_END:
         if(state->arg_num == 0) {
             argp_usage(state);
@@ -54,6 +58,27 @@ int main(int argc, char* argv[]){
 
 	struct arguments arguments;
 	argp_parse(&argp, argc, argv, 0, 0, &arguments);
+
+	if(arguments.write && !arguments.sudowrite){
+		string answer;
+		if(NBINS*NBINS_Z > TXT_OUTPUT_WARNING_THRESHOLD){
+			cout << "> Warning: main.cpp: main(): Text output requested, but NBINS*NBINS_Z = " << NBINS*NBINS_Z << " > " << TXT_OUTPUT_WARNING_THRESHOLD << endl;	
+			cout << "\tVery large output files may be created. Proceed?" << endl;	
+			cout << "\t(To force file-writing, use the '-W' option instead of '-w')" << endl;
+			cout << "\t'y' yes" << endl;
+			cout << "\t'n' no" << endl; 
+			while(true){
+				cin >> answer;
+				if(answer == "y"){
+					break;
+				}else if(answer == "n"){
+					abort();
+				}else{
+					continue;
+				}
+			}
+		}
+	}
 
 	high_resolution_clock::time_point start = high_resolution_clock::now();
 

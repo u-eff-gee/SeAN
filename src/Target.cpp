@@ -412,9 +412,21 @@ void Target::print(){
 
 void Target::write(double (&energy_bins)[NBINS]){
 	print1DArray(energy_bins, NBINS, "Energy / eV", TXT_OUTPUT_DIR + target_name + "_energy_bins.txt");
+	print1DArray(incident_beam_bins, NBINS, "Incident beam / a.u.", TXT_OUTPUT_DIR + target_name + "_incident_beam.txt");
+	print1DArray(dopplercs_bins, NBINS, "Doppler-broadened cross section / eV fm^2", TXT_OUTPUT_DIR + target_name + "_doppler_shift.txt");
+	print1DArray(massattenuation_bins, NBINS, "Mass attenuation / fm^2 / atom", TXT_OUTPUT_DIR + target_name + "_mass_attenuation.txt");
+	print1DArray(z_bins, NBINS_Z, "z / atoms / fm^2", TXT_OUTPUT_DIR + target_name + "_z_bins.txt");
+	print1DArray(transmitted_beam_bins, NBINS, "Transmitted beam / a.u.", TXT_OUTPUT_DIR + target_name + "_transmitted_beam.txt");
+
+	print2DArray(photon_flux_density_bins, "Photon flux density / a.u.", TXT_OUTPUT_DIR + target_name + "_phi.txt");
+	print2DArray(resonance_absorption_density_bins, "Resonance absorption density / a.u.", TXT_OUTPUT_DIR + target_name + "_alpha.txt");
+
+	print2DVector(crosssection_bins, "Cross section / eV fm^2", TXT_OUTPUT_DIR + target_name + "_cross_section.txt");
+	print2DVector(velocity_bins, "Velocity / c", TXT_OUTPUT_DIR + target_name + "_velocity_bins.txt");
+	print2DVector(vdist_bins, "Velocity distribution", TXT_OUTPUT_DIR + target_name + "_velocity_distribution.txt");
 }
 
-void Target::print1DArray(double *array, unsigned int n, string c1, string filename){
+void Target::print1DArray(double *array, unsigned int n, string column, string filename){
 	
 	ofstream ofile(filename);
 
@@ -425,9 +437,76 @@ void Target::print1DArray(double *array, unsigned int n, string c1, string filen
         cout << "> Writing output file '" << filename << "'" << endl;
 
 	ofile.precision(8);
-	ofile << c1 << endl;
+	ofile << COMMENT << " "  << column << endl;
 	for(unsigned int i = 0; i < n; ++i){
 		ofile << scientific << array[i] << endl;
+	}
+}
+
+void Target::print2DArray(double (&array)[NBINS][NBINS_Z], string column, string filename){
+	
+	ofstream ofile(filename);
+
+        if(!ofile.is_open()){
+                cout << "Error: Target.cpp: print2DArray(): File '" << filename << "' could not be opened." << endl;
+		abort();
+	}
+        cout << "> Writing output file '" << filename << "'" << endl;
+
+	ofile.precision(8);
+	ofile << COMMENT << " "  << column << endl;
+	ofile << COMMENT << " f(E0, z0)" << endl;
+	ofile << COMMENT << " f(E0, z1)" << endl;
+	ofile << COMMENT << " ... " << endl;
+	ofile << COMMENT << " f(E1, z0)" << endl;
+	ofile << COMMENT << " f(E1, z1)" << endl;
+	ofile << COMMENT << " ... " << endl;
+	for(unsigned int i = 0; i < NBINS; ++i){
+		for(unsigned int j = 0; j < NBINS_Z; ++j){
+			ofile << scientific << array[i][j] << endl;
+		}
+	}
+}
+
+void Target::print1DVector(vector<double> (&vec), string column, string filename){
+	
+	ofstream ofile(filename);
+
+        if(!ofile.is_open()){
+                cout << "Error: Target.cpp: print1DVector(): File '" << filename << "' could not be opened." << endl;
+		abort();
+	}
+        cout << "> Writing output file '" << filename << "'" << endl;
+
+	ofile.precision(8);
+	ofile << COMMENT << " " << column << endl;
+	for(unsigned int i = 0; i < vec.size(); ++i){
+		ofile << scientific << vec[i] << endl;
+	}
+}
+
+void Target::print2DVector(vector< vector<double> > (&vec), string column, string filename){
+	
+	ofstream ofile(filename);
+
+        if(!ofile.is_open()){
+                cout << "Error: Target.cpp: print2DVector(): File '" << filename << "' could not be opened." << endl;
+		abort();
+	}
+        cout << "> Writing output file '" << filename << "'" << endl;
+
+	ofile.precision(8);
+	ofile << COMMENT << " "  << column << endl;
+	ofile << COMMENT << " f(E0, z0)" << endl;
+	ofile << COMMENT << " f(E0, z1)" << endl;
+	ofile << COMMENT << " ... " << endl;
+	ofile << COMMENT << " f(E1, z0)" << endl;
+	ofile << COMMENT << " f(E1, z1)" << endl;
+	ofile << COMMENT << " ... " << endl;
+	for(unsigned int i = 0; i < vec.size(); ++i){
+		for(unsigned int j = 0; j < vec[i].size(); ++j){
+			ofile << scientific << vec[i][j] << endl;
+		}
 	}
 }
 

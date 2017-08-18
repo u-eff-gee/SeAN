@@ -104,4 +104,10 @@ const string NIST_SEPARATOR = "  ";
 
 #define NBINS_F_MAX 100
 
+//************************************
+// Parameters for text file output
+//************************************
+
+#define TXT_OUTPUT_WARNING_THRESHOLD 1e6
+
 #endif
