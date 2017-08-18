@@ -18,7 +18,7 @@ void Experiment::readInputFile(const char* filename){
 	ifstream ifile(filename);
 
         if(!ifile.is_open()){
-                cout << "Error: Experiment.cc: readInputFile(): File '" << filename << "' not found." << endl;
+                cout << "Error: Experiment.cpp: readInputFile(): File '" << filename << "' not found." << endl;
 		abort();
 	}
         cout << "> Reading input file '" << filename << "'" << endl;
@@ -202,7 +202,7 @@ void Experiment::createEnergyBins(double emin, double emax){
 		energy_bins[i] = emin + i*delta_e;
 };
 
-void Experiment::crossSections(bool plot){
+void Experiment::crossSections(bool plot, bool write){
 	for(unsigned int i = 0; i < targets.size(); ++i){
 		targets[i]->calculateCrossSection(energy_bins);
 		targets[i]->calculateVelocityDistribution(energy_bins);
@@ -213,10 +213,13 @@ void Experiment::crossSections(bool plot){
 			targets[i]->plotVelocityDistribution();
 			targets[i]->plotDopplerShift(energy_bins);
 		}
+		if(write){
+			targets[i]->write(energy_bins);
+		}
 	}
 };
 
-void Experiment::transmission(bool plot){
+void Experiment::transmission(bool plot, bool output){
 	targets[0]->calculateIncidentBeam(energy_bins, beam_ID, beamParams);
 	for(unsigned int i = 0; i < targets.size(); ++i){
 		targets[i]->calculateMassAttenuation(energy_bins);

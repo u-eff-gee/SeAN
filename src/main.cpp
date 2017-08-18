@@ -18,13 +18,14 @@ static char args_doc[] = "INPUTFILE";
 
 static struct argp_option options[] = {
   { 0, 'p', 0, 0, "Create plots of all calculated quantities" },
-  { 0, 'o', 0, 0, "Create output files for all calculated quantities" },
+  { 0, 'w', 0, 0, "Create text output files for all calculated quantities" },
   { 0 }
 };
 
 struct arguments{
         char *inputfile;
 	bool plot = false;
+	bool write = false;
 };
 
 static error_t parse_opt(int key, char *arg, struct argp_state *state) {
@@ -33,6 +34,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     switch (key) {
     case ARGP_KEY_ARG: arguments->inputfile = arg; break;
     case 'p': arguments->plot = true; break;
+    case 'w': arguments->write = true; break;
     case ARGP_KEY_END:
         if(state->arg_num == 0) {
             argp_usage(state);
@@ -62,8 +64,8 @@ int main(int argc, char* argv[]){
 		experiment.testIntegration(arguments.plot);
 	} else{
 		experiment.print();
-		experiment.crossSections(arguments.plot);
-		experiment.transmission(arguments.plot);
+		experiment.crossSections(arguments.plot, arguments.write);
+		experiment.transmission(arguments.plot, arguments.write);
 	}
 
 	high_resolution_clock::time_point stop = high_resolution_clock::now();

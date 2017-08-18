@@ -11,8 +11,10 @@
 using std::cout;
 using std::endl;
 using std::ifstream;
+using std::ofstream;
 using std::stringstream;
 using std::regex;
+using std::scientific;
 
 void Target::readAME(string isotope){
 	unsigned int separator = 0;
@@ -72,7 +74,7 @@ void Target::calculateCrossSection(double (&energy_bins)[NBINS]){
 void Target::plotCrossSection(double (&energy_bins)[NBINS]){
 
 	stringstream filename;
-	filename << target_name << "_cross_section.pdf";
+	filename << PLOT_OUTPUT_DIR << target_name << "_cross_section.pdf";
 	stringstream canvasname;
 	canvasname << target_name << "_canvas";
 	TCanvas *canvas = new TCanvas(canvasname.str().c_str(), target_name.c_str(), 0, 0, 800, 500);
@@ -264,7 +266,7 @@ void Target::calculateAbsorption(double (&energy_bins)[NBINS]){
 void Target::plotVelocityDistribution(){
 
 	stringstream filename;
-	filename << target_name << "_velocity_distribution.pdf";
+	filename << PLOT_OUTPUT_DIR << target_name << "_velocity_distribution.pdf";
 	stringstream canvasname;
 	canvasname << target_name << "_canvas";
 	TCanvas *canvas = new TCanvas(canvasname.str().c_str(), target_name.c_str(), 0, 0, 800, 500);
@@ -281,7 +283,7 @@ void Target::plotVelocityDistribution(){
 void Target::plotDopplerShift(double (&energy_bins)[NBINS]){
 
 	stringstream filename;
-	filename << target_name << "_doppler_shift.pdf";
+	filename << PLOT_OUTPUT_DIR << target_name << "_doppler_shift.pdf";
 	stringstream canvasname;
 	canvasname << target_name << "_canvas";
 	TCanvas *canvas = new TCanvas(canvasname.str().c_str(), target_name.c_str(), 0, 0, 800, 500);
@@ -298,7 +300,7 @@ void Target::plotDopplerShift(double (&energy_bins)[NBINS]){
 void Target::plotMassAttenuation(double (&energy_bins)[NBINS]){
 
 	stringstream filename;
-	filename << target_name << "_mass_attenuation.pdf";
+	filename << PLOT_OUTPUT_DIR << target_name << "_mass_attenuation.pdf";
 	stringstream canvasname;
 	canvasname << target_name << "_canvas";
 	TCanvas *canvas = new TCanvas(canvasname.str().c_str(), target_name.c_str(), 0, 0, 800, 500);
@@ -315,7 +317,7 @@ void Target::plotMassAttenuation(double (&energy_bins)[NBINS]){
 void Target::plotMu(){
 
 	stringstream filename;
-	filename << target_name << "_mu.pdf";
+	filename << PLOT_OUTPUT_DIR << target_name << "_mu.pdf";
 	stringstream canvasname;
 	canvasname << target_name << "_canvas";
 	TCanvas *canvas = new TCanvas(canvasname.str().c_str(), target_name.c_str(), 0, 0, 800, 500);
@@ -335,7 +337,7 @@ void Target::plotMu(){
 void Target::plotPhotonFluxDensity(double (&energy_bins)[NBINS]){
 
 	stringstream filename;
-	filename << target_name << "_phi.pdf";
+	filename << PLOT_OUTPUT_DIR << target_name << "_phi.pdf";
 	stringstream canvasname;
 	canvasname << target_name << "_canvas";
 	TCanvas *canvas = new TCanvas(canvasname.str().c_str(), target_name.c_str(), 0, 0, 800, 500);
@@ -351,7 +353,7 @@ void Target::plotPhotonFluxDensity(double (&energy_bins)[NBINS]){
 void Target::plotTestIntegration(double (&energy_bins)[NBINS]){
 
 	stringstream filename;
-	filename << target_name << "_function.pdf";
+	filename << PLOT_OUTPUT_DIR << target_name << "_function.pdf";
 	stringstream canvasname;
 	canvasname << target_name << "_canvas";
 	TCanvas *canvas = new TCanvas(canvasname.str().c_str(), target_name.c_str(), 0, 0, 800, 500);
@@ -367,7 +369,7 @@ void Target::plotTestIntegration(double (&energy_bins)[NBINS]){
 void Target::plotResonanceAbsorptionDensity(double (&energy_bins)[NBINS]){
 
 	stringstream filename;
-	filename << target_name << "_alpha.pdf";
+	filename << PLOT_OUTPUT_DIR << target_name << "_alpha.pdf";
 	stringstream canvasname;
 	canvasname << target_name << "_canvas";
 	TCanvas *canvas = new TCanvas(canvasname.str().c_str(), target_name.c_str(), 0, 0, 800, 500);
@@ -408,6 +410,26 @@ void Target::print(){
 	cout << "TARGET VELOCITY = " << vz << " m/s" << endl;
 }
 
+void Target::write(double (&energy_bins)[NBINS]){
+	print1DArray(energy_bins, NBINS, "Energy / eV", TXT_OUTPUT_DIR + target_name + "_energy_bins.txt");
+}
+
+void Target::print1DArray(double *array, unsigned int n, string c1, string filename){
+	
+	ofstream ofile(filename);
+
+        if(!ofile.is_open()){
+                cout << "Error: Target.cpp: print1DArray(): File '" << filename << "' could not be opened." << endl;
+		abort();
+	}
+        cout << "> Writing output file '" << filename << "'" << endl;
+
+	ofile.precision(8);
+	ofile << c1 << endl;
+	for(unsigned int i = 0; i < n; ++i){
+		ofile << scientific << array[i] << endl;
+	}
+}
 
 double Target::normalizeVDist(unsigned int i){
 

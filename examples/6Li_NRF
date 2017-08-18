@@ -17,7 +17,7 @@ const, 1.0
 # 6) Model for velocity distribution
 maxwell_boltzmann, 412.5
 # 7) Nuclear mass in atomic mass units
-6.01512288742
+6Li
 # 8) Mass attenuation coefficient
 0
 # 9) Target thickness in atoms/fm^2
