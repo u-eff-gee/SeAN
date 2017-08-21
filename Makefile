@@ -6,7 +6,7 @@ EXE=sean
 CC=g++
 CFLAGS=-g -Wall -Wconversion -Wsign-conversion -I$(INCDIR) -fopenmp
 #CFLAGS=-O3 -Wall -Wconversion -Wsign-conversion -I$(INCDIR) -fopenmp
-ROOTFLAGS=`root-config --cflags --glibs` -lMathMore
+ROOTFLAGS=`root-config --cflags --glibs` -lMathMore -lfftw3 -lm
 
 _DEPS = Experiment.h Config.h CrossSection.h Target.h Absorption.h
 DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))

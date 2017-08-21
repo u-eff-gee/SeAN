@@ -57,8 +57,8 @@ const string NIST_SEPARATOR = "  ";
 //************************************
 
 // Number of bins for the calculation
-#define NBINS 5000
-#define NBINS_Z 5000
+#define NBINS 50
+#define NBINS_Z 50
 
 // Limit for the applicability of the approximation for the doppler-shifted cross section (Gamma << Delta). The code will output a warning if the ratio Gamma/Delta is larger than APPROXIMATION_LIMIT.
 #define APPROXIMATION_LIMIT 0.1 // Arbitrary choice

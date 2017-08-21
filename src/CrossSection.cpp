@@ -3,8 +3,10 @@
 #include <iostream>
 #include <sstream>
 #include <algorithm>
+#include <complex.h>
 
 #include "omp.h"
+#include "fftw3.h"
 
 #include "TGraph.h"
 #include "TAxis.h"
@@ -46,6 +48,11 @@ void CrossSection::maxwell_boltzmann_debye(double (&energy_bins)[NBINS], vector<
 
 void CrossSection::dopplershift(double (&dopplercs_bins)[NBINS], double (&energy_bins)[NBINS], vector<vector<double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector<vector<double> > &vdist_bins, vector<double> &vdist_norm){
 
+	fftw_complex* vdist_fft, *crosssection_fft;
+	fftw_plan vdist_plan, crosssection_plan;
+	vdist_fft = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * NBINS/2+1);
+	crosssection_fft = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * NBINS/2+1);
+
 	for(unsigned int i = 0; i < crosssection_bins.size(); ++i){
 		unsigned long int resonance_position = (unsigned long int) (max_element(crosssection_bins[i].begin(), crosssection_bins[i].end()) - crosssection_bins[i].begin() + 1);
 
@@ -55,6 +62,18 @@ void CrossSection::dopplershift(double (&dopplercs_bins)[NBINS], double (&energy
 				dopplercs_bins[j] += vdist_norm[i]*vdist_bins[i][k]*crosssection_bins[i][j + resonance_position - k]*(velocity_bins[i][k + 1] - velocity_bins[i][k]);
 			}
 		}
+
+		vdist_plan = fftw_plan_dft_r2c_1d(NBINS, &vdist_bins[i][0], vdist_fft, FFTW_ESTIMATE);
+		crosssection_plan = fftw_plan_dft_r2c_1d(NBINS, &crosssection_bins[i][0], crosssection_fft, FFTW_ESTIMATE);
+
+		fftw_execute(vdist_plan);
+		fftw_execute(crosssection_plan);
+
+		for(int i = 0; i < NBINS; ++i){
+			cout << i << " : " << vdist_fft[i] << endl;
+			vdist_fft[i] = crosssection_fft[i]*vdist_fft[i];
+		}
+
 	}
 }
 
