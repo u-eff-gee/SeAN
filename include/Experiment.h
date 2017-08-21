@@ -28,8 +28,8 @@ public:
 	// Functions to manage the calculation process
 	void readInputFile(const char* filename);
 	void testIntegration(bool plot);
-	void crossSections(bool plot, bool output);
-	void transmission(bool plot, bool output);
+	void crossSections(bool plot, bool write);
+	void transmission(bool plot, bool write);
 	void print();
 	void runTests();
 

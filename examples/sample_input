@@ -25,6 +25,7 @@ Li
 # 10) Velocity of the target along the beam direction in m/s
 #1500.
 5000.
+############################################################
 # 0) Identifier of the target (string)
 6Li_2
 # 1) Resonance energies in eV (comma separated values)
