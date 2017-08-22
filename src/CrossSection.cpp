@@ -35,9 +35,28 @@ void CrossSection::maxwell_boltzmann(double (&energy_bins)[NBINS], vector<double
 	// Find bin of resonance energy
 	long int resonance_position = upper_bound(energy_bins, energy_bins + NBINS, e0) - energy_bins;
 
+	// Equidistant velocity bins
+//	energy_ratio = energy_bins[0]/energy_bins[resonance_position];
+//	double vmin = (-2. + 2.*energy_ratio*energy_ratio)/(2. + 2.*energy_ratio*energy_ratio);
+//	energy_ratio = energy_bins[NBINS - 1]/energy_bins[resonance_position];
+//	double vmax = (-2. + 2.*energy_ratio*energy_ratio)/(2. + 2.*energy_ratio*energy_ratio);
+//
+//	double vrange = 0;
+//
+//	if(fabs(vmin) > fabs(vmax))
+//		vrange = fabs(vmin);
+//	else
+//		vrange = fabs(vmax);
+//
+//	double vstep = 2.*vrange/NBINS;
+//	double v;
+
       	for(unsigned int i = 0; i < NBINS; ++i){
 		energy_ratio = energy_bins[i]/energy_bins[resonance_position];
 		velocity_bins[i] = (-2. + 2.*energy_ratio*energy_ratio)/(2. + 2.*energy_ratio*energy_ratio);
+
+//		v = -vrange + i*vstep;
+//		velocity_bins[i] = v;
               	vdist_bins[i] = c1*exp(c2*velocity_bins[i]*velocity_bins[i]);
       	}
 }
@@ -48,33 +67,90 @@ void CrossSection::maxwell_boltzmann_debye(double (&energy_bins)[NBINS], vector<
 
 void CrossSection::dopplershift(double (&dopplercs_bins)[NBINS], double (&energy_bins)[NBINS], vector<vector<double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector<vector<double> > &vdist_bins, vector<double> &vdist_norm){
 
-	fftw_complex* vdist_fft, *crosssection_fft;
-	fftw_plan vdist_plan, crosssection_plan;
-	vdist_fft = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * NBINS/2+1);
-	crosssection_fft = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * NBINS/2+1);
+	for(unsigned int i = 0; i < vdist_bins.size(); ++i){
+		for(unsigned int j = 0; j < NBINS; ++j){
+			vdist_bins[i].push_back(0.);
+		}
+	}
+	
+	fftw_plan vdist_plan, crosssection_plan, product_fft_plan;
+	fftw_complex vdist_fft[NBINS*2] = {{0.}};
+	fftw_complex crosssection_fft[NBINS*2];
+	fftw_complex product_fft[NBINS*2] = {{0.}};
+	double folded[2*NBINS] = {0.};
+
+//	Unit test for Fourier transform: Transform back and forth
+//	fftw_complex cs_fft[NBINS + 1] = {{0.}};
+//	double cs_again[NBINS*2] = {0.};
+//	
+//	fftw_plan cs_plan = fftw_plan_dft_r2c_1d(2*NBINS, &crosssection_bins[0][NBINS], cs_fft, FFTW_ESTIMATE);
+//	fftw_plan cs_plan_inv = fftw_plan_dft_c2r_1d(2*NBINS, cs_fft, cs_again, FFTW_ESTIMATE);
+//
+//	fftw_execute(cs_plan);
+//	fftw_execute(cs_plan_inv);
+//
+//	for(unsigned int i = 0; i < NBINS*2; ++i)
+//		cout << crosssection_bins[0][NBINS + i] << " <-> " << cs_again[i]/(2.*NBINS) << endl;
+
+//	cout << "Original arrays: " << endl;
+//	for(unsigned int i = 0; i < 2*NBINS; ++i){
+//		cout << i << " : " << crosssection_bins[0][NBINS +i] << " | " << vdist_bins[0][i] << endl;
+//	}
+//	cout << endl;
+
+//	cout << "TXT output: " << endl;
+//	for(unsigned int i = 0; i < 2*NBINS; ++i){
+//		//cout << crosssection_bins[0][NBINS + i] << ", ";
+//		//cout << vdist_bins[0][i] << ", ";
+//	}
+//	cout << endl;
 
 	for(unsigned int i = 0; i < crosssection_bins.size(); ++i){
-		unsigned long int resonance_position = (unsigned long int) (max_element(crosssection_bins[i].begin(), crosssection_bins[i].end()) - crosssection_bins[i].begin() + 1);
+		unsigned long int resonance_position = (unsigned long int) (max_element(crosssection_bins[i].begin(), crosssection_bins[i].end()) - crosssection_bins[i].begin());
 
-		#pragma omp parallel for
+		//#pragma omp parallel for
 		for(unsigned int j = 0; j < NBINS; ++j){
 			for(unsigned int k = 0; k < NBINS - 1; ++k){
-				dopplercs_bins[j] += vdist_norm[i]*vdist_bins[i][k]*crosssection_bins[i][j + resonance_position - k]*(velocity_bins[i][k + 1] - velocity_bins[i][k]);
+				//dopplercs_bins[j] += vdist_norm[i]*vdist_bins[i][k]*crosssection_bins[i][j + resonance_position - k]*(velocity_bins[i][k + 1] - velocity_bins[i][k]);
+				dopplercs_bins[j] += vdist_norm[i]*vdist_bins[i][k]*crosssection_bins[i][j + NBINS - k]*(velocity_bins[i][k + 1] - velocity_bins[i][k]);
 			}
 		}
 
-		vdist_plan = fftw_plan_dft_r2c_1d(NBINS, &vdist_bins[i][0], vdist_fft, FFTW_ESTIMATE);
-		crosssection_plan = fftw_plan_dft_r2c_1d(NBINS, &crosssection_bins[i][0], crosssection_fft, FFTW_ESTIMATE);
+		vdist_plan = fftw_plan_dft_r2c_1d(2*NBINS, &vdist_bins[i][0], vdist_fft, FFTW_ESTIMATE);
+		crosssection_plan = fftw_plan_dft_r2c_1d(2*NBINS, &crosssection_bins[i][NBINS], crosssection_fft, FFTW_ESTIMATE);
 
 		fftw_execute(vdist_plan);
 		fftw_execute(crosssection_plan);
 
-		for(int i = 0; i < NBINS; ++i){
-			cout << i << " : " << vdist_fft[i] << endl;
-			vdist_fft[i] = crosssection_fft[i]*vdist_fft[i];
+		cout << "Fourier-transformed arrays: " << endl;
+		for(unsigned int l = 0; l < NBINS + 1; ++l){
+			product_fft[l][0] = crosssection_fft[l][0]*vdist_fft[l][0] - crosssection_fft[l][1]*vdist_fft[l][1];
+			product_fft[l][1] = crosssection_fft[l][0]*vdist_fft[l][1] - crosssection_fft[l][1]*vdist_fft[l][0];
+			cout << l << " : " << crosssection_fft[l][0] << " + i*" << crosssection_fft[l][1] << " | " << vdist_fft[l][0] << " + i*" << vdist_fft[l][1] << endl;
 		}
+		cout << endl;
 
+		cout << "Product: " << endl;
+		for(unsigned int l = 0; l < NBINS + 1; ++l){
+			cout << l << " : " << product_fft[l][0] << " + i*" << product_fft[l][1] << endl;
+		}
+		cout << endl;
 	}
+
+		product_fft_plan = fftw_plan_dft_c2r_1d(2*NBINS, product_fft, folded, FFTW_ESTIMATE);
+		fftw_execute(product_fft_plan);
+
+		fftw_destroy_plan(crosssection_plan);
+		fftw_destroy_plan(vdist_plan);
+		fftw_destroy_plan(product_fft_plan);
+
+		cout << "Result :" << endl;
+		for(unsigned int l = 0; l < 2*NBINS; ++l){
+			cout << l << " : " << folded[l]/(2.*NBINS)*(velocity_bins[0][1] - velocity_bins[0][0]) << ", " << dopplercs_bins[l] << endl;
+		}
+		cout << vdist_norm[0] << endl;
+
+		cout << endl;
 }
 
 void CrossSection::maxwell_boltzmann_approximation(double (&dopplercs_bins)[NBINS], double (&energy_bins)[NBINS], vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &e0_list, vector<double> &gamma0_list, vector<double> &gamma_list, vector<double> &jj_list, double j0, vector<double> &params, double mass){

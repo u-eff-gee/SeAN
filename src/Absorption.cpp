@@ -78,7 +78,7 @@ void Absorption::gauss_beam(double (&energy_bins)[NBINS], double (&incident_beam
 
 void Absorption::photon_flux_density(double (&dopplercs_bins)[NBINS], double (&massattenuation_bins)[NBINS], double (&z_bins)[NBINS_Z], double (&incident_beam_bins)[NBINS], double (&photon_flux_density_bins)[NBINS][NBINS_Z]){
 
-	#pragma omp parallel for
+	//#pragma omp parallel for
 	for(int i = 0; i < NBINS; ++i){
 		for(int j = 0; j < NBINS_Z; ++j){
 			photon_flux_density_bins[i][j] = incident_beam_bins[i]*exp(-(dopplercs_bins[i] + massattenuation_bins[i])*z_bins[j]);
@@ -88,7 +88,7 @@ void Absorption::photon_flux_density(double (&dopplercs_bins)[NBINS], double (&m
 
 void Absorption::resonance_absorption_density(double (&dopplercs_bins)[NBINS], double (&photon_flux_density_bins)[NBINS][NBINS_Z], double (&resonance_absorption_density_bins)[NBINS][NBINS_Z]){
 
-	#pragma omp parallel for
+	//#pragma omp parallel for
 	for(int i = 0; i < NBINS; ++i){
 		for(int j = 0; j < NBINS_Z; ++j){
 			resonance_absorption_density_bins[i][j] = dopplercs_bins[i]*photon_flux_density_bins[i][j];
