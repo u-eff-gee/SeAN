@@ -5,3 +5,4 @@ H
 He
 Li
 Ce
+Gd
