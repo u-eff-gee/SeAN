@@ -67,11 +67,10 @@ void Absorption::const_beam(double (&energy_bins)[NBINS], double (&incident_beam
 
 void Absorption::gauss_beam(double (&energy_bins)[NBINS], double (&incident_beam_bins)[NBINS], vector<double> beamParams){
 
-	double c1 = beamParams[2]/sqrt(2.*PI*beamParams[1]*beamParams[1]);
-	double c2 = -1./(2.*beamParams[1]*beamParams[1]);
+	double c1 = -1./(2.*beamParams[1]*beamParams[1]);
 
 	for(int i = 0; i < NBINS; ++i)
-		incident_beam_bins[i] = c1*exp((energy_bins[i] - beamParams[0])*(energy_bins[i] - beamParams[0])*c2);
+		incident_beam_bins[i] = beamParams[2]*exp((energy_bins[i] - beamParams[0])*(energy_bins[i] - beamParams[0])*c1);
 
 }
 

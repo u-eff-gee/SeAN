@@ -62,8 +62,8 @@ using std::string;
 //************************************
 
 // Number of bins for the calculation
-#define NBINS 5000
-#define NBINS_Z 5000
+#define NBINS 10000
+#define NBINS_Z 500
 
 // Limit for the applicability of the approximation for the doppler-shifted cross section (Gamma << Delta). The code will output a warning if the ratio Gamma/Delta is larger than APPROXIMATION_LIMIT.
 #define APPROXIMATION_LIMIT 0.1 // Arbitrary choice
@@ -101,11 +101,11 @@ using std::string;
 #define MU_PLOT_LEGEND_Y2 0.9
 
 // Maximum number of bins on the energy- und z-axis for plots of phi and alpha
-#define NBINS_PHI_MAX 100
-#define NBINS_Z_PHI_MAX 100
+#define NBINS_PHI_MAX 1000
+#define NBINS_Z_PHI_MAX 1000
 
-#define NBINS_ALPHA_MAX 100
-#define NBINS_Z_ALPHA_MAX 100
+#define NBINS_ALPHA_MAX 1000
+#define NBINS_Z_ALPHA_MAX 1000
 
 #define NBINS_F_MAX 100
 

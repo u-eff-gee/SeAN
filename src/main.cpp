@@ -80,6 +80,9 @@ int main(int argc, char* argv[]){
 		}
 	}
 
+	if(arguments.sudowrite)
+		arguments.write = true;
+
 	high_resolution_clock::time_point start = high_resolution_clock::now();
 
 	Experiment experiment;
