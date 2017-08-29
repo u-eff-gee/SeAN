@@ -27,8 +27,13 @@ using std::string;
 #define AME_MASS_START 96
 #define AME_MASS_LENGTH 13
 
-// Separator between columns in a NIST x-ray attenuation file
-const string NIST_SEPARATOR = "  ";
+// Coordinates in NIST file
+#define NIST_XRAY 0
+#define NIST_XRAY_LENGTH 3
+#define NIST_ENERGY 3
+#define NIST_ENERGY_LENGTH 11
+#define NIST_MU 16
+#define NIST_MU_LENGTH 9
 
 //************************************
 // Definitions of input parameters

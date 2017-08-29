@@ -3,6 +3,7 @@
 #include <sstream>
 #include <fstream>
 #include <iostream>
+#include <regex>
 
 #include "TGraph2D.h"
 #include "TH2D.h"
@@ -12,6 +13,8 @@ using std::stringstream;
 using std::ifstream;
 using std::cout;
 using std::endl;
+using std::regex;
+using std::regex_replace;
 
 void Absorption::read_massattenuation_NIST(double (&energy_bins)[NBINS], double (&massattenuation_bins)[NBINS], string massAttenuation_ID, double mass){
 	
@@ -21,8 +24,6 @@ void Absorption::read_massattenuation_NIST(double (&energy_bins)[NBINS], double 
 	string line;
 	nbins_matt = 0;
 	ifstream ifile;
-	size_t start = 0;
-	size_t stop = 0;
 
 	ifile.open(filename.str().c_str());	
 
@@ -35,21 +36,19 @@ void Absorption::read_massattenuation_NIST(double (&energy_bins)[NBINS], double 
 	while(getline(ifile, line)){
 		if(line.substr(0,1) == COMMENT)
 			continue;
+
+		// Ignore lines with x-ray resonances since they have the same energy value as the previous bins. Those steps can not be interpolated.
+		if(regex_replace(line.substr(NIST_XRAY, NIST_XRAY_LENGTH), regex("\\s+"), "") != "")
+			continue;	
 		
-		start = 0;
-
-		stop = line.find(NIST_SEPARATOR);
-
-		matt[0].push_back(atof(line.substr(start, stop).c_str()));
-		start = stop + NIST_SEPARATOR.length();
-		stop = line.substr(start, line.length()).find(NIST_SEPARATOR);
-		matt[1].push_back(atof(line.substr(start, stop).c_str()));
+		matt[0].push_back(atof(line.substr(NIST_ENERGY, NIST_ENERGY_LENGTH).c_str()));
+		matt[1].push_back(atof(line.substr(NIST_MU, NIST_MU_LENGTH).c_str()));
 
 		++nbins_matt;
 	}
 
-	inter = new ROOT::Math::Interpolator(nbins_matt, ROOT::Math::Interpolation::kCSPLINE);
-	inter->SetData(nbins_matt, &matt[0][0], &matt[1][0]);
+	inter = new ROOT::Math::Interpolator(nbins_matt - 1, ROOT::Math::Interpolation::kCSPLINE);
+	inter->SetData(nbins_matt - 1, &matt[0][0], &matt[1][0]);
 
 	// Conversion from cm2/g to fm2/atom
 	double conversion_factor = mass*AtomicMassUnitG*1.e26;
@@ -110,7 +109,7 @@ void Absorption::plot_massattenuation(double (&energy_bins)[NBINS], double (&mas
 
 void Absorption::plot_total_massattenuation(string title, TCanvas *canvas, TLegend* legend, string legend_entry){
 
-	TGraph *graph = new TGraph((Int_t) nbins_matt, &matt[0][0], &matt[1][0]);
+	TGraph *graph = new TGraph((Int_t) nbins_matt - 1, &matt[0][0], &matt[1][0]);
 	
 	graph->SetName(title.c_str());
 	graph->SetTitle(title.c_str());
