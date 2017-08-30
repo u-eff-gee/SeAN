@@ -111,8 +111,8 @@ void CrossSection::dopplershift(double (&dopplercs_bins)[NBINS], double (&energy
 		//#pragma omp parallel for
 		for(unsigned int j = 0; j < NBINS; ++j){
 			for(unsigned int k = 0; k < NBINS - 1; ++k){
-				//dopplercs_bins[j] += vdist_norm[i]*vdist_bins[i][k]*crosssection_bins[i][j + resonance_position - k]*(velocity_bins[i][k + 1] - velocity_bins[i][k]);
-				dopplercs_bins[j] += vdist_norm[i]*vdist_bins[i][k]*crosssection_bins[i][j + NBINS - k]*(velocity_bins[i][k + 1] - velocity_bins[i][k]);
+				dopplercs_bins[j] += vdist_norm[i]*vdist_bins[i][k]*crosssection_bins[i][j + resonance_position - k]*(velocity_bins[i][k + 1] - velocity_bins[i][k]);
+				//dopplercs_bins[j] += vdist_norm[i]*vdist_bins[i][k]*crosssection_bins[i][j + NBINS - k]*(velocity_bins[i][k + 1] - velocity_bins[i][k]);
 			}
 		}
 

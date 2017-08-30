@@ -10,8 +10,10 @@ sean
 # vim .swp files
 *.swp
 
-# Plot output files
-*.pdf
+# Output files
+output/*.pdf
+output/*.txt
+!output/output.txt
 
 # valgrind output
 *.out.*
