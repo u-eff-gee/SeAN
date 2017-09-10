@@ -23,3 +23,13 @@ input/*
 
 # .json files
 *.json
+
+# LaTeX output
+doc/*.aux
+doc/*.bbl
+doc/*.blg
+doc/*.dvi
+doc/*.log
+doc/*.out
+doc/*.pdf
+doc/*.toc
