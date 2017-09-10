@@ -5,7 +5,7 @@ import time
 from scipy import integrate
 
 ### Set number of bins for calculation
-NBINS = 7000
+NBINS = 100
 
 ### Physical constants
 HBARC = 197.3269788e6 # eVfm
@@ -14,17 +14,17 @@ kB = 8.6173303e-5 # eV/K
 ATOMICMASSUNIT = 931.494095e6 # eV7c^2
 
 ### Set limits for the calculation
-EMIN = 5.999980e6
-EMAX = 6.000020e6
+EMIN = 3.561880e6
+EMAX = 3.563880e6
 
 ### Set parameters of the nuclear resonance
-Ei = 6.0e6
-Ji = 1.
-J0 = 0.
-Gamma0 = 1.
-Gamma = 1.
-M = 60.
-T = 250.
+Ei = 3.562880e6
+Ji = 0.
+J0 = 1.
+Gamma0 = 8.16
+Gamma = 8.16
+M = 6.01512
+T = 412.5
 
 ### Definitions of functions
 # Breit-Wigner cross section
@@ -60,11 +60,11 @@ v_dist = maxwell(v_bins, M, T)
 ### 1) The "exact" solution: Numerical integration (num) using an integration algorithm
 # Define a new function that is the product of the cross section and the velocity distribution
 maxwell_average = lambda v, E: breit_wigner(E, Elab(v, Ei), Ji, J0, Gamma0, Gamma)*maxwell(v, M, T)
+
+start = time.time()
     
 doppler_num = np.zeros(NBINS)
 doppler_num_err = np.zeros(NBINS)
-
-start = time.time()
 
 for i in range(NBINS):
     doppler_num[i], doppler_num_err[i] = integrate.quad(maxwell_average, v_bins[NBINS - 1], v_bins[0], args=(energy_bins[i], ))
@@ -80,7 +80,7 @@ print()
 
 start = time.time()
 
-# Substitute v with E in the integral to have something that looks like a convolution integral
+# Substitute v with E in the integral to have an expression that looks like a convolution integral
 v_dist_sub = -v_dist*dvp(energy_bins, Ei) # The minus sign comes in because one would have to switch the limits of the integral when the integration variable is substituted.
 doppler_con = np.convolve(cross_section, v_dist_sub, 'same')*(energy_bins[1] - energy_bins[0])
 
@@ -97,29 +97,40 @@ print()
 # - Multiplication of the Fourier transformed lists
 # - Back-transformation of the product
 
-# Substitute v with E in the integral to have something that looks like a convolution integral
-
 start = time.time()
-
+# Substitute v with E in the integral to have an expression that looks like a convolution integral
 v_dist_sub = -v_dist*dvp(energy_bins, Ei) # The minus sign comes in because one would have to switch the limits of the integral when the integration variable is substituted.
 
-cross_section_padded = np.pad(cross_section, (NBINS, NBINS), "constant")
-v_dist_sub_padded = np.pad(v_dist_sub, (NBINS, NBINS), "constant")
+cross_section_padded = np.pad(cross_section, (0, 0), "constant")*(energy_bins[1] - energy_bins[0])
+v_dist_sub_padded = np.pad(v_dist_sub, (0, 0), "constant")
 
-cross_section_fft = np.fft.rfft(cross_section_padded, norm = "ortho")
-v_dist_sub_fft = np.fft.rfft(v_dist_sub_padded, norm = "ortho")
+#cross_section_fft = np.fft.rfft(cross_section_padded, norm = "ortho")
+#v_dist_sub_fft = np.fft.rfft(v_dist_sub_padded, norm = "ortho")
+cross_section_fft = np.fft.rfft(cross_section_padded)
+v_dist_sub_fft = np.fft.rfft(v_dist_sub_padded)
 
 doppler_fft_fft = cross_section_fft*v_dist_sub_fft
 
-doppler_fft = np.fft.irfft(doppler_fft_fft, norm = "ortho")
+#doppler_fft = np.fft.irfft(doppler_fft_fft, norm = "ortho")
+doppler_fft = np.fft.irfft(doppler_fft_fft)
 
 stop = time.time()
 
 print("FFT:", stop - start, "seconds")
-int_fft = int_hist(energy_bins, doppler_fft[0:NBINS])
+int_fft = int_hist(energy_bins, doppler_fft)
 #print("Integral:", int_fft, "(", (int_fft - int_num)/int_num*100., "% relative to 'true' result)")
-print("Integral:", int_fft, "(", int_fft/int_num ,")")
+print("Integral:", int_fft, "(", (int_fft - int_num)/int_num*100., "% relative to 'true' result)")
 print()
+
+### 4) Numerical integration using the trapezoidal rule
+    
+doppler_tra = np.zeros(NBINS)
+
+for i in range(NBINS):
+    for j in range(NBINS - 1):
+        doppler_tra[i] += maxwell_average(v_bins[j], energy_bins[i])
+        #[...]
+
 
 ### Plot the results
 
@@ -138,12 +149,11 @@ doppler_num_plot, = plt.plot(energy_bins, doppler_num, color = "red", label = "N
 #plt.plot(energy_bins, doppler_num + doppler_num_err, linestyle="--", color = "red")
 #plt.plot(energy_bins, doppler_num - doppler_num_err, linestyle="--", color = "red")
 doppler_con_plot, = plt.plot(energy_bins, doppler_con, color = "chartreuse", label = "Convolution")
-doppler_fft_plot, = plt.plot(energy_bins, doppler_fft[0:NBINS], color = "royalblue", label = "FFT")
+#doppler_fft_plot, = plt.plot(energy_bins, doppler_fft[NBINS//2:3*NBINS//2]/(2.5e-2*NBINS), color = "royalblue", label = "FFT")
+doppler_fft_plot, = plt.plot(energy_bins, doppler_fft, color = "royalblue", label = "FFT")
 plt.legend(handles=[doppler_num_plot, doppler_con_plot, doppler_fft_plot])
 
 plt.subplot(414)
-doppler_num_con_plot, = plt.plot(energy_bins, (doppler_con - doppler_num)/doppler_num, color = "black", label = "num vs. con")
+doppler_num_con_plot, = plt.plot(energy_bins, (doppler_con - doppler_num)/doppler_num, color = "chartreuse", label = "num vs. con")
+#doppler_num_fft_plot, = plt.plot(energy_bins, (doppler_fft - doppler_num)/doppler_num, color = "royalblue", label = "num vs. fft")
 plt.legend(handles=[doppler_num_con_plot])
-
-plt.figure("FFT")
-plt.plot(doppler_fft)

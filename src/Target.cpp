@@ -66,7 +66,7 @@ void Target::boost(){
 void Target::calculateCrossSection(double (&energy_bins)[NBINS]){
 	for(unsigned int i = 0; i < e0_list.size(); ++i){
 		// The vector of cross section bins is 3 times as large as the required energy range, because of the folding procedure
-		crosssection_bins.push_back(vector <double>(3*NBINS, 0.));
+		crosssection_bins.push_back(vector <double>(NBINS, 0.));
 		crossSection->breit_wigner(energy_bins, crosssection_bins[i], e0_list[i], gamma0_list[i], gamma_list[i], jj_list[i], j0);
 	}
 }
