@@ -93,6 +93,7 @@ public:
 	void calculateCrossSection(double (&energy_bins)[NBINS]);
 	void calculateVelocityDistribution(double (&energy_bins)[NBINS]);
 	void calculateDopplerShift(double (&energy_bins)[NBINS]);
+	void calculateDopplerShiftFFT(double (&energy_bins)[NBINS]);
 	void calculateMassAttenuation(double (&energy_bins)[NBINS]);
 	void calculateIncidentBeam(double (&energy_bins)[NBINS], string beam_ID, vector<double> beamParams);
 	void calculateTransmittedBeam();

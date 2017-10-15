@@ -210,7 +210,7 @@ void Experiment::crossSections(bool plot, bool write, bool exact){
 			targets[i]->calculateDopplerShift(energy_bins);
 		} else{
 			targets[i]->calculateVelocityDistribution(energy_bins);
-			targets[i]->calculateDopplerShift(energy_bins);
+			targets[i]->calculateDopplerShiftFFT(energy_bins);
 		}
 
 		if(plot){

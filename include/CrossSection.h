@@ -35,7 +35,9 @@ public:
 
 	void fft_input(double (&energy_bins)[NBINS], vector< vector<double> > &crosssection_bins, vector< vector<double> > &vdist_bins, vector<double> e0_list);
 
-	void dopplershift(double (&dopplercs_bins)[NBINS], double (&energy_bins)[NBINS], vector< vector <double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &vdist_norm);
+	void dopplershift(double (&dopplercs_bins)[NBINS], double (&energy_bins)[NBINS], vector< vector <double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &vdist_norm, vector<double> &e0_list);
+
+	void dopplershiftFFT(double (&dopplercs_bins)[NBINS], double (&energy_bins)[NBINS], vector< vector <double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &vdist_norm);
 
 	void plot_crosssection(double (&energies)[NBINS], vector< vector<double> > &crosssection, string title, TCanvas* canvas, TLegend* legend, string legend_entry);
 

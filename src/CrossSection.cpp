@@ -71,7 +71,26 @@ void CrossSection::fft_input(double (&energy_bins)[NBINS], vector< vector<double
 	}
 }
 
-void CrossSection::dopplershift(double (&dopplercs_bins)[NBINS], double (&energy_bins)[NBINS], vector<vector<double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector<vector<double> > &vdist_bins, vector<double> &vdist_norm){
+void CrossSection::dopplershift(double (&dopplercs_bins)[NBINS], double (&energy_bins)[NBINS], vector<vector<double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector<vector<double> > &vdist_bins, vector<double> &vdist_norm, vector<double> &e0_list){
+
+	// Integrate using trapezoidal rule
+	
+	double resonance_energy_squared = 1.;
+	
+	for(unsigned int n = 0; n < crosssection_bins.size(); ++n){
+		long int resonance_position = upper_bound(energy_bins, energy_bins + NBINS, e0_list[n]) - energy_bins;
+		resonance_energy_squared = e0_list[n]*e0_list[n];
+
+		for(unsigned int i = 0; i < NBINS; ++i){
+			for(unsigned int j = 0; j < NBINS - 1; ++j){
+				// Not correct, crosssection_bins need zero padding
+				//dopplercs_bins[i] += 0.5*(vdist_bins[n][j]*crosssection_bins[n][j - resonance_position + i]*resonance_energy_squared/(energy_bins[j]*energy_bins[j]) + vdist_bins[n][j + 1])*(velocity_bins[n][j] - velocity_bins[n][j + 1]); 
+			}
+		}
+	}
+}
+
+void CrossSection::dopplershiftFFT(double (&dopplercs_bins)[NBINS], double (&energy_bins)[NBINS], vector<vector<double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector<vector<double> > &vdist_bins, vector<double> &vdist_norm){
 
 	fftw_plan vdist_plan, crosssection_plan, product_fft_plan;
 	fftw_complex vdist_fft[NBINS/2 + 1] = {{0.}};

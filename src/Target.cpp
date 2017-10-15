@@ -145,8 +145,14 @@ void Target::calculateZBins(double z0, double z1){
 
 void Target::calculateDopplerShift(double (&energy_bins)[NBINS]){
 	if(vDist_ID != "maxwell_boltzmann_approximation"){
+		crossSection->dopplershift(dopplercs_bins, energy_bins, crosssection_bins, velocity_bins, vdist_bins, vdist_norm, e0_list);
+	}
+}
+
+void Target::calculateDopplerShiftFFT(double (&energy_bins)[NBINS]){
+	if(vDist_ID != "maxwell_boltzmann_approximation"){
 		crossSection->fft_input(energy_bins, crosssection_bins, vdist_bins, e0_list);
-		crossSection->dopplershift(dopplercs_bins, energy_bins, crosssection_bins, velocity_bins, vdist_bins, vdist_norm);
+		crossSection->dopplershiftFFT(dopplercs_bins, energy_bins, crosssection_bins, velocity_bins, vdist_bins, vdist_norm);
 	}
 }
 
