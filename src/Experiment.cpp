@@ -196,17 +196,22 @@ void Experiment::testIntegration(bool plot){
 }
 
 void Experiment::createEnergyBins(double emin, double emax){
-	double delta_e = (emax - emin)/NBINS;
+	double delta_e = (double) (emax - emin)/(NBINS - 1);
 
 	for(int i = 0; i < NBINS; ++i)
 		energy_bins[i] = emin + i*delta_e;
 };
 
-void Experiment::crossSections(bool plot, bool write){
+void Experiment::crossSections(bool plot, bool write, bool exact){
 	for(unsigned int i = 0; i < targets.size(); ++i){
 		targets[i]->calculateCrossSection(energy_bins);
-		targets[i]->calculateVelocityDistribution(energy_bins);
-		targets[i]->calculateDopplerShift(energy_bins);
+		if(exact){
+			targets[i]->calculateVelocityDistribution(energy_bins);
+			targets[i]->calculateDopplerShift(energy_bins);
+		} else{
+			targets[i]->calculateVelocityDistribution(energy_bins);
+			targets[i]->calculateDopplerShift(energy_bins);
+		}
 
 		if(plot){
 			targets[i]->plotCrossSection(energy_bins);

@@ -41,7 +41,6 @@ void Target::readAME(string isotope){
         cout << "> Reading input file '" << filename.str() << "'" << endl;
 
         string line;
-	//unsigned int n = 0;
 	unsigned int nline = 0;
 
         while(getline(ifile, line)){
@@ -88,6 +87,12 @@ void Target::plotCrossSection(double (&energy_bins)[NBINS]){
 }
 
 void Target::calculateVelocityDistribution(double (&energy_bins)[NBINS]){
+	for(unsigned int i = 0; i < e0_list.size(); ++i){
+		velocity_bins.push_back(vector<double> (NBINS));
+		vdist_bins.push_back(vector<double> (NBINS));
+		crossSection->calculateVelocityBins(energy_bins, velocity_bins[i], e0_list[i]);
+	}
+
 	if(vDist_ID == "absolute_zero"){
 		for(unsigned int i = 0; i < NBINS; ++i){
 			for(unsigned int j = 0; j < crosssection_bins.size(); ++j){
@@ -98,8 +103,6 @@ void Target::calculateVelocityDistribution(double (&energy_bins)[NBINS]){
 
 	if(vDist_ID == "maxwell_boltzmann"){
 		for(unsigned int i = 0; i < e0_list.size(); ++i){
-			velocity_bins.push_back(vector<double> (NBINS));
-			vdist_bins.push_back(vector<double> (NBINS));
 			crossSection->maxwell_boltzmann(energy_bins, velocity_bins[i], vdist_bins[i], vDistParams, mass, e0_list[i]);
 			vdist_norm.push_back(normalizeVDist(i));
 		}
@@ -142,6 +145,7 @@ void Target::calculateZBins(double z0, double z1){
 
 void Target::calculateDopplerShift(double (&energy_bins)[NBINS]){
 	if(vDist_ID != "maxwell_boltzmann_approximation"){
+		crossSection->fft_input(energy_bins, crosssection_bins, vdist_bins, e0_list);
 		crossSection->dopplershift(dopplercs_bins, energy_bins, crosssection_bins, velocity_bins, vdist_bins, vdist_norm);
 	}
 }

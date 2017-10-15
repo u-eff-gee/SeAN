@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import numpy as np
 import matplotlib.pyplot as plt
 import time
@@ -14,8 +16,8 @@ kB = 8.6173303e-5 # eV/K
 ATOMICMASSUNIT = 931.494095e6 # eV7c^2
 
 ### Set limits for the calculation
-EMIN = 3.561880e6
-EMAX = 3.563880e6
+EMIN = 3.562480e6
+EMAX = 3.563280e6
 
 ### Set parameters of the nuclear resonance
 Ei = 3.562880e6
@@ -101,6 +103,8 @@ start = time.time()
 # Substitute v with E in the integral to have an expression that looks like a convolution integral
 v_dist_sub = -v_dist*dvp(energy_bins, Ei) # The minus sign comes in because one would have to switch the limits of the integral when the integration variable is substituted.
 
+#cross_section_padded = np.pad(cross_section, (0, 2*NBINS - 1), "constant")*(energy_bins[1] - energy_bins[0])
+#v_dist_sub_padded = np.pad(v_dist_sub, (0, 2*NBINS - 1), "constant")
 cross_section_padded = np.pad(cross_section, (0, 0), "constant")*(energy_bins[1] - energy_bins[0])
 v_dist_sub_padded = np.pad(v_dist_sub, (0, 0), "constant")
 
@@ -114,11 +118,18 @@ doppler_fft_fft = cross_section_fft*v_dist_sub_fft
 #doppler_fft = np.fft.irfft(doppler_fft_fft, norm = "ortho")
 doppler_fft = np.fft.irfft(doppler_fft_fft)
 
+# Rearrange the elements in doppler_fft, because the Fourier transformation rearranges the elements like
+# [0, 1, ..., N-2, N-1] -> [N/2, N/2 + 1, ..., N - 2, N - 1, 0, 1, ... N/2 - 2, N/2 - 1]
+
+doppler_fft_rearranged = np.zeros(NBINS)
+doppler_fft_rearranged[0:NBINS/2] = doppler_fft[NBINS/2 - 1: :-1]
+doppler_fft_rearranged[NBINS/2:NBINS] = doppler_fft[NBINS + 1:NBINS/2 - 1:-1]
+doppler_fft = doppler_fft_rearranged
+
 stop = time.time()
 
 print("FFT:", stop - start, "seconds")
 int_fft = int_hist(energy_bins, doppler_fft)
-#print("Integral:", int_fft, "(", (int_fft - int_num)/int_num*100., "% relative to 'true' result)")
 print("Integral:", int_fft, "(", (int_fft - int_num)/int_num*100., "% relative to 'true' result)")
 print()
 
@@ -126,34 +137,47 @@ print()
     
 doppler_tra = np.zeros(NBINS)
 
+start = time.time()
+
 for i in range(NBINS):
     for j in range(NBINS - 1):
-        doppler_tra[i] += maxwell_average(v_bins[j], energy_bins[i])
-        #[...]
+        doppler_tra[i] += 0.5*(maxwell_average(v_bins[j], energy_bins[i]) + maxwell_average(v_bins[j], energy_bins[i]))*(v_bins[j] - v_bins[j + 1])
 
+stop = time.time()
+
+print("Trapezoidal rule:", stop - start, "seconds")
+int_tra = int_hist(energy_bins, doppler_tra)
+print("Integral:", int_tra, "(", (int_tra - int_num)/int_num*100., "% relative to 'true' result)")
+print()
 
 ### Plot the results
 
-plt.figure("Distributions")
+plt.figure("Cross section")
 plt.subplot(411)
+plt.ylabel(r"$\sigma / fm^2$")
 cross_section_plot, = plt.plot(energy_bins, cross_section, color = "black", label = r"$\sigma(E)$")
 plt.legend(handles=[cross_section_plot])
 
 plt.subplot(412)
+plt.ylabel(r"$w(v_\parallel(E))$")
 v_dist_plot, = plt.plot(energy_bins, v_dist, color = "black", label = r"$w(v_\parallel(E))$")
 plt.legend(handles=[v_dist_plot])
 
 plt.subplot(413)
+plt.ylabel(r"$\sigma / fm^2$")
 doppler_num_plot, = plt.plot(energy_bins, doppler_num, color = "red", label = "Numerical integration")
 # Uncomment to plot the error estimate of the numerical integration
 #plt.plot(energy_bins, doppler_num + doppler_num_err, linestyle="--", color = "red")
 #plt.plot(energy_bins, doppler_num - doppler_num_err, linestyle="--", color = "red")
 doppler_con_plot, = plt.plot(energy_bins, doppler_con, color = "chartreuse", label = "Convolution")
-#doppler_fft_plot, = plt.plot(energy_bins, doppler_fft[NBINS//2:3*NBINS//2]/(2.5e-2*NBINS), color = "royalblue", label = "FFT")
 doppler_fft_plot, = plt.plot(energy_bins, doppler_fft, color = "royalblue", label = "FFT")
-plt.legend(handles=[doppler_num_plot, doppler_con_plot, doppler_fft_plot])
+doppler_tra_plot, = plt.plot(energy_bins, doppler_tra, color = "grey", label = "Trapezoidal rule")
+plt.legend(handles=[doppler_num_plot, doppler_con_plot, doppler_fft_plot, doppler_tra_plot])
 
 plt.subplot(414)
+plt.xlabel("Energy / eV")
+plt.ylabel("rel. deviation")
 doppler_num_con_plot, = plt.plot(energy_bins, (doppler_con - doppler_num)/doppler_num, color = "chartreuse", label = "num vs. con")
-#doppler_num_fft_plot, = plt.plot(energy_bins, (doppler_fft - doppler_num)/doppler_num, color = "royalblue", label = "num vs. fft")
-plt.legend(handles=[doppler_num_con_plot])
+doppler_num_fft_plot, = plt.plot(energy_bins, (doppler_fft - doppler_num)/doppler_num, color = "royalblue", label = "num vs. fft")
+doppler_num_tra_plot, = plt.plot(energy_bins, (doppler_tra - doppler_num)/doppler_num, color = "grey", label = "num vs. tra")
+plt.legend(handles=[doppler_num_con_plot, doppler_num_fft_plot, doppler_num_tra_plot])
