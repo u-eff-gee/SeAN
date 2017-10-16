@@ -88,16 +88,12 @@ int main(int argc, char* argv[]){
 
 	high_resolution_clock::time_point start = high_resolution_clock::now();
 
-	Experiment experiment;
+	Experiment experiment(1000);
 
 	experiment.readInputFile(arguments.inputfile);
-	if(experiment.getTarget(0)->getName() == "Integration_Test"){
-		experiment.testIntegration(arguments.plot);
-	} else{
-		experiment.print();
-		experiment.crossSections(arguments.plot, arguments.write, arguments.exact);
-		experiment.transmission(arguments.plot, arguments.write);
-	}
+	experiment.print();
+	experiment.crossSections(arguments.plot, arguments.write, arguments.exact);
+	experiment.transmission(arguments.plot, arguments.write);
 
 	high_resolution_clock::time_point stop = high_resolution_clock::now();
 	duration<double> delta_t = duration_cast< duration<double>>(stop - start);

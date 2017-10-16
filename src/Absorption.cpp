@@ -16,7 +16,7 @@ using std::endl;
 using std::regex;
 using std::regex_replace;
 
-void Absorption::read_massattenuation_NIST(double (&energy_bins)[NBINS], double (&massattenuation_bins)[NBINS], string massAttenuation_ID, double mass){
+void Absorption::read_massattenuation_NIST(vector<double> &energy_bins, double (&massattenuation_bins)[NBINS], string massAttenuation_ID, double mass){
 	
 	stringstream filename;
 	filename << MU_DIR << massAttenuation_ID << ".dat";
@@ -58,14 +58,14 @@ void Absorption::read_massattenuation_NIST(double (&energy_bins)[NBINS], double 
 	}
 }
 
-void Absorption::const_beam(double (&energy_bins)[NBINS], double (&incident_beam_bins)[NBINS], vector<double> beamParams){
+void Absorption::const_beam(vector<double> &energy_bins, double (&incident_beam_bins)[NBINS], vector<double> beamParams){
 
 	for(int i = 0; i < NBINS; ++i)
 		incident_beam_bins[i] = beamParams[0];	
 
 }
 
-void Absorption::gauss_beam(double (&energy_bins)[NBINS], double (&incident_beam_bins)[NBINS], vector<double> beamParams){
+void Absorption::gauss_beam(vector<double> &energy_bins, double (&incident_beam_bins)[NBINS], vector<double> beamParams){
 
 	double c1 = -1./(2.*beamParams[1]*beamParams[1]);
 
@@ -94,7 +94,7 @@ void Absorption::resonance_absorption_density(double (&dopplercs_bins)[NBINS], d
 	}
 }
 
-void Absorption::plot_massattenuation(double (&energy_bins)[NBINS], double (&massattenuation_bins)[NBINS], string title, TCanvas *canvas, TLegend* legend, string legend_entry){
+void Absorption::plot_massattenuation(vector<double> &energy_bins, double (&massattenuation_bins)[NBINS], string title, TCanvas *canvas, TLegend* legend, string legend_entry){
 
 	TGraph *graph = new TGraph(NBINS, energy_bins, massattenuation_bins);
 	graph->SetName(title.c_str());
@@ -120,7 +120,7 @@ void Absorption::plot_total_massattenuation(string title, TCanvas *canvas, TLege
 
 }
 
-void Absorption::plot_photon_flux_density(double (&energy_bins)[NBINS], double (&z_bins)[NBINS_Z], double (&photon_flux_density_bins)[NBINS][NBINS_Z], string title, TCanvas *canvas, TLegend* legend, string legend_entry){
+void Absorption::plot_photon_flux_density(vector<double> &energy_bins, double (&z_bins)[NBINS_Z], double (&photon_flux_density_bins)[NBINS][NBINS_Z], string title, TCanvas *canvas, TLegend* legend, string legend_entry){
 	
 	// Saveguard for the number of bins used for plotting phi. TGraph2D uses up a lot of memory if the dimension of the matrix for phi is too large.
 	int nbins_plot = NBINS;
@@ -168,7 +168,7 @@ void Absorption::plot_photon_flux_density(double (&energy_bins)[NBINS], double (
 	legend->AddEntry(graph->GetName(), legend_entry.c_str(), "l");
 }
 
-void Absorption::plot_test_integration(double (&energy_bins)[NBINS], double (&z_bins)[NBINS_Z], double (&photon_flux_density_bins)[NBINS][NBINS_Z], string title, TCanvas *canvas, TLegend* legend, string legend_entry){
+void Absorption::plot_test_integration(vector<double> &energy_bins, double (&z_bins)[NBINS_Z], double (&photon_flux_density_bins)[NBINS][NBINS_Z], string title, TCanvas *canvas, TLegend* legend, string legend_entry){
 	
 	// Saveguard for the number of bins used for plotting phi. TGraph2D uses up a lot of memory if the dimension of the matrix for phi is too large.
 	int nbins_plot = NBINS;
@@ -216,7 +216,7 @@ void Absorption::plot_test_integration(double (&energy_bins)[NBINS], double (&z_
 	legend->AddEntry(graph->GetName(), legend_entry.c_str(), "l");
 }
 
-void Absorption::plot_resonance_absorption_density(double (&energy_bins)[NBINS], double (&z_bins)[NBINS_Z], double (&resonance_absorption_density_bins)[NBINS][NBINS_Z], string title, TCanvas *canvas, TLegend* legend, string legend_entry){
+void Absorption::plot_resonance_absorption_density(vector<double> &energy_bins, double (&z_bins)[NBINS_Z], double (&resonance_absorption_density_bins)[NBINS][NBINS_Z], string title, TCanvas *canvas, TLegend* legend, string legend_entry){
 	
 	// Saveguard for the number of bins used for plotting phi. TGraph2D uses up a lot of memory if the dimension of the matrix for phi is too large.
 	int nbins_plot = NBINS;

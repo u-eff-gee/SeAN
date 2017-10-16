@@ -16,6 +16,7 @@ private:
 	vector< vector<double> > crosssection_bins;
 	vector< vector<double> > velocity_bins;
 	vector< vector<double> > vdist_bins;
+	vector<double> z_bins;
 
 	vector<double> e0_at_rest_list;
 	vector<double> e0_list;
@@ -35,7 +36,6 @@ private:
 	double incident_beam_bins[NBINS] = {1.};
 	double dopplercs_bins[NBINS] = {0.};
 	double massattenuation_bins[NBINS] = {0.};
-	double z_bins[NBINS_Z] = {0.};
 	double transmitted_beam_bins[NBINS] = {0.};
 
 
@@ -91,46 +91,41 @@ public:
 	void print();
 
 	// Functions to calculate histograms
-	void calculateCrossSection(double (&energy_bins)[NBINS]);
-	void calculateVelocityDistribution(double (&energy_bins)[NBINS]);
-	void calculateDopplerShift(double (&energy_bins)[NBINS]);
-	void calculateDopplerShiftFFT(double (&energy_bins)[NBINS]);
-	void calculateMassAttenuation(double (&energy_bins)[NBINS]);
-	void calculateIncidentBeam(double (&energy_bins)[NBINS], string beam_ID, vector<double> beamParams);
+	void calculateCrossSection(vector<double> &energy_bins);
+	void calculateVelocityDistribution(vector<double> &energy_bins);
+	void calculateDopplerShift(vector<double> &energy_bins);
+	void calculateDopplerShiftFFT(vector<double> &energy_bins);
+	void calculateMassAttenuation(vector<double> &energy_bins);
+	void calculateIncidentBeam(vector<double> &energy_bins, string beam_ID, vector<double> beamParams);
 	void calculateTransmittedBeam();
 	void calculateZBins();
 	void calculateZBins(double z0, double z1);
 	void calculatePhotonFluxDensity();
 	void calculateResonanceAbsorptionDensity();
-	void calculateAbsorption(double (&energy_bins)[NBINS]);
+	void calculateAbsorption(vector<double> &energy_bins);
 
 	// Functions to plot histograms
-	void plotCrossSection(double (&energy_bins)[NBINS]);
+	void plotCrossSection(vector<double> &energy_bins);
 	void plotVelocityDistribution();
-	void plotDopplerShift(double (&energy_bins)[NBINS]);
-	void plotMassAttenuation(double (&energy_bins)[NBINS]);
+	void plotDopplerShift(vector<double> &energy_bins);
+	void plotMassAttenuation(vector<double> &energy_bins);
 	void plotMu();
-	void plotPhotonFluxDensity(double (&energy_bins)[NBINS]);
-	void plotTestIntegration(double (&energy_bins)[NBINS]);
-	void plotResonanceAbsorptionDensity(double (&energy_bins)[NBINS]);
+	void plotPhotonFluxDensity(vector<double> &energy_bins);
+	void plotTestIntegration(vector<double> &energy_bins);
+	void plotResonanceAbsorptionDensity(vector<double> &energy_bins);
 
 	// Functions to write histograms to file
-	void write(double (&energy_bins)[NBINS]);
-	void print1DArray(double *array, unsigned int n, string column, string filename);
-	void print2DArray(double (&array)[NBINS][NBINS_Z], string column, string filename);
-	void print1DVector(vector<double> (&vec), string column, string filename);
-	void print2DVector(vector<vector<double> > (&vec), string column, string filename);
+	void write(vector<double> &energy_bins);
+	void print1DVector(vector<double> &vec, string column, string filename);
+	void print2DVector(vector<vector<double> > &vec, string column, string filename);
 
 	// Function to set the incident beam and return the transmitted beam
 	double& getTransmittedBeam(){ return transmitted_beam_bins[0]; };
 	void setIncidentBeam(double &trans_beam_bins);
 
 	// Functions to integrate over 2D histograms
-	double integrateEZHistogram(double (&energy_bins)[NBINS], double (&z_bins)[NBINS_Z], double (&ezhist)[NBINS][NBINS_Z]);
-	double integrateEEHistogram(double (&energy_bins)[NBINS], double (&eehist)[NBINS][NBINS]);
-
-	// Functions for testing
-	void testIntegration(double emin, double emax, double (&energy_bins)[NBINS], vector<double> beamParams);
+	double integrateEZHistogram(vector<double> &energy_bins, double (&z_bins)[NBINS_Z], double (&ezhist)[NBINS][NBINS_Z]);
+	double integrateEEHistogram(vector<double> &energy_bins, double (&eehist)[NBINS][NBINS]);
 
 	void vDistInfo(vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &vdist_norm, vector<unsigned int> &vdist_centroid);
 };

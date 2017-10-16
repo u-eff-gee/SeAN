@@ -62,7 +62,7 @@ void Target::boost(){
 		e0_list.push_back((1. + beta)/sqrt(1. - beta*beta)*e0_at_rest_list[i]);
 }
 
-void Target::calculateCrossSection(double (&energy_bins)[NBINS]){
+void Target::calculateCrossSection(vector<double> &energy_bins){
 	for(unsigned int i = 0; i < e0_list.size(); ++i){
 		// The vector of cross section bins is 3 times as large as the required energy range, because of the folding procedure
 		crosssection_bins.push_back(vector <double>(NBINS, 0.));
@@ -70,7 +70,7 @@ void Target::calculateCrossSection(double (&energy_bins)[NBINS]){
 	}
 }
 
-void Target::plotCrossSection(double (&energy_bins)[NBINS]){
+void Target::plotCrossSection(vector<double> &energy_bins){
 
 	stringstream filename;
 	filename << PLOT_OUTPUT_DIR << target_name << "_cross_section.pdf";
@@ -86,7 +86,7 @@ void Target::plotCrossSection(double (&energy_bins)[NBINS]){
 	delete canvas;
 }
 
-void Target::calculateVelocityDistribution(double (&energy_bins)[NBINS]){
+void Target::calculateVelocityDistribution(vector<double> &energy_bins){
 	for(unsigned int i = 0; i < e0_list.size(); ++i){
 		velocity_bins.push_back(vector<double> (NBINS));
 		vdist_bins.push_back(vector<double> (NBINS));
@@ -114,7 +114,7 @@ void Target::calculateVelocityDistribution(double (&energy_bins)[NBINS]){
 	vDistInfo(velocity_bins, vdist_bins, vdist_norm, vdist_centroid);
 }
 
-void Target::calculateIncidentBeam(double (&energy_bins)[NBINS], string beam_ID, vector<double> beamParams){
+void Target::calculateIncidentBeam(vector<double> &energy_bins, string beam_ID, vector<double> beamParams){
 	if(beam_ID == "const")
 		absorption->const_beam(energy_bins, incident_beam_bins, beamParams);
 
@@ -126,7 +126,7 @@ void Target::calculateZBins(){
 	
 	double delta_z = z/NBINS_Z;
 
-	for(int i = 0; i < NBINS_Z; ++i){
+	for(unsigned int i = 0; i < NBINS_Z; ++i){
 		z_bins[i] = i*delta_z;
 	}
 }
@@ -140,21 +140,21 @@ void Target::calculateZBins(double z0, double z1){
 	}
 }
 
-void Target::calculateDopplerShift(double (&energy_bins)[NBINS]){
+void Target::calculateDopplerShift(vector<double> &energy_bins){
 	if(vDist_ID != "maxwell_boltzmann_approximation"){
 		crossSection->integration_input(crosssection_bins, vdist_bins);
 		crossSection->dopplershift(dopplercs_bins, energy_bins, crosssection_bins, velocity_bins, vdist_bins, vdist_norm, e0_list);
 	}
 }
 
-void Target::calculateDopplerShiftFFT(double (&energy_bins)[NBINS]){
+void Target::calculateDopplerShiftFFT(vector<double> &energy_bins){
 	if(vDist_ID != "maxwell_boltzmann_approximation"){
 		crossSection->fft_input(energy_bins, crosssection_bins, vdist_bins, e0_list);
 		crossSection->dopplershiftFFT(dopplercs_bins, energy_bins, crosssection_bins, velocity_bins, vdist_bins, vdist_norm, vdist_centroid);
 	}
 }
 
-void Target::calculateMassAttenuation(double (&energy_bins)[NBINS]){
+void Target::calculateMassAttenuation(vector<double> &energy_bins){
 	if(massAttenuation_ID == "0"){
 	;} else{
 		absorption->read_massattenuation_NIST(energy_bins, massattenuation_bins, massAttenuation_ID, mass);
@@ -179,7 +179,7 @@ void Target::calculateResonanceAbsorptionDensity(){
 	absorption->resonance_absorption_density(dopplercs_bins, photon_flux_density_bins, resonance_absorption_density_bins);
 }
 
-double Target::integrateEZHistogram(double (&energy_bins)[NBINS], double (&z_bins)[NBINS_Z], double (&ezhist)[NBINS][NBINS_Z]){
+double Target::integrateEZHistogram(vector<double> &energy_bins, double (&z_bins)[NBINS_Z], double (&ezhist)[NBINS][NBINS_Z]){
 
 	// Area of a bin in 2D plane
 	double bin_area = (energy_bins[1] - energy_bins[0])*(z_bins[1] - z_bins[0]);
@@ -205,7 +205,7 @@ double Target::integrateEZHistogram(double (&energy_bins)[NBINS], double (&z_bin
 	return bin_area*integral;
 }
 
-double Target::integrateEEHistogram(double (&energy_bins)[NBINS], double (&eehist)[NBINS][NBINS]){
+double Target::integrateEEHistogram(vector<double> &energy_bins, double (&eehist)[NBINS][NBINS]){
 
 	// Area of a bin in 2D plane
 	double bin_area = (energy_bins[1] - energy_bins[0])*(energy_bins[1] - energy_bins[0]);
@@ -222,49 +222,7 @@ double Target::integrateEEHistogram(double (&energy_bins)[NBINS], double (&eehis
 	return integral;
 }
 
-void Target::testIntegration(double emin, double emax, double (&energy_bins)[NBINS], vector<double> beamParams){
-
-	cout << "> Test of integration ..." << endl;
-	cout << "[EMIN, EMAX] = [" << energy_bins[0] << ", " << energy_bins[NBINS - 1] << "]" << endl;
-	cout << "c\tx0\ty0\tsigma" << endl;
-
-	for(unsigned int i = 0; i < gamma0_list.size(); ++i){
-		cout << beamParams[i] << "\t" << e0_list[2*i] << "\t" << e0_list[2*i + 1] << "\t" << gamma0_list[i] << endl;
-	}
-
-	calculateZBins(emin, emax);
-
-	double denominator = 1.;
-
-	for(int i = 0; i < NBINS; ++i){
-		for(int j = 0; j < NBINS_Z; ++j){
-			for(unsigned int k = 0; k < beamParams.size(); ++k){
-				denominator = 1./(2.*gamma0_list[k]*gamma0_list[k]);
-				photon_flux_density_bins[i][j] += beamParams[k]
-					*exp(-denominator*(energy_bins[i] - e0_list[2*k])*(energy_bins[i] - e0_list[2*k]))
-					*exp(-denominator*(z_bins[j] - e0_list[2*k + 1])*(z_bins[j] - e0_list[2*k + 1]));
-			}
-		}
-	}
-
-	double result = integrateEZHistogram(energy_bins, z_bins, photon_flux_density_bins);
-
-	cout << "> Integration of test function yields " << result << endl;
-	double exact_result = 0.;
-
-	for(unsigned int i = 0; i < gamma0_list.size(); ++i){
-		exact_result += beamParams[i]*(
-				sqrt(PI/2.)*gamma0_list[i]*erf((energy_bins[NBINS - 1] - e0_list[2*i])/(sqrt(2)*gamma0_list[i])) - 
-				sqrt(PI/2.)*gamma0_list[i]*erf((energy_bins[0] - e0_list[2*i])/(sqrt(2)*gamma0_list[i]))) * 
-				(
-			 	sqrt(PI/2.)*gamma0_list[i]*erf((z_bins[NBINS_Z- 1] - e0_list[2*i + 1])/(sqrt(2)*gamma0_list[i])) - 
-				sqrt(PI/2.)*gamma0_list[i]*erf((z_bins[0] - e0_list[2*i + 1])/(sqrt(2)*gamma0_list[i])));
-	}	
-
-	cout << "\tExact result: " << exact_result << " (" << ((result - exact_result)/exact_result*100.) << " %)" << endl;
-}
-
-void Target::calculateAbsorption(double (&energy_bins)[NBINS]){
+void Target::calculateAbsorption(vector<double> &energy_bins){
 
 	double absorption = integrateEZHistogram(energy_bins, z_bins, resonance_absorption_density_bins);
 
@@ -289,7 +247,7 @@ void Target::plotVelocityDistribution(){
 	delete canvas;
 }
 
-void Target::plotDopplerShift(double (&energy_bins)[NBINS]){
+void Target::plotDopplerShift(vector<double> &energy_bins){
 
 	stringstream filename;
 	filename << PLOT_OUTPUT_DIR << target_name << "_doppler_shift.pdf";
@@ -306,7 +264,7 @@ void Target::plotDopplerShift(double (&energy_bins)[NBINS]){
 	
 }
 
-void Target::plotMassAttenuation(double (&energy_bins)[NBINS]){
+void Target::plotMassAttenuation(vector<double> &energy_bins){
 
 	stringstream filename;
 	filename << PLOT_OUTPUT_DIR << target_name << "_mass_attenuation.pdf";
@@ -343,7 +301,7 @@ void Target::plotMu(){
 	
 }
 
-void Target::plotPhotonFluxDensity(double (&energy_bins)[NBINS]){
+void Target::plotPhotonFluxDensity(vector<double> &energy_bins){
 
 	stringstream filename;
 	filename << PLOT_OUTPUT_DIR << target_name << "_phi.pdf";
@@ -359,7 +317,7 @@ void Target::plotPhotonFluxDensity(double (&energy_bins)[NBINS]){
 	delete canvas;
 }
 
-void Target::plotTestIntegration(double (&energy_bins)[NBINS]){
+void Target::plotTestIntegration(vector<double> &energy_bins){
 
 	stringstream filename;
 	filename << PLOT_OUTPUT_DIR << target_name << "_function.pdf";
@@ -375,7 +333,7 @@ void Target::plotTestIntegration(double (&energy_bins)[NBINS]){
 	delete canvas;
 }
 
-void Target::plotResonanceAbsorptionDensity(double (&energy_bins)[NBINS]){
+void Target::plotResonanceAbsorptionDensity(vector<double> &energy_bins){
 
 	stringstream filename;
 	filename << PLOT_OUTPUT_DIR << target_name << "_alpha.pdf";
@@ -419,16 +377,16 @@ void Target::print(){
 	cout << "TARGET VELOCITY = " << vz << " m/s" << endl;
 }
 
-void Target::write(double (&energy_bins)[NBINS]){
-	print1DArray(energy_bins, NBINS, "Energy / eV", TXT_OUTPUT_DIR + target_name + "_energy_bins.txt");
-	print1DArray(incident_beam_bins, NBINS, "Incident beam / a.u.", TXT_OUTPUT_DIR + target_name + "_incident_beam.txt");
-	print1DArray(dopplercs_bins, NBINS, "Doppler-broadened cross section / eV fm^2", TXT_OUTPUT_DIR + target_name + "_doppler_shift.txt");
-	print1DArray(massattenuation_bins, NBINS, "Mass attenuation / fm^2 / atom", TXT_OUTPUT_DIR + target_name + "_mass_attenuation.txt");
-	print1DArray(z_bins, NBINS_Z, "z / atoms / fm^2", TXT_OUTPUT_DIR + target_name + "_z_bins.txt");
-	print1DArray(transmitted_beam_bins, NBINS, "Transmitted beam / a.u.", TXT_OUTPUT_DIR + target_name + "_transmitted_beam.txt");
+void Target::write(vector<double> &energy_bins){
+	print1DVector(energy_bins,  "Energy / eV", TXT_OUTPUT_DIR + target_name + "_energy_bins.txt");
+	print1DVector(incident_beam_bins, "Incident beam / a.u.", TXT_OUTPUT_DIR + target_name + "_incident_beam.txt");
+	print1DVector(dopplercs_bins, "Doppler-broadened cross section / eV fm^2", TXT_OUTPUT_DIR + target_name + "_doppler_shift.txt");
+	print1DVector(massattenuation_bins, "Mass attenuation / fm^2 / atom", TXT_OUTPUT_DIR + target_name + "_mass_attenuation.txt");
+	print1DVector(z_bins, "z / atoms / fm^2", TXT_OUTPUT_DIR + target_name + "_z_bins.txt");
+	print1DVector(transmitted_beam_bins, "Transmitted beam / a.u.", TXT_OUTPUT_DIR + target_name + "_transmitted_beam.txt");
 
-	print2DArray(photon_flux_density_bins, "Photon flux density / a.u.", TXT_OUTPUT_DIR + target_name + "_phi.txt");
-	print2DArray(resonance_absorption_density_bins, "Resonance absorption density / a.u.", TXT_OUTPUT_DIR + target_name + "_alpha.txt");
+	print2DVector(photon_flux_density_bins, "Photon flux density / a.u.", TXT_OUTPUT_DIR + target_name + "_phi.txt");
+	print2DVector(resonance_absorption_density_bins, "Resonance absorption density / a.u.", TXT_OUTPUT_DIR + target_name + "_alpha.txt");
 
 	print2DVector(crosssection_bins, "Cross section / eV fm^2", TXT_OUTPUT_DIR + target_name + "_cross_section.txt");
 	print2DVector(velocity_bins, "Velocity / c", TXT_OUTPUT_DIR + target_name + "_velocity_bins.txt");
@@ -477,7 +435,7 @@ void Target::print2DArray(double (&array)[NBINS][NBINS_Z], string column, string
 	}
 }
 
-void Target::print1DVector(vector<double> (&vec), string column, string filename){
+void Target::print1DVector(vector<double> &vec, string column, string filename){
 	
 	ofstream ofile(filename);
 

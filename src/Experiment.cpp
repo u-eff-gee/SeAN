@@ -187,18 +187,10 @@ void Experiment::readInputFile(const char* filename){
 	createEnergyBins(emin, emax);
 }
 
-void Experiment::testIntegration(bool plot){
-	createEnergyBins(emin, emax);
-	targets[0]->testIntegration(emin, emax, energy_bins, beamParams);
-	if(plot){
-		targets[0]->plotTestIntegration(energy_bins);
-	}
-}
-
 void Experiment::createEnergyBins(double emin, double emax){
 	double delta_e = (double) (emax - emin)/(NBINS - 1);
 
-	for(int i = 0; i < NBINS; ++i)
+	for(unsigned int i = 0; i < NBINS; ++i)
 		energy_bins[i] = emin + i*delta_e;
 };
 

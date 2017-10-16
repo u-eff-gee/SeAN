@@ -10,8 +10,7 @@ using std::vector;
 class Experiment{
 
 private:
-	double energy_bins[NBINS] = {0.};
-
+	vector<double> energy_bins;
 	vector<Target*> targets;
 	vector<double> beamParams;
 
@@ -21,17 +20,17 @@ private:
 	double emin;
 	double emax;
 
+	const unsigned int nBins;
+
 public:
-	Experiment(){};
+	Experiment(unsigned int n) : energy_bins(n, 0.), nBins(n) {};
 	~Experiment(){};
 
 	// Functions to manage the calculation process
-	void readInputFile(const char* filename);
-	void testIntegration(bool plot);
+	void readInputFile (const char* filename);
 	void crossSections(bool plot, bool write, bool exact);
 	void transmission(bool plot, bool write);
 	void print();
-	void runTests();
 
 	// Functions to return private members
 	Target* getTarget(unsigned int i){ return targets[i]; };

@@ -1,5 +1,9 @@
 # Minimum and maximum energy for the calculation in eV
 3.561880e6, 3.563880e6
+# Number of bins on the energy axis
+1000
+# Number of bins on the z-axis
+1000
 # Primary beam intensity distribution
 const, 1.0
 # 0) Identifier of the target (string)

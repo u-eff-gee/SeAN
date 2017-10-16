@@ -16,7 +16,7 @@ using std::endl;
 using std::upper_bound;
 using std::max_element;
 
-void CrossSection::breit_wigner(double (&energy_bins)[NBINS], vector<double> (&crosssection_bins), double e0, double gamma0, double gamma, double jj, double j0){
+void CrossSection::breit_wigner(vector<double> &energy_bins, vector<double> (&crosssection_bins), double e0, double gamma0, double gamma, double jj, double j0){
 
 	double cs_max = PI*0.5*HBARC2/(e0*e0)*(2.*jj + 1.)/(2.*j0 + 1.)*gamma0*gamma;
 	
@@ -25,7 +25,7 @@ void CrossSection::breit_wigner(double (&energy_bins)[NBINS], vector<double> (&c
 	}
 }
 
-void CrossSection::calculateVelocityBins(double (&energy_bins)[NBINS], vector<double> &velocity_bins, double e0){
+void CrossSection::calculateVelocityBins(vector<double> &energy_bins, vector<double> &velocity_bins, double e0){
 
 	// SeAN uses non-equidistant velocity bins. Here, velocity_bins[i] is the velocity that is needed to shift energy_bins[j] to energy_bins[i].
 	double energy_ratio = 1.;
@@ -40,7 +40,7 @@ void CrossSection::calculateVelocityBins(double (&energy_bins)[NBINS], vector<do
 	}
 }
 
-void CrossSection::maxwell_boltzmann(double (&energy_bins)[NBINS], vector<double> &velocity_bins, vector<double> &vdist_bins, vector<double> &params, double mass, double e0){
+void CrossSection::maxwell_boltzmann(vector<double> &energy_bins, vector<double> &velocity_bins, vector<double> &vdist_bins, vector<double> &params, double mass, double e0){
 
 	double c1 = sqrt(mass*AtomicMassUnit/(2*PI*kB*params[0]));
       	double c2 = -1./pow(delta(params[0], mass), 2);
@@ -50,7 +50,7 @@ void CrossSection::maxwell_boltzmann(double (&energy_bins)[NBINS], vector<double
       	}
 }
 
-void CrossSection::maxwell_boltzmann_debye(double (&energy_bins)[NBINS], vector<double> &velocity_bins, vector<double> &vdist_bins, vector<double> &params, double mass, double e0){
+void CrossSection::maxwell_boltzmann_debye(vector<double> &energy_bins, vector<double> &velocity_bins, vector<double> &vdist_bins, vector<double> &params, double mass, double e0){
 	;
 }
 
@@ -64,7 +64,7 @@ void CrossSection::integration_input(vector< vector<double> > &crosssection_bins
 	}
 }
 
-void CrossSection::fft_input(double (&energy_bins)[NBINS], vector< vector<double> > &crosssection_bins, vector< vector<double> > &vdist_bins, vector<double> e0_list){
+void CrossSection::fft_input(vector<double> &energy_bins, vector< vector<double> > &crosssection_bins, vector< vector<double> > &vdist_bins, vector<double> e0_list){
 	double de = energy_bins[1] - energy_bins[0];
 	double energy_ratio_squared = 1.;
 
@@ -81,14 +81,14 @@ void CrossSection::fft_input(double (&energy_bins)[NBINS], vector< vector<double
 	}
 }
 
-void CrossSection::dopplershift(double (&dopplercs_bins)[NBINS], double (&energy_bins)[NBINS], vector<vector<double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector<vector<double> > &vdist_bins, vector<double> &vdist_norm, vector<double> &e0_list){
+void CrossSection::dopplershift(double (&dopplercs_bins)[NBINS], vector<double> &energy_bins, vector<vector<double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector<vector<double> > &vdist_bins, vector<double> &vdist_norm, vector<double> &e0_list){
 
 	// Integrate using trapezoidal rule
 	
 	double resonance_energy_squared = 1.;
 	
 	for(unsigned int n = 0; n < pconv_crosssection_bins.size(); ++n){
-		long unsigned int resonance_position = (long unsigned int) (upper_bound(energy_bins, energy_bins + NBINS, e0_list[n]) - energy_bins);
+		long unsigned int resonance_position = (unsigned long int) (upper_bound(energy_bins.begin(), energy_bins.end(), e0_list[n]) - energy_bins.begin());
 		resonance_energy_squared = e0_list[n]*e0_list[n];
 
 		for(unsigned int i = 0; i < NBINS; ++i){
@@ -102,7 +102,7 @@ void CrossSection::dopplershift(double (&dopplercs_bins)[NBINS], double (&energy
 	}
 }
 
-void CrossSection::dopplershiftFFT(double (&dopplercs_bins)[NBINS], double (&energy_bins)[NBINS], vector<vector<double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector<vector<double> > &vdist_bins, vector<double> &vdist_norm, vector<unsigned int> &vdist_centroid){
+void CrossSection::dopplershiftFFT(double (&dopplercs_bins)[NBINS], vector<double> &energy_bins, vector<vector<double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector<vector<double> > &vdist_bins, vector<double> &vdist_norm, vector<unsigned int> &vdist_centroid){
 
 	fftw_plan vdist_plan, crosssection_plan, product_fft_plan;
 	fftw_complex vdist_fft[NBINS/2 + 1] = {{0.}};
@@ -143,7 +143,7 @@ void CrossSection::dopplershiftFFT(double (&dopplercs_bins)[NBINS], double (&ene
 	}
 }
 
-void CrossSection::maxwell_boltzmann_approximation(double (&dopplercs_bins)[NBINS], double (&energy_bins)[NBINS], vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &e0_list, vector<double> &gamma0_list, vector<double> &gamma_list, vector<double> &jj_list, double j0, vector<double> &params, double mass){
+void CrossSection::maxwell_boltzmann_approximation(double (&dopplercs_bins)[NBINS], vector<double> &energy_bins, vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &e0_list, vector<double> &gamma0_list, vector<double> &gamma_list, vector<double> &jj_list, double j0, vector<double> &params, double mass){
 
 // Calculate velocity distribution as in maxwell_boltzmann
 
@@ -171,13 +171,13 @@ void CrossSection::maxwell_boltzmann_approximation(double (&dopplercs_bins)[NBIN
 
 		double cs_max = 2.*PI*HBARC2/(e0_list[i]*e0_list[i])*(2.*jj_list[i] + 1.)/(2. * j0 + 1.)*gamma0_list[i]/gamma_list[i]*sqrt(PI)/(2.*doppler_width/gamma_list[i]);
 		
-		for(int j = 0; j < NBINS; ++j){
+		for(unsigned int j = 0; j < NBINS; ++j){
 			dopplercs_bins[j] += cs_max*exp(-(energy_bins[j] - e0_list[i])*(energy_bins[j] - e0_list[i])/(doppler_width*doppler_width));
 		}
 	}
 }
 
-void CrossSection::plot_crosssection(double (&energy_bins)[NBINS], vector< vector<double> > (&crosssection_bins), string title, TCanvas* canvas, TLegend* legend, string legend_entry){
+void CrossSection::plot_crosssection(vector<double> &energy_bins, vector< vector<double> > (&crosssection_bins), string title, TCanvas* canvas, TLegend* legend, string legend_entry){
 
 	double total_crosssection_bins[NBINS] = {0.};
 	vector< TGraph* > graphs;
@@ -192,7 +192,7 @@ void CrossSection::plot_crosssection(double (&energy_bins)[NBINS], vector< vecto
 		graphs[i]->SetLineStyle(2);
 	}
 
-	TGraph* graph = new TGraph(NBINS, energy_bins, total_crosssection_bins);
+	TGraph* graph = new TGraph(NBINS, &energy_bins[0], total_crosssection_bins);
 	
 	graph->SetName(title.c_str());
 	graph->SetTitle(title.c_str());
@@ -222,7 +222,7 @@ void CrossSection::plot_vdist(vector<double> &velocity_bins, vector<double> &vdi
 
 }
 
-void CrossSection::plot_dopplershift(double (&energy_bins)[NBINS], vector< vector<double> > &crosssection_bins, double (&dopplercs_bins)[NBINS], string title, TCanvas* canvas, TLegend* legend, string legend_entry){
+void CrossSection::plot_dopplershift(vector<double> &energy_bins, vector< vector<double> > &crosssection_bins, double (&dopplercs_bins)[NBINS], string title, TCanvas* canvas, TLegend* legend, string legend_entry){
 
 	double total_crosssection_bins[NBINS] = {0.};
 
@@ -232,7 +232,7 @@ void CrossSection::plot_dopplershift(double (&energy_bins)[NBINS], vector< vecto
 		}
 	}
 
-	TGraph* graph = new TGraph(NBINS, energy_bins, total_crosssection_bins);
+	TGraph* graph = new TGraph(NBINS, &energy_bins[0], total_crosssection_bins);
 	graph->SetName(title.c_str());
 	graph->SetTitle(title.c_str());
 	graph->GetXaxis()->SetTitle("Energy / eV");
@@ -242,7 +242,7 @@ void CrossSection::plot_dopplershift(double (&energy_bins)[NBINS], vector< vecto
 
 	legend->AddEntry(graph->GetName(), "Cross section", "l");
 
-	graph = new TGraph(NBINS, energy_bins, dopplercs_bins);
+	graph = new TGraph(NBINS, &energy_bins[0], dopplercs_bins);
 	graph->Draw("same");
 
 	legend->AddEntry(graph->GetName(), legend_entry.c_str(), "l");
