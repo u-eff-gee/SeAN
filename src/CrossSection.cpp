@@ -81,7 +81,7 @@ void CrossSection::fft_input(vector<double> &energy_bins, vector< vector<double>
 	}
 }
 
-void CrossSection::dopplershift(double (&dopplercs_bins)[NBINS], vector<double> &energy_bins, vector<vector<double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector<vector<double> > &vdist_bins, vector<double> &vdist_norm, vector<double> &e0_list){
+void CrossSection::dopplershift(vector<double> &dopplercs_bins, vector<double> &energy_bins, vector<vector<double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector<vector<double> > &vdist_bins, vector<double> &vdist_norm, vector<double> &e0_list){
 
 	// Integrate using trapezoidal rule
 	
@@ -102,7 +102,7 @@ void CrossSection::dopplershift(double (&dopplercs_bins)[NBINS], vector<double> 
 	}
 }
 
-void CrossSection::dopplershiftFFT(double (&dopplercs_bins)[NBINS], vector<double> &energy_bins, vector<vector<double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector<vector<double> > &vdist_bins, vector<double> &vdist_norm, vector<unsigned int> &vdist_centroid){
+void CrossSection::dopplershiftFFT(vector<double> &dopplercs_bins, vector<double> &energy_bins, vector<vector<double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector<vector<double> > &vdist_bins, vector<double> &vdist_norm, vector<unsigned int> &vdist_centroid){
 
 	fftw_plan vdist_plan, crosssection_plan, product_fft_plan;
 	fftw_complex vdist_fft[NBINS/2 + 1] = {{0.}};
@@ -143,7 +143,7 @@ void CrossSection::dopplershiftFFT(double (&dopplercs_bins)[NBINS], vector<doubl
 	}
 }
 
-void CrossSection::maxwell_boltzmann_approximation(double (&dopplercs_bins)[NBINS], vector<double> &energy_bins, vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &e0_list, vector<double> &gamma0_list, vector<double> &gamma_list, vector<double> &jj_list, double j0, vector<double> &params, double mass){
+void CrossSection::maxwell_boltzmann_approximation(vector<double> &dopplercs_bins, vector<double> &energy_bins, vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &e0_list, vector<double> &gamma0_list, vector<double> &gamma_list, vector<double> &jj_list, double j0, vector<double> &params, double mass){
 
 // Calculate velocity distribution as in maxwell_boltzmann
 
@@ -222,7 +222,7 @@ void CrossSection::plot_vdist(vector<double> &velocity_bins, vector<double> &vdi
 
 }
 
-void CrossSection::plot_dopplershift(vector<double> &energy_bins, vector< vector<double> > &crosssection_bins, double (&dopplercs_bins)[NBINS], string title, TCanvas* canvas, TLegend* legend, string legend_entry){
+void CrossSection::plot_dopplershift(vector<double> &energy_bins, vector< vector<double> > &crosssection_bins, vector<double> &dopplercs_bins, string title, TCanvas* canvas, TLegend* legend, string legend_entry){
 
 	double total_crosssection_bins[NBINS] = {0.};
 
@@ -242,7 +242,7 @@ void CrossSection::plot_dopplershift(vector<double> &energy_bins, vector< vector
 
 	legend->AddEntry(graph->GetName(), "Cross section", "l");
 
-	graph = new TGraph(NBINS, &energy_bins[0], dopplercs_bins);
+	graph = new TGraph(NBINS, &energy_bins[0], &dopplercs_bins[0]);
 	graph->Draw("same");
 
 	legend->AddEntry(graph->GetName(), legend_entry.c_str(), "l");

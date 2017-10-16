@@ -2,6 +2,10 @@
 3.562080e6, 3.563680e6
 # Primary beam intensity distribution
 const, 1.0
+# Number of bins on the energy axis
+1000
+# Number of bins on the z-axis
+1000
 # 0) Identifier of the target (string)
 6Li_RSA_absorber
 # 1) Resonance energies in eV (comma separated values)

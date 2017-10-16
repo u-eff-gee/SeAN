@@ -20,10 +20,11 @@ private:
 	double emin;
 	double emax;
 
-	const unsigned int nBins;
+	unsigned int nBins_e;
+	unsigned int nBins_z;
 
 public:
-	Experiment(unsigned int n) : energy_bins(n, 0.), nBins(n) {};
+	Experiment(): nBins_e(0), nBins_z(0){};
 	~Experiment(){};
 
 	// Functions to manage the calculation process

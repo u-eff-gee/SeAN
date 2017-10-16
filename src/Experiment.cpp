@@ -65,8 +65,22 @@ void Experiment::readInputFile(const char* filename){
 			continue;
 		}
 
+		if(nline == 2){
+			nBins_e = atoi(line.c_str());
+
+			++nline;
+			continue;
+		}
+
+		if(nline == 3){
+			nBins_z = atoi(line.c_str());
+
+			++nline;
+			continue;
+		}
+
 		if(nline - INPUT_HEADER == n*NPARAMETERS + NAME){
-			targets.push_back(new Target(line, n));
+			targets.push_back(new Target(NBINS, NBINS_Z, line, n));
 			++nline;
 			continue;
 		}
@@ -252,6 +266,9 @@ void Experiment::print(){
 	} else{
 		cout << endl;
 	}
+
+	cout << "NBINS_E = " << nBins_e << endl;
+	cout << "NBINS_Z = " << nBins_z << endl;
 
 	for(unsigned int i = 0; i < targets.size(); ++i){
 		cout << endl;

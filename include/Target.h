@@ -30,13 +30,13 @@ private:
 	CrossSection *crossSection;
 	Absorption *absorption;
 
-	double photon_flux_density_bins[NBINS][NBINS_Z] = {{0.}, {0.}};
-	double resonance_absorption_density_bins[NBINS][NBINS_Z] = {{0.}, {0.}};
+	vector<vector <double> > photon_flux_density_bins;
+	vector<vector <double> > resonance_absorption_density_bins;
 
-	double incident_beam_bins[NBINS] = {1.};
-	double dopplercs_bins[NBINS] = {0.};
-	double massattenuation_bins[NBINS] = {0.};
-	double transmitted_beam_bins[NBINS] = {0.};
+	vector<double> incident_beam_bins;
+	vector<double> dopplercs_bins;
+	vector<double> massattenuation_bins;
+	vector<double> transmitted_beam_bins;
 
 
 	string target_name;
@@ -50,12 +50,20 @@ private:
 	unsigned int target_number;
 
 public:	
-	Target(string name, unsigned int number){
+	Target(unsigned int ne, unsigned int nz, string name, unsigned int number) : z_bins(nz, 0.), incident_beam_bins(ne, 0.), dopplercs_bins(ne, 0.), massattenuation_bins(ne, 0.), transmitted_beam_bins(ne, 0.){
 		target_name = name;
 		target_number = number;
 
 		crossSection = new CrossSection();
 		absorption = new Absorption();
+
+		photon_flux_density_bins.reserve(ne*nz);
+		resonance_absorption_density_bins.reserve(ne*nz);
+
+		for(unsigned int i = 0; i < nz; ++i){
+			photon_flux_density_bins.push_back(vector<double>(ne, 0.));
+			resonance_absorption_density_bins.push_back(vector<double>(ne, 0.));
+		}
 	};
 	
 	~Target(){
@@ -124,8 +132,8 @@ public:
 	void setIncidentBeam(double &trans_beam_bins);
 
 	// Functions to integrate over 2D histograms
-	double integrateEZHistogram(vector<double> &energy_bins, double (&z_bins)[NBINS_Z], double (&ezhist)[NBINS][NBINS_Z]);
-	double integrateEEHistogram(vector<double> &energy_bins, double (&eehist)[NBINS][NBINS]);
+	double integrateEZHistogram(vector<double> &energy_bins, vector<double> &z_bins, vector<vector<double> > &ezhist);
+	double integrateEEHistogram(vector<double> &energy_bins, vector<vector<double> > &eehist);
 
 	void vDistInfo(vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &vdist_norm, vector<unsigned int> &vdist_centroid);
 };

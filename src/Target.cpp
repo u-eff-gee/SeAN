@@ -135,7 +135,7 @@ void Target::calculateZBins(double z0, double z1){
 	
 	double delta_z = (z1-z0)/NBINS_Z;
 
-	for(int i = 0; i < NBINS_Z; ++i){
+	for(unsigned int i = 0; i < NBINS_Z; ++i){
 		z_bins[i] = i*delta_z + z0;
 	}
 }
@@ -162,7 +162,7 @@ void Target::calculateMassAttenuation(vector<double> &energy_bins){
 }
 
 void Target::setIncidentBeam(double &trans_beam_bins){
-	for(int i = 0; i < NBINS; ++i)
+	for(unsigned int i = 0; i < NBINS; ++i)
 		incident_beam_bins[i] = (&trans_beam_bins)[i];
 }
 
@@ -171,7 +171,7 @@ void Target::calculatePhotonFluxDensity(){
 }
 
 void Target::calculateTransmittedBeam(){
-	for(int i = 0; i < NBINS; ++i)
+	for(unsigned int i = 0; i < NBINS; ++i)
 		transmitted_beam_bins[i] = photon_flux_density_bins[i][NBINS_Z - 1];
 }
 
@@ -179,7 +179,7 @@ void Target::calculateResonanceAbsorptionDensity(){
 	absorption->resonance_absorption_density(dopplercs_bins, photon_flux_density_bins, resonance_absorption_density_bins);
 }
 
-double Target::integrateEZHistogram(vector<double> &energy_bins, double (&z_bins)[NBINS_Z], double (&ezhist)[NBINS][NBINS_Z]){
+double Target::integrateEZHistogram(vector<double> &energy_bins, vector<double> &z_bins, vector<vector<double> > &ezhist){
 
 	// Area of a bin in 2D plane
 	double bin_area = (energy_bins[1] - energy_bins[0])*(z_bins[1] - z_bins[0]);
@@ -188,8 +188,8 @@ double Target::integrateEZHistogram(vector<double> &energy_bins, double (&z_bins
 	double integral = 0.;
 
 	#pragma omp parallel for reduction (+:integral)
-	for(int i = 0; i < NBINS - 1; ++i){
-		for(int j = 0; j < NBINS_Z - 1; ++j){
+	for(unsigned int i = 0; i < NBINS - 1; ++i){
+		for(unsigned int j = 0; j < NBINS_Z - 1; ++j){
 			integral += ezhist[i][j]; 
 		}
 	}
@@ -205,7 +205,7 @@ double Target::integrateEZHistogram(vector<double> &energy_bins, double (&z_bins
 	return bin_area*integral;
 }
 
-double Target::integrateEEHistogram(vector<double> &energy_bins, double (&eehist)[NBINS][NBINS]){
+double Target::integrateEEHistogram(vector<double> &energy_bins, vector<vector<double> > &eehist){
 
 	// Area of a bin in 2D plane
 	double bin_area = (energy_bins[1] - energy_bins[0])*(energy_bins[1] - energy_bins[0]);
@@ -213,8 +213,8 @@ double Target::integrateEEHistogram(vector<double> &energy_bins, double (&eehist
 	// Crude implementation of the Riemann integral as a sum of bin contents times their dimension in energy- and z-direction. Since there are only NBINS-1 spaces between NBINS bins, leave out the last bin in each loop.
 	double integral = 0.;
 
-	for(int i = 0; i < NBINS - 1; ++i){
-		for(int j = 0; j < NBINS - 1; ++j){
+	for(unsigned int i = 0; i < NBINS - 1; ++i){
+		for(unsigned int j = 0; j < NBINS - 1; ++j){
 			integral += bin_area*eehist[i][j]; 
 		}
 	}
@@ -317,22 +317,6 @@ void Target::plotPhotonFluxDensity(vector<double> &energy_bins){
 	delete canvas;
 }
 
-void Target::plotTestIntegration(vector<double> &energy_bins){
-
-	stringstream filename;
-	filename << PLOT_OUTPUT_DIR << target_name << "_function.pdf";
-	stringstream canvasname;
-	canvasname << target_name << "_canvas";
-	TCanvas *canvas = new TCanvas(canvasname.str().c_str(), target_name.c_str(), 0, 0, 800, 500);
-	TLegend *legend = new TLegend(MU_PLOT_LEGEND_X1, MU_PLOT_LEGEND_Y1, MU_PLOT_LEGEND_X2, MU_PLOT_LEGEND_Y2);
-
-	absorption->plot_test_integration(energy_bins, z_bins, photon_flux_density_bins, target_name, canvas, legend, "Function inside the integral, ignore axis labels");
-
-	legend->Draw();
-	canvas->SaveAs(filename.str().c_str());
-	delete canvas;
-}
-
 void Target::plotResonanceAbsorptionDensity(vector<double> &energy_bins){
 
 	stringstream filename;
@@ -391,48 +375,6 @@ void Target::write(vector<double> &energy_bins){
 	print2DVector(crosssection_bins, "Cross section / eV fm^2", TXT_OUTPUT_DIR + target_name + "_cross_section.txt");
 	print2DVector(velocity_bins, "Velocity / c", TXT_OUTPUT_DIR + target_name + "_velocity_bins.txt");
 	print2DVector(vdist_bins, "Velocity distribution", TXT_OUTPUT_DIR + target_name + "_velocity_distribution.txt");
-}
-
-void Target::print1DArray(double *array, unsigned int n, string column, string filename){
-	
-	ofstream ofile(filename);
-
-        if(!ofile.is_open()){
-                cout << "Error: Target.cpp: print1DArray(): File '" << filename << "' could not be opened." << endl;
-		abort();
-	}
-        cout << "> Writing output file '" << filename << "'" << endl;
-
-	ofile.precision(8);
-	ofile << COMMENT << " "  << column << endl;
-	for(unsigned int i = 0; i < n; ++i){
-		ofile << scientific << array[i] << endl;
-	}
-}
-
-void Target::print2DArray(double (&array)[NBINS][NBINS_Z], string column, string filename){
-	
-	ofstream ofile(filename);
-
-        if(!ofile.is_open()){
-                cout << "Error: Target.cpp: print2DArray(): File '" << filename << "' could not be opened." << endl;
-		abort();
-	}
-        cout << "> Writing output file '" << filename << "'" << endl;
-
-	ofile.precision(8);
-	ofile << COMMENT << " "  << column << endl;
-	ofile << COMMENT << " f(E0, z0)" << endl;
-	ofile << COMMENT << " f(E0, z1)" << endl;
-	ofile << COMMENT << " ... " << endl;
-	ofile << COMMENT << " f(E1, z0)" << endl;
-	ofile << COMMENT << " f(E1, z1)" << endl;
-	ofile << COMMENT << " ... " << endl;
-	for(unsigned int i = 0; i < NBINS; ++i){
-		for(unsigned int j = 0; j < NBINS_Z; ++j){
-			ofile << scientific << array[i][j] << endl;
-		}
-	}
 }
 
 void Target::print1DVector(vector<double> &vec, string column, string filename){

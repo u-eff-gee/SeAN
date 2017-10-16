@@ -3,6 +3,10 @@
 # Primary beam intensity distribution
 #gauss, 6.505e6, 0.003e6, 1.
 const, 1.
+# Number of bins on the energy axis
+1000
+# Number of bins on the z-axis
+1000
 # 0) Identifier of the target (string)
 156Gd_NRF_scatterer
 # 1) Resonance energies in eV (comma separated values)

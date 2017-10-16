@@ -42,8 +42,8 @@ using std::string;
 // Number of parameters required for a single calculation
 #define NPARAMETERS 11
 
-// Length of the header of the input file, where EMIN and EMAX are set
-#define INPUT_HEADER 1
+// Length of the header of the input file, where EMIN and EMAX, NBINS_E and NBINS_Z are set
+#define INPUT_HEADER 3
 // Define shortcuts to access the input parameters
 #define NAME 1
 #define E0 2
@@ -62,8 +62,8 @@ using std::string;
 //************************************
 
 // Number of bins for the calculation
-#define NBINS 5000
-#define NBINS_Z 5000
+#define NBINS 1000
+#define NBINS_Z 1000
 
 // Limit for the applicability of the approximation for the doppler-shifted cross section (Gamma << Delta). The code will output a warning if the ratio Gamma/Delta is larger than APPROXIMATION_LIMIT.
 #define APPROXIMATION_LIMIT 0.1 // Arbitrary choice
