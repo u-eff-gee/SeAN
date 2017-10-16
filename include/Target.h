@@ -24,6 +24,7 @@ private:
 	vector<double> jj_list;
 	vector<double> vDistParams;
 	vector<double> vdist_norm;
+	vector<unsigned int> vdist_centroid;
 
 	CrossSection *crossSection;
 	Absorption *absorption;
@@ -131,8 +132,7 @@ public:
 	// Functions for testing
 	void testIntegration(double emin, double emax, double (&energy_bins)[NBINS], vector<double> beamParams);
 
-private:
-	double normalizeVDist(unsigned int i);
+	void vDistInfo(vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &vdist_norm, vector<unsigned int> &vdist_centroid);
 };
 
 #endif

@@ -54,19 +54,29 @@ void CrossSection::maxwell_boltzmann_debye(double (&energy_bins)[NBINS], vector<
 	;
 }
 
+void CrossSection::integration_input(vector< vector<double> > &crosssection_bins, vector< vector<double> > &vdist_bins){
+	for(unsigned int i = 0; i < crosssection_bins.size(); ++i){
+		pconv_crosssection_bins.push_back(vector<double>(3*NBINS, 0.));
+
+		for(unsigned int j = 0; j < NBINS; ++j){
+			pconv_crosssection_bins[i][j + NBINS] = crosssection_bins[i][j];
+		}
+	}
+}
+
 void CrossSection::fft_input(double (&energy_bins)[NBINS], vector< vector<double> > &crosssection_bins, vector< vector<double> > &vdist_bins, vector<double> e0_list){
 	double de = energy_bins[1] - energy_bins[0];
 	double energy_ratio_squared = 1.;
 
 	for(unsigned int i = 0; i < crosssection_bins.size(); ++i){
-		fft_crosssection_bins.push_back(vector<double>(NBINS, 0.));	
-		fft_vdist_bins.push_back(vector<double>(NBINS, 0.));	
+		pconv_crosssection_bins.push_back(vector<double>(NBINS, 0.));	
+		pconv_vdist_bins.push_back(vector<double>(NBINS, 0.));	
 
 		for(unsigned int j = 0; j < NBINS; ++j){
-			fft_crosssection_bins[i][j] = crosssection_bins[i][j]*de;
+			pconv_crosssection_bins[i][j] = crosssection_bins[i][j]*de;
 
 			energy_ratio_squared = energy_bins[j]*energy_bins[j]/(e0_list[i]*e0_list[i]);	
-			fft_vdist_bins[i][j] = -vdist_bins[i][j]*(-4.*energy_ratio_squared/e0_list[i])/((1. + energy_ratio_squared)*(1. + energy_ratio_squared));
+			pconv_vdist_bins[i][j] = -vdist_bins[i][j]*(-4.*energy_ratio_squared/e0_list[i])/((1. + energy_ratio_squared)*(1. + energy_ratio_squared));
 		}
 	}
 }
@@ -77,20 +87,22 @@ void CrossSection::dopplershift(double (&dopplercs_bins)[NBINS], double (&energy
 	
 	double resonance_energy_squared = 1.;
 	
-	for(unsigned int n = 0; n < crosssection_bins.size(); ++n){
-		long int resonance_position = upper_bound(energy_bins, energy_bins + NBINS, e0_list[n]) - energy_bins;
+	for(unsigned int n = 0; n < pconv_crosssection_bins.size(); ++n){
+		long unsigned int resonance_position = (long unsigned int) (upper_bound(energy_bins, energy_bins + NBINS, e0_list[n]) - energy_bins);
 		resonance_energy_squared = e0_list[n]*e0_list[n];
 
 		for(unsigned int i = 0; i < NBINS; ++i){
 			for(unsigned int j = 0; j < NBINS - 1; ++j){
-				// Not correct, crosssection_bins need zero padding
-				//dopplercs_bins[i] += 0.5*(vdist_bins[n][j]*crosssection_bins[n][j - resonance_position + i]*resonance_energy_squared/(energy_bins[j]*energy_bins[j]) + vdist_bins[n][j + 1])*(velocity_bins[n][j] - velocity_bins[n][j + 1]); 
+				dopplercs_bins[i] += 0.5*(
+						vdist_bins[n][j]*pconv_crosssection_bins[n][NBINS + i + resonance_position - j]*resonance_energy_squared/(energy_bins[j]*energy_bins[j]) 
+						+ vdist_bins[n][j + 1]*pconv_crosssection_bins[n][NBINS + i + resonance_position - (j + 1)]*resonance_energy_squared/(energy_bins[j + 1]*energy_bins[j + 1]))
+					*(velocity_bins[n][j] - velocity_bins[n][j + 1]); 
 			}
 		}
 	}
 }
 
-void CrossSection::dopplershiftFFT(double (&dopplercs_bins)[NBINS], double (&energy_bins)[NBINS], vector<vector<double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector<vector<double> > &vdist_bins, vector<double> &vdist_norm){
+void CrossSection::dopplershiftFFT(double (&dopplercs_bins)[NBINS], double (&energy_bins)[NBINS], vector<vector<double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector<vector<double> > &vdist_bins, vector<double> &vdist_norm, vector<unsigned int> &vdist_centroid){
 
 	fftw_plan vdist_plan, crosssection_plan, product_fft_plan;
 	fftw_complex vdist_fft[NBINS/2 + 1] = {{0.}};
@@ -100,8 +112,8 @@ void CrossSection::dopplershiftFFT(double (&dopplercs_bins)[NBINS], double (&ene
 
 	for(unsigned int i = 0; i < crosssection_bins.size(); ++i){
 
-		vdist_plan = fftw_plan_dft_r2c_1d(NBINS, &fft_vdist_bins[i][0], vdist_fft, FFTW_ESTIMATE);
-		crosssection_plan = fftw_plan_dft_r2c_1d(NBINS, &fft_crosssection_bins[i][0], crosssection_fft, FFTW_ESTIMATE);
+		vdist_plan = fftw_plan_dft_r2c_1d(NBINS, &pconv_vdist_bins[i][0], vdist_fft, FFTW_ESTIMATE);
+		crosssection_plan = fftw_plan_dft_r2c_1d(NBINS, &pconv_crosssection_bins[i][0], crosssection_fft, FFTW_ESTIMATE);
 
 		// Calculate Fourier transform of both arrays
 		fftw_execute(vdist_plan);
@@ -111,10 +123,6 @@ void CrossSection::dopplershiftFFT(double (&dopplercs_bins)[NBINS], double (&ene
 		for(unsigned int j = 0; j < NBINS / 2 + 1; ++j){
 			product_fft[j][0] = crosssection_fft[j][0]*vdist_fft[j][0] - crosssection_fft[j][1]*vdist_fft[j][1];
 			product_fft[j][1] = crosssection_fft[j][0]*vdist_fft[j][1] + crosssection_fft[j][1]*vdist_fft[j][0];
-
-			//cout << crosssection_fft[j][0] << " + i * " << crosssection_fft[j][1] << endl;
-			//cout << vdist_fft[j][0] << " + i * " << vdist_fft[j][1] << endl;
-			//cout << product_fft[j][0] << " + i * " << product_fft[j][1] << endl;
 		}
 
 		// Transform the product back
@@ -122,11 +130,14 @@ void CrossSection::dopplershiftFFT(double (&dopplercs_bins)[NBINS], double (&ene
 		fftw_execute(product_fft_plan);
 
 		// Add the i-th convoluted cross section to the total cross section, observing that the transformation back changed the order of the elements in the array and leaves them scaled by NBINS.
+		unsigned int shift = vdist_centroid[i];
+		double inverse_norm = (double) 1./(vdist_norm[i]*NBINS);
+		shift = NBINS - shift;
 		for(unsigned int j = 0; j < NBINS; ++j){
-			if(j < NBINS/2){
-				dopplercs_bins[j] += (double) convolution[NBINS/2 - j - 1]/NBINS/fabs(vdist_norm[i]);
+			if(j + shift < NBINS){
+				dopplercs_bins[j + shift] += convolution[j]*inverse_norm;
 			} else{
-				dopplercs_bins[j] += (double) convolution[NBINS - (j - NBINS/2) - 1]/NBINS/fabs(vdist_norm[i]);
+				dopplercs_bins[j - (NBINS - shift)] += convolution[j]*inverse_norm;
 			}
 		}
 	}

@@ -6,6 +6,14 @@ import time
 
 from scipy import integrate
 
+####################################################################
+# This is a python module to test the pseudo-convolution of the
+# Breit-Wigner cross section and the velocity distribution.
+# It compares different methods to execute the integration and
+# tries to assess the errors that are made by approximating the
+# integration as a true convolution.
+####################################################################
+
 ### Set number of bins for calculation
 NBINS = 100
 
@@ -20,7 +28,7 @@ EMIN = 3.562480e6
 EMAX = 3.563280e6
 
 ### Set parameters of the nuclear resonance
-Ei = 3.562880e6
+Ei = 3.563000e6
 Ji = 0.
 J0 = 1.
 Gamma0 = 8.16
@@ -53,11 +61,19 @@ def dvp(Elab, Enucl):
 def int_hist(bins, hist):
     return np.sum(hist)*(bins[1] - bins[0])
     
+def hist_mean(bins, hist):
+    return np.sum(bins*hist)/np.sum(hist)
+    
 energy_bins = np.linspace(EMIN, EMAX, NBINS)
 v_bins = np.ones(NBINS)*vp(energy_bins, np.ones(NBINS)*Ei)
 
 cross_section = breit_wigner(energy_bins, Ei, Ji, J0, Gamma0, Gamma)
 v_dist = maxwell(v_bins, M, T)
+
+v_dist_mean = hist_mean(energy_bins, v_dist)
+v_dist_centroid = np.argmin(np.abs(energy_bins - v_dist_mean))
+cross_section_mean = hist_mean(energy_bins, cross_section)
+cross_section_centroid = np.argmin(np.abs(energy_bins - cross_section_mean))
 
 ### 1) The "exact" solution: Numerical integration (num) using an integration algorithm
 # Define a new function that is the product of the cross section and the velocity distribution
@@ -85,6 +101,13 @@ start = time.time()
 # Substitute v with E in the integral to have an expression that looks like a convolution integral
 v_dist_sub = -v_dist*dvp(energy_bins, Ei) # The minus sign comes in because one would have to switch the limits of the integral when the integration variable is substituted.
 doppler_con = np.convolve(cross_section, v_dist_sub, 'same')*(energy_bins[1] - energy_bins[0])
+
+# Rearrange the elements in doppler_fft, because the convolution rearranges the elements like
+# [0, 1, ...] -> [0 + x, 1 + x, ...]
+# ... did not find out yet how x is related to the input, so if the energy bins
+# around the maximum of the cross section are not symmetric, this cross section
+# will be shifted compared to the others
+# doppler_con = np.roll(doppler_con, NBINS - v_dist_centroid)
 
 stop = time.time()
 
@@ -119,12 +142,8 @@ doppler_fft_fft = cross_section_fft*v_dist_sub_fft
 doppler_fft = np.fft.irfft(doppler_fft_fft)
 
 # Rearrange the elements in doppler_fft, because the Fourier transformation rearranges the elements like
-# [0, 1, ..., N-2, N-1] -> [N/2, N/2 + 1, ..., N - 2, N - 1, 0, 1, ... N/2 - 2, N/2 - 1]
-
-doppler_fft_rearranged = np.zeros(NBINS)
-doppler_fft_rearranged[0:NBINS/2] = doppler_fft[NBINS/2 - 1: :-1]
-doppler_fft_rearranged[NBINS/2:NBINS] = doppler_fft[NBINS + 1:NBINS/2 - 1:-1]
-doppler_fft = doppler_fft_rearranged
+# [0, 1, ...] -> [0 + v_dist_centroid, 1 + v_dist_centroid, ...]
+doppler_fft = np.roll(doppler_fft, -v_dist_centroid)
 
 stop = time.time()
 

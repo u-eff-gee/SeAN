@@ -15,8 +15,8 @@ using std::vector;
 using std::string;
 
 class CrossSection{
-	vector< vector<double> > fft_crosssection_bins;
-	vector< vector<double> > fft_vdist_bins;
+	vector< vector<double> > pconv_crosssection_bins;
+	vector< vector<double> > pconv_vdist_bins;
 
 public:
 	CrossSection(){};
@@ -35,9 +35,11 @@ public:
 
 	void fft_input(double (&energy_bins)[NBINS], vector< vector<double> > &crosssection_bins, vector< vector<double> > &vdist_bins, vector<double> e0_list);
 
+	void integration_input(vector< vector<double> > &crosssection_bins, vector< vector<double> > &vdist_bins);
+
 	void dopplershift(double (&dopplercs_bins)[NBINS], double (&energy_bins)[NBINS], vector< vector <double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &vdist_norm, vector<double> &e0_list);
 
-	void dopplershiftFFT(double (&dopplercs_bins)[NBINS], double (&energy_bins)[NBINS], vector< vector <double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &vdist_norm);
+	void dopplershiftFFT(double (&dopplercs_bins)[NBINS], double (&energy_bins)[NBINS], vector< vector <double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &vdist_norm, vector<unsigned int> &vdist_centroid);
 
 	void plot_crosssection(double (&energies)[NBINS], vector< vector<double> > &crosssection, string title, TCanvas* canvas, TLegend* legend, string legend_entry);
 

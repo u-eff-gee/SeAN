@@ -104,7 +104,6 @@ void Target::calculateVelocityDistribution(double (&energy_bins)[NBINS]){
 	if(vDist_ID == "maxwell_boltzmann"){
 		for(unsigned int i = 0; i < e0_list.size(); ++i){
 			crossSection->maxwell_boltzmann(energy_bins, velocity_bins[i], vdist_bins[i], vDistParams, mass, e0_list[i]);
-			vdist_norm.push_back(normalizeVDist(i));
 		}
 	}
 
@@ -112,9 +111,7 @@ void Target::calculateVelocityDistribution(double (&energy_bins)[NBINS]){
 		crossSection->maxwell_boltzmann_approximation(dopplercs_bins, energy_bins, velocity_bins, vdist_bins, e0_list, gamma0_list, gamma0_list, jj_list, j0, vDistParams, mass);
 	}
 
-//	if(vDist_ID == "maxwell_boltzmann_debye"){
-//		crossSection->maxwell_boltzmann_debye(velocity_bins, vdist_bins, vDistParams);
-//	}
+	vDistInfo(velocity_bins, vdist_bins, vdist_norm, vdist_centroid);
 }
 
 void Target::calculateIncidentBeam(double (&energy_bins)[NBINS], string beam_ID, vector<double> beamParams){
@@ -145,6 +142,7 @@ void Target::calculateZBins(double z0, double z1){
 
 void Target::calculateDopplerShift(double (&energy_bins)[NBINS]){
 	if(vDist_ID != "maxwell_boltzmann_approximation"){
+		crossSection->integration_input(crosssection_bins, vdist_bins);
 		crossSection->dopplershift(dopplercs_bins, energy_bins, crosssection_bins, velocity_bins, vdist_bins, vdist_norm, e0_list);
 	}
 }
@@ -152,7 +150,7 @@ void Target::calculateDopplerShift(double (&energy_bins)[NBINS]){
 void Target::calculateDopplerShiftFFT(double (&energy_bins)[NBINS]){
 	if(vDist_ID != "maxwell_boltzmann_approximation"){
 		crossSection->fft_input(energy_bins, crosssection_bins, vdist_bins, e0_list);
-		crossSection->dopplershiftFFT(dopplercs_bins, energy_bins, crosssection_bins, velocity_bins, vdist_bins, vdist_norm);
+		crossSection->dopplershiftFFT(dopplercs_bins, energy_bins, crosssection_bins, velocity_bins, vdist_bins, vdist_norm, vdist_centroid);
 	}
 }
 
@@ -521,13 +519,34 @@ void Target::print2DVector(vector< vector<double> > (&vec), string column, strin
 	}
 }
 
-double Target::normalizeVDist(unsigned int i){
-
+void Target::vDistInfo(vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &vdist_norm, vector<unsigned int> &vdist_centroid){
+	
+	// Determine the integral of the velocity distribution and the centroid of the distribution.
+	// The integral is needed to normalize the pseudo-convolution with the cross section, since this should conserve the area under the resonance curve.
+	// The centroid is needed for the FFT convolution. The algorithm which is used re-orders the input array by the shift of the centroid of the velocity distribution from the array centroid.
+	double norm = 0.;
 	double sum = 0.;
+	double weightedsum = 0.;
+	double velocity_bin_low = 0.;
+	double velocity_bin_high = 0.;
+	double vdist = 0.;
 
-	for(unsigned int j = 0; j < NBINS-1; j++){
-		sum += vdist_bins[i][j]*(velocity_bins[i][j + 1] - velocity_bins[i][j]);
+	for(unsigned int i = 0; i < vdist_bins.size(); ++i){
+
+		sum = 0.;
+		norm = 0.;
+		weightedsum = 0.;
+
+		for(unsigned int j = 0; j < NBINS - 1; ++j){
+			vdist = vdist_bins[i][j];
+			velocity_bin_low = velocity_bins[i][j];
+			velocity_bin_high = velocity_bins[i][j + 1];
+			norm += vdist*(velocity_bin_high - velocity_bin_low);
+			weightedsum += vdist*j;
+			sum += vdist;
+		}
+
+		vdist_norm.push_back(fabs(norm));
+		vdist_centroid.push_back((unsigned int) (weightedsum/sum));
 	}
-
-	return 1./sum;
 }
