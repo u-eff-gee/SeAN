@@ -3,8 +3,10 @@
 #include <iostream>
 #include <sstream>
 #include <algorithm>
+#include <complex.h>
 
 #include "omp.h"
+#include "fftw3.h"
 
 #include "TGraph.h"
 #include "TAxis.h"
@@ -16,26 +18,34 @@ using std::max_element;
 
 void CrossSection::breit_wigner(double (&energy_bins)[NBINS], vector<double> (&crosssection_bins), double e0, double gamma0, double gamma, double jj, double j0){
 
-	double cs_max = PI*0.5*HBARC2/(e0*e0)*(2.*jj + 1.)/(2. * j0 + 1.)*gamma0*gamma;
+	double cs_max = PI*0.5*HBARC2/(e0*e0)*(2.*jj + 1.)/(2.*j0 + 1.)*gamma0*gamma;
 	
 	for(unsigned int j = 0; j < NBINS; ++j){
-		crosssection_bins[NBINS + j] += cs_max / ((energy_bins[j] - e0)*(energy_bins[j] - e0) + 0.25*gamma*gamma);
+		crosssection_bins[j] += cs_max / ((energy_bins[j] - e0)*(energy_bins[j] - e0) + 0.25*gamma*gamma);
+	}
+}
+
+void CrossSection::calculateVelocityBins(double (&energy_bins)[NBINS], vector<double> &velocity_bins, double e0){
+
+	// SeAN uses non-equidistant velocity bins. Here, velocity_bins[i] is the velocity that is needed to shift energy_bins[j] to energy_bins[i].
+	double energy_ratio = 1.;
+
+	// Find bin of resonance energy
+//	long int resonance_position = upper_bound(energy_bins, energy_bins + NBINS, e0) - energy_bins;
+//	double resonance_energy = energy_bins[resonance_position];
+
+	for(unsigned int i = 0; i < NBINS; ++i){
+		energy_ratio = energy_bins[i]/e0;
+		velocity_bins[i] = (1. - energy_ratio*energy_ratio)/(1. + energy_ratio*energy_ratio);
 	}
 }
 
 void CrossSection::maxwell_boltzmann(double (&energy_bins)[NBINS], vector<double> &velocity_bins, vector<double> &vdist_bins, vector<double> &params, double mass, double e0){
 
-// Implementation with non-equidistant velocity bins. Here, velocity_bins[i] is the velocity that is needed to shift energy_bins[j] to energy_bins[i].
 	double c1 = sqrt(mass*AtomicMassUnit/(2*PI*kB*params[0]));
       	double c2 = -1./pow(delta(params[0], mass), 2);
-	double energy_ratio = 1.;
-
-	// Find bin of resonance energy
-	long int resonance_position = upper_bound(energy_bins, energy_bins + NBINS, e0) - energy_bins;
 
       	for(unsigned int i = 0; i < NBINS; ++i){
-		energy_ratio = energy_bins[i]/energy_bins[resonance_position];
-		velocity_bins[i] = (-2. + 2.*energy_ratio*energy_ratio)/(2. + 2.*energy_ratio*energy_ratio);
               	vdist_bins[i] = c1*exp(c2*velocity_bins[i]*velocity_bins[i]);
       	}
 }
@@ -44,15 +54,90 @@ void CrossSection::maxwell_boltzmann_debye(double (&energy_bins)[NBINS], vector<
 	;
 }
 
-void CrossSection::dopplershift(double (&dopplercs_bins)[NBINS], double (&energy_bins)[NBINS], vector<vector<double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector<vector<double> > &vdist_bins, vector<double> &vdist_norm){
+void CrossSection::integration_input(vector< vector<double> > &crosssection_bins, vector< vector<double> > &vdist_bins){
+	for(unsigned int i = 0; i < crosssection_bins.size(); ++i){
+		pconv_crosssection_bins.push_back(vector<double>(3*NBINS, 0.));
+
+		for(unsigned int j = 0; j < NBINS; ++j){
+			pconv_crosssection_bins[i][j + NBINS] = crosssection_bins[i][j];
+		}
+	}
+}
+
+void CrossSection::fft_input(double (&energy_bins)[NBINS], vector< vector<double> > &crosssection_bins, vector< vector<double> > &vdist_bins, vector<double> e0_list){
+	double de = energy_bins[1] - energy_bins[0];
+	double energy_ratio_squared = 1.;
 
 	for(unsigned int i = 0; i < crosssection_bins.size(); ++i){
-		unsigned long int resonance_position = (unsigned long int) (max_element(crosssection_bins[i].begin(), crosssection_bins[i].end()) - crosssection_bins[i].begin() + 1);
+		pconv_crosssection_bins.push_back(vector<double>(NBINS, 0.));	
+		pconv_vdist_bins.push_back(vector<double>(NBINS, 0.));	
 
-		#pragma omp parallel for
 		for(unsigned int j = 0; j < NBINS; ++j){
-			for(unsigned int k = 0; k < NBINS - 1; ++k){
-				dopplercs_bins[j] += vdist_norm[i]*vdist_bins[i][k]*crosssection_bins[i][j + resonance_position - k]*(velocity_bins[i][k + 1] - velocity_bins[i][k]);
+			pconv_crosssection_bins[i][j] = crosssection_bins[i][j]*de;
+
+			energy_ratio_squared = energy_bins[j]*energy_bins[j]/(e0_list[i]*e0_list[i]);	
+			pconv_vdist_bins[i][j] = -vdist_bins[i][j]*(-4.*energy_ratio_squared/e0_list[i])/((1. + energy_ratio_squared)*(1. + energy_ratio_squared));
+		}
+	}
+}
+
+void CrossSection::dopplershift(double (&dopplercs_bins)[NBINS], double (&energy_bins)[NBINS], vector<vector<double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector<vector<double> > &vdist_bins, vector<double> &vdist_norm, vector<double> &e0_list){
+
+	// Integrate using trapezoidal rule
+	
+	double resonance_energy_squared = 1.;
+	
+	for(unsigned int n = 0; n < pconv_crosssection_bins.size(); ++n){
+		long unsigned int resonance_position = (long unsigned int) (upper_bound(energy_bins, energy_bins + NBINS, e0_list[n]) - energy_bins);
+		resonance_energy_squared = e0_list[n]*e0_list[n];
+
+		for(unsigned int i = 0; i < NBINS; ++i){
+			for(unsigned int j = 0; j < NBINS - 1; ++j){
+				dopplercs_bins[i] += 0.5*(
+						vdist_bins[n][j]*pconv_crosssection_bins[n][NBINS + i + resonance_position - j]*resonance_energy_squared/(energy_bins[j]*energy_bins[j]) 
+						+ vdist_bins[n][j + 1]*pconv_crosssection_bins[n][NBINS + i + resonance_position - (j + 1)]*resonance_energy_squared/(energy_bins[j + 1]*energy_bins[j + 1]))
+					*(velocity_bins[n][j] - velocity_bins[n][j + 1]); 
+			}
+		}
+	}
+}
+
+void CrossSection::dopplershiftFFT(double (&dopplercs_bins)[NBINS], double (&energy_bins)[NBINS], vector<vector<double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector<vector<double> > &vdist_bins, vector<double> &vdist_norm, vector<unsigned int> &vdist_centroid){
+
+	fftw_plan vdist_plan, crosssection_plan, product_fft_plan;
+	fftw_complex vdist_fft[NBINS/2 + 1] = {{0.}};
+	fftw_complex crosssection_fft[NBINS/2 + 1] = {{0.}};
+	fftw_complex product_fft[NBINS/2 + 1] = {{0.}};
+	double convolution[NBINS] = {0.};
+
+	for(unsigned int i = 0; i < crosssection_bins.size(); ++i){
+
+		vdist_plan = fftw_plan_dft_r2c_1d(NBINS, &pconv_vdist_bins[i][0], vdist_fft, FFTW_ESTIMATE);
+		crosssection_plan = fftw_plan_dft_r2c_1d(NBINS, &pconv_crosssection_bins[i][0], crosssection_fft, FFTW_ESTIMATE);
+
+		// Calculate Fourier transform of both arrays
+		fftw_execute(vdist_plan);
+		fftw_execute(crosssection_plan);
+
+		// Multiply the (complex) Fourier - transformed arrays
+		for(unsigned int j = 0; j < NBINS / 2 + 1; ++j){
+			product_fft[j][0] = crosssection_fft[j][0]*vdist_fft[j][0] - crosssection_fft[j][1]*vdist_fft[j][1];
+			product_fft[j][1] = crosssection_fft[j][0]*vdist_fft[j][1] + crosssection_fft[j][1]*vdist_fft[j][0];
+		}
+
+		// Transform the product back
+		product_fft_plan = fftw_plan_dft_c2r_1d(NBINS, product_fft, convolution, FFTW_ESTIMATE);
+		fftw_execute(product_fft_plan);
+
+		// Add the i-th convoluted cross section to the total cross section, observing that the transformation back changed the order of the elements in the array and leaves them scaled by NBINS.
+		unsigned int shift = vdist_centroid[i];
+		double inverse_norm = (double) 1./(vdist_norm[i]*NBINS);
+		shift = NBINS - shift;
+		for(unsigned int j = 0; j < NBINS; ++j){
+			if(j + shift < NBINS){
+				dopplercs_bins[j + shift] += convolution[j]*inverse_norm;
+			} else{
+				dopplercs_bins[j - (NBINS - shift)] += convolution[j]*inverse_norm;
 			}
 		}
 	}
@@ -63,18 +148,10 @@ void CrossSection::maxwell_boltzmann_approximation(double (&dopplercs_bins)[NBIN
 // Calculate velocity distribution as in maxwell_boltzmann
 
 	for(unsigned int i = 0; i < e0_list.size(); ++i){
-		velocity_bins.push_back(vector<double> (NBINS));
-		vdist_bins.push_back(vector<double> (NBINS));
 		double c1 = sqrt(mass*AtomicMassUnit/(2*PI*kB*params[0]));
 		double c2 = -1./pow(delta(params[0], mass), 2);
-		double energy_ratio = 1.;
-
-		// Find bin of resonance energy
-		long int resonance_position = upper_bound(energy_bins, energy_bins + NBINS, e0_list[i]) - energy_bins;
 
 		for(unsigned int j = 0; j < NBINS; ++j){
-			energy_ratio = energy_bins[j]/energy_bins[resonance_position];
-			velocity_bins[i][j] = (-2. + 2.*energy_ratio*energy_ratio)/(2. + 2.*energy_ratio*energy_ratio);
 			vdist_bins[i][j] = c1*exp(c2*velocity_bins[i][j]*velocity_bins[i][j]);
 		}
 	}
@@ -108,8 +185,8 @@ void CrossSection::plot_crosssection(double (&energy_bins)[NBINS], vector< vecto
 	for(unsigned int i = 0; i < crosssection_bins.size(); ++i){
 		graphs.push_back(new TGraph(NBINS));
 		for(unsigned int j = 0; j < NBINS; ++j){
-			graphs[i]->SetPoint((Int_t) j, energy_bins[j], crosssection_bins[i][NBINS + j]);
-			total_crosssection_bins[j] += crosssection_bins[i][NBINS + j];
+			graphs[i]->SetPoint((Int_t) j, energy_bins[j], crosssection_bins[i][j]);
+			total_crosssection_bins[j] += crosssection_bins[i][j];
 		}
 
 		graphs[i]->SetLineStyle(2);
@@ -151,7 +228,7 @@ void CrossSection::plot_dopplershift(double (&energy_bins)[NBINS], vector< vecto
 
 	for(unsigned int i = 0; i < crosssection_bins.size(); ++i){
 		for(unsigned int j = 0; j < NBINS; ++j){
-			total_crosssection_bins[j] += crosssection_bins[i][NBINS + j];
+			total_crosssection_bins[j] += crosssection_bins[i][j];
 		}
 	}
 

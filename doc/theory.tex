@@ -1,0 +1,120 @@
+\documentclass{article}
+
+\usepackage{cite}
+\usepackage{hyperref}
+\usepackage{mathtools}
+
+\begin{document}
+\title{SeAN, Self-Absorption Numerical \\ Theoretical background}
+\author{Udo Gayer}
+\date{}
+\maketitle
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\section{Introduction}
+This document describes the theoretical background of nuclear self-absorption experiments relevant for the usage of SeAN. 
+A comprehensive basic introduction can be found in the PhD thesis of C. Romig (Ref. \cite{Rom15}).
+The notation in all SeAN - related documents is also based on this reference.
+
+One of the first introductions into the formalism was given by F.R. Metzger in 1959 \cite{Met59}.
+
+\newpage
+
+\section{Theory}
+\subsection{Doppler shift}
+
+\begin{equation}
+\label{breit_wigner}
+\sigma_{0 \to i} (E, E_i^{nucl}) = \frac{\pi}{2} \cdot \left( \frac{\hbar c}{E_i^{nucl}} \right)^2 \cdot \frac{2 J_i + 1}{2 J_0 + 1} \cdot \frac{\Gamma_0 \Gamma}{\left( E - E_i^{nucl} \right)^2 + \frac{\Gamma^2}{4}}
+\end{equation}
+
+\begin{equation}
+\label{doppler_shift}
+E_\gamma^{lab}(v_\parallel) = \frac{\sqrt{1 - \left( \frac{v_\parallel}{c} \right)^2}}{1 + \frac{v_\parallel}{c}} \cdot E_\gamma^{nucl}
+\end{equation}
+
+\begin{equation}
+\label{doppler_shift_inverse}
+\frac{v_\parallel}{c} \left( E_\gamma^{lab}, E_\gamma^{nucl} \right) = \frac{1 - \left( \frac{E_\gamma^{lab}}{E_\gamma^{nucl}} \right)^2}{1 + \left( \frac{E_\gamma^{lab}}{E_\gamma^{nucl}} \right)^2}
+\end{equation}
+
+\begin{equation}
+\frac{v_\parallel}{c} \left( 0, E_\gamma^{nucl} \right) = 1
+\end{equation}
+
+\begin{equation}
+	\frac{v_\parallel}{c} \left( E_\gamma^{nucl}, E_\gamma^{nucl} \right) = 0
+\end{equation}
+
+\begin{equation}
+\mathrm{lim}_{E_\gamma^{lab} \to \infty} \frac{v_\parallel}{c} \left( E_\gamma^{lab}, E_\gamma^{nucl} \right) = -1
+\end{equation}
+
+\begin{equation}
+\label{maxwell_boltzmann_distribution}
+w\left(v_\parallel \right) = \sqrt{\frac{M}{2 \pi k_B T}} \cdot \mathrm{exp} \left( -\frac{M v_\parallel^2}{2 k_B T} \right) 
+\end{equation}
+
+\begin{equation}
+\label{pseudo_convolution_v}
+\sigma^{D}_{0 \to i} (E) = \int_{-c}^{c} \sigma_{0 \to i} (E, E_i^{nucl} \to E_i^{lab}(v_\parallel)) \cdot w(v_\parallel) \mathrm{d} v_\parallel
+\end{equation}
+
+\begin{equation}
+\label{substitute_v_E}
+\mathrm{d} v_\parallel = \left( \frac{\mathrm{d} v_\parallel}{\mathrm{d} E_i^{lab}} \right) \mathrm{d} E_i^{lab} = \frac{- 4 \cdot c \cdot \frac{E_\gamma^{lab}}{\left( E_\gamma^{nucl} \right)^2}}{ \left[ 1 + \left( \frac{E_\gamma^{lab}}{E_\gamma^{nucl}} \right)^2 \right]^2} ~ \mathrm{d} E_i^{lab}
+\end{equation}
+
+\begin{equation}
+\label{pseudo_convolution_E_0}
+\sigma^{D}_{0 \to i} (E) = \int_{E_\gamma^{lab} \left(-c \right)}^{E_\gamma^{lab} \left(c \right)} \sigma_{0 \to i} (E, E_i^{lab}) \cdot w(E_i^{lab}) \left( \frac{\mathrm{d} v_\parallel}{\mathrm{d} E_i^{lab}} \right) \mathrm{d} E_i^{lab}
+\end{equation}
+
+\begin{equation}
+\label{pseudo_convolution_E}
+\sigma^{D}_{0 \to i} (E) = - \int_{0}^{\infty} \sigma_{0 \to i} (E, E_i^{lab}) \cdot w(E_i^{lab}) \left( \frac{\mathrm{d} v_\parallel}{\mathrm{d} E_i^{lab}} \right) \mathrm{d} E_i^{lab}
+\end{equation}
+
+\begin{equation}
+\label{convolution_f_1}
+\sigma_{0 \to i} (E, E_i^{lab}) = \frac{\pi}{2} \cdot \left( \frac{\hbar c}{E_i^{nucl}} \right)^2 \cdot \frac{2 J_i + 1}{2 J_0 + 1} \cdot \frac{\Gamma_0 \Gamma}{\left( E - E_i^{nucl} \right)^2 + \frac{\Gamma^2}{4}} 
+\end{equation}
+\begin{equation}
+\label{convolution_f_1}
+= \frac{1}{\left( E_i^{lab} \right)^2} \cdot f\left( E - E^{lab}_i \right)
+\end{equation}
+
+\begin{equation}
+\label{convolution_g}
+	w \left( E^{lab}_i \right)\left( \frac{\mathrm{d} v_\parallel}{\mathrm{d} E_i^{lab}} \right) \coloneqq g \left( E^{lab}_i \right)
+\end{equation}
+
+\begin{equation}
+\label{convolution_approximation_1}
+\sigma^{D}_{0 \to i} (E) = - \int_{0}^{\infty} \frac{1}{\left( E_i^{lab} \right)^2} \cdot f\left( E - E^{lab}_i \right) \cdot g \left( E^{lab}_i \right) \mathrm{d} E_i^{lab}
+\end{equation}
+
+\begin{equation}
+\label{convolution_approximation_2}
+\approx - \int_{0}^{\infty} \frac{1}{\left( E_i^{nucl} \right)^2} \cdot f\left( E - E^{lab}_i \right) \cdot g \left( E^{lab}_i \right) \mathrm{d} E_i^{lab}
+\end{equation}
+
+\begin{equation}
+\label{convolution_approximation_3}
+	\approx - \int_{0}^{\infty} \tilde{f}\left( E - E^{lab}_i \right) \cdot g \left( E^{lab}_i \right) \mathrm{d} E_i^{lab} = -\left( f * g \right) \left( E \right)
+\end{equation}
+
+\begin{equation}
+\label{discrete_convolution}
+	\sigma^{D}_{0 \to i} (E) = \sum_n \tilde{f} \left( E -  \left(E^{lab}_i\right)_n \right) \cdot g \left( \left( (E^{lab}_i\right)_n \right)
+\end{equation}
+\newpage
+
+\bibliography{references}{}
+\bibliographystyle{plain}
+\end{document}
