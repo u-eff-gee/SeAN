@@ -28,7 +28,9 @@ public:
 		matt.push_back(vector<double>());
 		matt.push_back(vector<double>());
 	};
-	~Absorption(){};
+	~Absorption(){
+		delete &matt;
+	};
 
 	void read_massattenuation_NIST(vector<double> &energy_bins, vector<double> &massattenuation_bins, string massAttenuation_ID, double mass);
 

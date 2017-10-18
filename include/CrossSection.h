@@ -21,7 +21,10 @@ class CrossSection{
 public:
 	CrossSection(){};
 	
-	~CrossSection(){};
+	~CrossSection(){
+		delete &pconv_crosssection_bins;
+		delete &pconv_vdist_bins;
+	};
 
 	void breit_wigner(vector<double> &energy_bins, vector<double> (&crosssection_bins), double e0, double gamma0, double gamma, double jj, double j0);
 

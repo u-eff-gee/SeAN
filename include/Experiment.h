@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "Target.h"
+#include "Settings.h"
 
 using std::vector;
 
@@ -17,6 +18,8 @@ private:
 	string ifname;
 	string beam_ID;
 
+	Settings settings;
+
 	double emin;
 	double emax;
 
@@ -24,7 +27,7 @@ private:
 	unsigned int nBins_z;
 
 public:
-	Experiment(): nBins_e(0), nBins_z(0){};
+	Experiment(Settings &s);
 	~Experiment(){};
 
 	// Functions to manage the calculation process

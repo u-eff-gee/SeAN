@@ -12,6 +12,11 @@ using std::string;
 using std::regex;
 using std::regex_replace;
 
+Experiment::Experiment(Settings &s){
+	settings = s;
+	energy_bins.reserve(settings.nbins_e);
+}
+
 void Experiment::readInputFile(const char* filename){
 	ifname = filename;
 
@@ -205,7 +210,7 @@ void Experiment::createEnergyBins(double emin, double emax){
 	double delta_e = (double) (emax - emin)/(NBINS - 1);
 
 	for(unsigned int i = 0; i < NBINS; ++i)
-		energy_bins[i] = emin + i*delta_e;
+		energy_bins.push_back(emin + i*delta_e);
 };
 
 void Experiment::crossSections(bool plot, bool write, bool exact){

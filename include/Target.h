@@ -68,6 +68,28 @@ public:
 	
 	~Target(){
 		delete crossSection;
+		delete absorption;
+
+		delete &crosssection_bins;
+		delete &velocity_bins;
+		delete &vdist_bins;
+		delete &z_bins;
+		delete &e0_at_rest_list;
+		delete &e0_list;
+		delete &gamma0_list;
+		delete &gamma_list;
+		delete &jj_list;
+		delete &vDistParams;
+		delete &vdist_norm;
+		delete &vdist_centroid;
+
+		delete &photon_flux_density_bins;
+		delete &resonance_absorption_density_bins;
+
+		delete &incident_beam_bins;
+		delete &dopplercs_bins;
+		delete &massattenuation_bins;
+		delete &transmitted_beam_bins;
 	};
 
 	// Functions to set private member variables

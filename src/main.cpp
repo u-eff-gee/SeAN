@@ -5,6 +5,7 @@
 
 #include "Experiment.h"
 #include "Config.h"
+#include "Settings.h"
 
 using std::cout;
 using std::endl;
@@ -25,28 +26,20 @@ static struct argp_option options[] = {
   { 0 }
 };
 
-struct arguments{
-        char *inputfile;
-	bool exact = false;
-	bool plot = false;
-	bool write = false;
-	bool sudowrite = false;
-};
-
 static error_t parse_opt(int key, char *arg, struct argp_state *state) {
-    struct arguments *arguments = (struct arguments*) state->input;
+    struct Settings *settings = (struct Settings*) state->input;
 
     switch (key) {
-    	case ARGP_KEY_ARG: arguments->inputfile = arg; break;
-	case 'e': arguments->exact = true; break;
-    	case 'p': arguments->plot = true; break;
-    	case 'w': arguments->write = true; break;
-    	case 'W': arguments->sudowrite = true; break;
+    	case ARGP_KEY_ARG: settings->inputfile = arg; break;
+	case 'e': settings->exact = true; break;
+    	case 'p': settings->plot = true; break;
+    	case 'w': settings->write = true; break;
+    	case 'W': settings->sudowrite = true; break;
     	case ARGP_KEY_END:
         	if(state->arg_num == 0) {
             		argp_usage(state);
         	}
-        	if(!arguments->inputfile) {
+        	if(!settings->inputfile) {
             		argp_failure(state, 1, 0, "INPUTFILE not specified.");
         	}
         	break;
@@ -59,10 +52,10 @@ static struct argp argp = { options, parse_opt, args_doc, doc, 0, 0, 0 };
 
 int main(int argc, char* argv[]){
 
-	struct arguments arguments;
-	argp_parse(&argp, argc, argv, 0, 0, &arguments);
+	struct Settings settings;
+	argp_parse(&argp, argc, argv, 0, 0, &settings);
 
-	if(arguments.write && !arguments.sudowrite){
+	if(settings.write && !settings.sudowrite){
 		string answer;
 		if(NBINS*NBINS_Z > TXT_OUTPUT_WARNING_THRESHOLD){
 			cout << "> Warning: main.cpp: main(): Text output requested, but NBINS*NBINS_Z = " << NBINS*NBINS_Z << " > " << TXT_OUTPUT_WARNING_THRESHOLD << endl;	
@@ -83,17 +76,17 @@ int main(int argc, char* argv[]){
 		}
 	}
 
-	if(arguments.sudowrite)
-		arguments.write = true;
+	if(settings.sudowrite)
+		settings.write = true;
 
 	high_resolution_clock::time_point start = high_resolution_clock::now();
 
-	Experiment experiment(1000);
+	Experiment experiment(settings);
 
-	experiment.readInputFile(arguments.inputfile);
+	experiment.readInputFile(settings.inputfile);
 	experiment.print();
-	experiment.crossSections(arguments.plot, arguments.write, arguments.exact);
-	experiment.transmission(arguments.plot, arguments.write);
+	experiment.crossSections(settings.plot, settings.write, settings.exact);
+	experiment.transmission(settings.plot, settings.write);
 
 	high_resolution_clock::time_point stop = high_resolution_clock::now();
 	duration<double> delta_t = duration_cast< duration<double>>(stop - start);
