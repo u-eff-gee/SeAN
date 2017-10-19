@@ -71,14 +71,14 @@ void Experiment::readInputFile(const char* filename){
 		}
 
 		if(nline == 2){
-			nBins_e = atoi(line.c_str());
+			nBins_e = (unsigned int) atoi(line.c_str());
 
 			++nline;
 			continue;
 		}
 
 		if(nline == 3){
-			nBins_z = atoi(line.c_str());
+			nBins_z = (unsigned int) atoi(line.c_str());
 
 			++nline;
 			continue;
