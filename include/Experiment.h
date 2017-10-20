@@ -20,20 +20,14 @@ private:
 
 	Settings settings;
 
-	double emin;
-	double emax;
-
-	unsigned int nBins_e;
-	unsigned int nBins_z;
-
 public:
 	Experiment(Settings &s);
 	~Experiment(){};
 
 	// Functions to manage the calculation process
 	void readInputFile (const char* filename);
-	void crossSections(bool plot, bool write, bool exact);
-	void transmission(bool plot, bool write);
+	void crossSections();
+	void transmission();
 	void print();
 
 	// Functions to return private members

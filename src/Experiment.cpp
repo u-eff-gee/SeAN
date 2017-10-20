@@ -14,6 +14,11 @@ using std::regex_replace;
 
 Experiment::Experiment(Settings &s){
 	settings = s;
+	settings.nbins_e = 0;
+	settings.nbins_z = 0;
+}
+
+void Experiment::init(){
 	energy_bins.reserve(settings.nbins_e);
 }
 
@@ -40,10 +45,10 @@ void Experiment::readInputFile(const char* filename){
 		if(nline == 0){
 			start = 0;
 			stop = line.find(","); 
-			emin = atof(line.substr(start, stop).c_str());
+			settings.emin = atof(line.substr(start, stop).c_str());
 			start = stop + 1;
 			stop = line.length() - 1;
-			emax = atof(line.substr(start, stop).c_str());
+			settings.emax = atof(line.substr(start, stop).c_str());
 
 			++nline;
 			continue;
@@ -71,14 +76,14 @@ void Experiment::readInputFile(const char* filename){
 		}
 
 		if(nline == 2){
-			nBins_e = (unsigned int) atoi(line.c_str());
+			settings.nbins_e = (unsigned int) atoi(line.c_str());
 
 			++nline;
 			continue;
 		}
 
 		if(nline == 3){
-			nBins_z = (unsigned int) atoi(line.c_str());
+			settings.nbins_z = (unsigned int) atoi(line.c_str());
 
 			++nline;
 			continue;
@@ -203,7 +208,7 @@ void Experiment::readInputFile(const char* filename){
 
 	ifile.close();
 
-	createEnergyBins(emin, emax);
+	createEnergyBins(settings.emin, settings.emax);
 }
 
 void Experiment::createEnergyBins(double emin, double emax){
@@ -213,10 +218,10 @@ void Experiment::createEnergyBins(double emin, double emax){
 		energy_bins.push_back(emin + i*delta_e);
 };
 
-void Experiment::crossSections(bool plot, bool write, bool exact){
+void Experiment::crossSections(){
 	for(unsigned int i = 0; i < targets.size(); ++i){
 		targets[i]->calculateCrossSection(energy_bins);
-		if(exact){
+		if(settings.exact){
 			targets[i]->calculateVelocityDistribution(energy_bins);
 			targets[i]->calculateDopplerShift(energy_bins);
 		} else{
@@ -224,7 +229,7 @@ void Experiment::crossSections(bool plot, bool write, bool exact){
 			targets[i]->calculateDopplerShiftFFT(energy_bins);
 		}
 
-		if(plot){
+		if(settings.plot){
 			targets[i]->plotCrossSection(energy_bins);
 			targets[i]->plotVelocityDistribution();
 			targets[i]->plotDopplerShift(energy_bins);
@@ -232,7 +237,7 @@ void Experiment::crossSections(bool plot, bool write, bool exact){
 	}
 };
 
-void Experiment::transmission(bool plot, bool write){
+void Experiment::transmission(){
 	targets[0]->calculateIncidentBeam(energy_bins, beam_ID, beamParams);
 	for(unsigned int i = 0; i < targets.size(); ++i){
 		targets[i]->calculateMassAttenuation(energy_bins);
@@ -245,13 +250,13 @@ void Experiment::transmission(bool plot, bool write){
 		targets[i]->calculateResonanceAbsorptionDensity();
 		targets[i]->calculateAbsorption(energy_bins);
 
-		if(plot){
+		if(settings.plot){
 			targets[i]->plotMassAttenuation(energy_bins);
 			targets[i]->plotMu();
 			targets[i]->plotPhotonFluxDensity(energy_bins);
 			targets[i]->plotResonanceAbsorptionDensity(energy_bins);
 		}
-		if(write){
+		if(settings.write){
 			targets[i]->write(energy_bins);
 		}
 	}
@@ -259,7 +264,7 @@ void Experiment::transmission(bool plot, bool write){
 
 void Experiment::print(){
 	cout << "INPUT FILE '" << ifname << "'" << endl;
-	cout << "[EMIN, EMAX] = [" << emin << ", " << emax << "]" << endl;
+	cout << "[EMIN, EMAX] = [" << settings.emin << ", " << settings.emax << "]" << endl;
 	cout << "BEAM = " << beam_ID;
 
 	if( beamParams.size() ){
@@ -272,8 +277,8 @@ void Experiment::print(){
 		cout << endl;
 	}
 
-	cout << "NBINS_E = " << nBins_e << endl;
-	cout << "NBINS_Z = " << nBins_z << endl;
+	cout << "NBINS_E = " << settings.nbins_e << endl;
+	cout << "NBINS_Z = " << settings.nbins_z << endl;
 
 	for(unsigned int i = 0; i < targets.size(); ++i){
 		cout << endl;

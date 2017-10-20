@@ -84,9 +84,10 @@ int main(int argc, char* argv[]){
 	Experiment experiment(settings);
 
 	experiment.readInputFile(settings.inputfile);
+	experiment.init();
 	experiment.print();
-	experiment.crossSections(settings.plot, settings.write, settings.exact);
-	experiment.transmission(settings.plot, settings.write);
+	experiment.crossSections();
+	experiment.transmission();
 
 	high_resolution_clock::time_point stop = high_resolution_clock::now();
 	duration<double> delta_t = duration_cast< duration<double>>(stop - start);
