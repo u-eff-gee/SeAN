@@ -6,6 +6,7 @@
 #include "Experiment.h"
 #include "Config.h"
 #include "Settings.h"
+#include "InputReader.h"
 
 using std::cout;
 using std::endl;
@@ -53,44 +54,47 @@ static struct argp argp = { options, parse_opt, args_doc, doc, 0, 0, 0 };
 int main(int argc, char* argv[]){
 
 	struct Settings settings;
-	argp_parse(&argp, argc, argv, 0, 0, &settings);
 
-	if(settings.write && !settings.sudowrite){
-		string answer;
-		if(NBINS*NBINS_Z > TXT_OUTPUT_WARNING_THRESHOLD){
-			cout << "> Warning: main.cpp: main(): Text output requested, but NBINS*NBINS_Z = " << NBINS*NBINS_Z << " > " << TXT_OUTPUT_WARNING_THRESHOLD << endl;	
-			cout << "\tVery large output files may be created. Proceed?" << endl;	
-			cout << "\t(To force file-writing, use the '-W' option instead of '-w')" << endl;
-			cout << "\t'y' yes" << endl;
-			cout << "\t'n' no" << endl; 
-			while(true){
-				cin >> answer;
-				if(answer == "y"){
-					break;
-				}else if(answer == "n"){
-					abort();
-				}else{
-					continue;
-				}
-			}
-		}
-	}
-
-	if(settings.sudowrite)
-		settings.write = true;
-
-	high_resolution_clock::time_point start = high_resolution_clock::now();
-
-	Experiment experiment(settings);
-
-	experiment.readInputFile(settings.inputfile);
-	experiment.init();
-	experiment.print();
-	experiment.crossSections();
-	experiment.transmission();
-
-	high_resolution_clock::time_point stop = high_resolution_clock::now();
-	duration<double> delta_t = duration_cast< duration<double>>(stop - start);
-
-	cout << "> main.cpp: Execution took " << delta_t.count() << " seconds" << endl;
+	InputReader input;
+	input.readFile("examples/6Li_NRF", settings);
+//	argp_parse(&argp, argc, argv, 0, 0, &settings);
+//
+//	if(settings.write && !settings.sudowrite){
+//		string answer;
+//		if(NBINS*NBINS_Z > TXT_OUTPUT_WARNING_THRESHOLD){
+//			cout << "> Warning: main.cpp: main(): Text output requested, but NBINS*NBINS_Z = " << NBINS*NBINS_Z << " > " << TXT_OUTPUT_WARNING_THRESHOLD << endl;	
+//			cout << "\tVery large output files may be created. Proceed?" << endl;	
+//			cout << "\t(To force file-writing, use the '-W' option instead of '-w')" << endl;
+//			cout << "\t'y' yes" << endl;
+//			cout << "\t'n' no" << endl; 
+//			while(true){
+//				cin >> answer;
+//				if(answer == "y"){
+//					break;
+//				}else if(answer == "n"){
+//					abort();
+//				}else{
+//					continue;
+//				}
+//			}
+//		}
+//	}
+//
+//	if(settings.sudowrite)
+//		settings.write = true;
+//
+//	high_resolution_clock::time_point start = high_resolution_clock::now();
+//
+//	Experiment experiment(settings);
+//
+//	experiment.readInputFile(settings.inputfile);
+//	experiment.init();
+//	experiment.print();
+//	experiment.crossSections();
+//	experiment.transmission();
+//
+//	high_resolution_clock::time_point stop = high_resolution_clock::now();
+//	duration<double> delta_t = duration_cast< duration<double>>(stop - start);
+//
+//	cout << "> main.cpp: Execution took " << delta_t.count() << " seconds" << endl;
 }

@@ -16,6 +16,49 @@ using std::stringstream;
 using std::regex;
 using std::scientific;
 
+
+Target::Target(unsigned int ne, unsigned int nz, string name, unsigned int number) : z_bins(nz, 0.), incident_beam_bins(ne, 0.), dopplercs_bins(ne, 0.), massattenuation_bins(ne, 0.), transmitted_beam_bins(ne, 0.){
+	target_name = name;
+	target_number = number;
+
+	crossSection = new CrossSection();
+	absorption = new Absorption();
+
+	photon_flux_density_bins.reserve(ne*nz);
+	resonance_absorption_density_bins.reserve(ne*nz);
+
+	for(unsigned int i = 0; i < nz; ++i){
+		photon_flux_density_bins.push_back(vector<double>(ne, 0.));
+		resonance_absorption_density_bins.push_back(vector<double>(ne, 0.));
+	}
+};
+
+Target::~Target(){
+	delete crossSection;
+	delete absorption;
+
+	delete &crosssection_bins;
+	delete &velocity_bins;
+	delete &vdist_bins;
+	delete &z_bins;
+	delete &e0_at_rest_list;
+	delete &e0_list;
+	delete &gamma0_list;
+	delete &gamma_list;
+	delete &jj_list;
+	delete &vDistParams;
+	delete &vdist_norm;
+	delete &vdist_centroid;
+
+	delete &photon_flux_density_bins;
+	delete &resonance_absorption_density_bins;
+
+	delete &incident_beam_bins;
+	delete &dopplercs_bins;
+	delete &massattenuation_bins;
+	delete &transmitted_beam_bins;
+};
+
 void Target::readAME(string isotope){
 	unsigned int separator = 0;
 

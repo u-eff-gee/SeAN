@@ -29,6 +29,7 @@ public:
 	void crossSections();
 	void transmission();
 	void print();
+	void init();
 
 	// Functions to return private members
 	Target* getTarget(unsigned int i){ return targets[i]; };

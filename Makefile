@@ -4,14 +4,14 @@ OBJDIR=obj
 EXE=sean
 
 CC=g++
-CFLAGS=-g -Wall -Wconversion -Wsign-conversion -I$(INCDIR) -fopenmp
-#CFLAGS=-O3 -Wall -Wconversion -Wsign-conversion -I$(INCDIR) -fopenmp
-ROOTFLAGS=`root-config --cflags --glibs` -lMathMore -lfftw3 -lm
+CFLAGS=-g -Wall -Wconversion -Wsign-conversion -I$(INCDIR) -fopenmp -lfftw3
+#CFLAGS=-O3 -Wall -Wconversion -Wsign-conversion -I$(INCDIR) -fopenmp -lfftw3
+ROOTFLAGS=`root-config --cflags --glibs` -lMathMore -lm
 
-_DEPS = Experiment.h Config.h CrossSection.h Target.h Absorption.h
+_DEPS = Experiment.h Config.h CrossSection.h Target.h Absorption.h Settings.h InputReader.h
 DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))
 
-_OBJ = Experiment.o main.o CrossSection.o Target.o Absorption.o
+_OBJ = Experiment.o main.o CrossSection.o Target.o Absorption.o Settings.o InputReader.o
 OBJ = $(patsubst %,$(OBJDIR)/%,$(_OBJ))
 #
 #$(OBJDIR)/%.o: $(SRCDIR)/%.cpp $(DEPS)

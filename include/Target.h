@@ -7,6 +7,7 @@
 #include "Config.h"
 #include "CrossSection.h"
 #include "Absorption.h"
+#include "Settings.h"
 
 using std::string;
 using std::vector;
@@ -38,7 +39,6 @@ private:
 	vector<double> massattenuation_bins;
 	vector<double> transmitted_beam_bins;
 
-
 	string target_name;
 	string vDist_ID;
 	string massAttenuation_ID;
@@ -50,47 +50,9 @@ private:
 	unsigned int target_number;
 
 public:	
-	Target(unsigned int ne, unsigned int nz, string name, unsigned int number) : z_bins(nz, 0.), incident_beam_bins(ne, 0.), dopplercs_bins(ne, 0.), massattenuation_bins(ne, 0.), transmitted_beam_bins(ne, 0.){
-		target_name = name;
-		target_number = number;
-
-		crossSection = new CrossSection();
-		absorption = new Absorption();
-
-		photon_flux_density_bins.reserve(ne*nz);
-		resonance_absorption_density_bins.reserve(ne*nz);
-
-		for(unsigned int i = 0; i < nz; ++i){
-			photon_flux_density_bins.push_back(vector<double>(ne, 0.));
-			resonance_absorption_density_bins.push_back(vector<double>(ne, 0.));
-		}
-	};
+	Target(unsigned int ne, unsigned int nz, string name, unsigned int number);
 	
-	~Target(){
-		delete crossSection;
-		delete absorption;
-
-		delete &crosssection_bins;
-		delete &velocity_bins;
-		delete &vdist_bins;
-		delete &z_bins;
-		delete &e0_at_rest_list;
-		delete &e0_list;
-		delete &gamma0_list;
-		delete &gamma_list;
-		delete &jj_list;
-		delete &vDistParams;
-		delete &vdist_norm;
-		delete &vdist_centroid;
-
-		delete &photon_flux_density_bins;
-		delete &resonance_absorption_density_bins;
-
-		delete &incident_beam_bins;
-		delete &dopplercs_bins;
-		delete &massattenuation_bins;
-		delete &transmitted_beam_bins;
-	};
+	~Target();
 
 	// Functions to set private member variables
 	void addEnergy(double e){ e0_list.push_back(e); };

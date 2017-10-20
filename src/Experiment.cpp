@@ -20,6 +20,7 @@ Experiment::Experiment(Settings &s){
 
 void Experiment::init(){
 	energy_bins.reserve(settings.nbins_e);
+	createEnergyBins(settings.emin, settings.emax);
 }
 
 void Experiment::readInputFile(const char* filename){
@@ -208,7 +209,6 @@ void Experiment::readInputFile(const char* filename){
 
 	ifile.close();
 
-	createEnergyBins(settings.emin, settings.emax);
 }
 
 void Experiment::createEnergyBins(double emin, double emax){
