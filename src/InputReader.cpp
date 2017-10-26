@@ -5,10 +5,13 @@
 #include <fstream>
 #include <string>
 #include <regex>
+#include <sstream>
 
 using std::cout;
 using std::endl;
 using std::ifstream;
+using std::istringstream;
+using std::getline;
 using std::string;
 using std::regex;
 using std::regex_replace;
@@ -24,15 +27,74 @@ void InputReader::readFile(const char* filename, Settings &settings){
 	}
         cout << "> Reading input file '" << filename << "'" << endl;
 
-//        string line;
-//	unsigned int n = 0;
-//	unsigned int nline = 0;
-//	size_t start, stop;
-//
-//        while(getline(ifile, line)){
-//		if(line.substr(0,1) == COMMENT)
-//			continue;
-//
+        string line, value;
+	unsigned int ntarget = 0;
+	unsigned int nline = 0;
+	size_t start, stop;
+
+        while(getline(ifile, line)){
+		if(line.substr(0,1) == COMMENT)
+			continue;
+
+		istringstream stream(line);
+
+		switch(nline % (N_EXPERIMENT_SETTINGS + N_TARGET_SETTINGS)){
+			case 0:
+				getline(stream, value, DELIMITER);
+				settings.emin = atof(value.c_str());
+				getline(stream, value, DELIMITER); 
+				settings.emax = atof(value.c_str());
+				++nline;
+				break;
+
+			case 1:
+				getline(stream, value, DELIMITER);
+				if(value == "const"){
+					settings.incidentBeam= incidentBeamModel::constant;
+					getline(stream, value, DELIMITER);
+					settings.incidentBeamParams.push_back(atof(value.c_str()));
+				}
+
+				else if(value == "gauss"){
+					settings.incidentBeam= incidentBeamModel::gauss;
+					getline(stream, value, DELIMITER);
+					settings.incidentBeamParams.push_back(atof(value.c_str()));
+				} 
+				
+				else{
+					cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
+					cout << " readFile(): Unknown option '" << value << "' for incident beam." << endl;
+					abort();
+				}
+				++nline;
+				break;
+
+			case 2:
+				getline(stream, value, DELIMITER);
+				settings.nbins_e = atof(value.c_str());
+				++nline;
+				break;
+
+			case 3:
+				getline(stream, value, DELIMITER);
+				settings.nbins_z = atof(value.c_str());
+				++nline;
+				break;
+
+			case 4:
+				settings.targetNames.push_back(stream.str());
+				++nline;
+				break;
+			
+			case 5:
+				settings.energy.push_back(vector<double>());
+				while(getline(stream, value, DELIMITER)){
+					settings.energy[ntarget].push_back(atof(value.c_str()));
+					cout << value << endl;
+				}
+				break;
+				
+		}
 //		if(nline == 0){
 //			start = 0;
 //			stop = line.find(","); 
@@ -195,7 +257,7 @@ void InputReader::readFile(const char* filename, Settings &settings){
 //			continue;
 //		}
 //
-//        }
+        }
 
 	ifile.close();
 }

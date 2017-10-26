@@ -19,6 +19,12 @@ enum class vDistModel{arb, zero, mb, mba};
 // nist: using tabulated data from NIST
 enum class mAttModel{arb, nist};
 
+// Enum for incident beam intensity distribution
+// constant: constant intensity over the whole energy range
+// gauss: normal distribution
+// arb: arbitrary, point-wise defined intensity distribution
+enum class incidentBeamModel{constant, gauss, arb};
+
 // Stores all the input information for SeAN
 struct Settings{
 	// Command-line options
@@ -41,6 +47,9 @@ struct Settings{
 	vector<vector<double> > gamma;
 	vector<vector<double> > ji;
 	vector<vector<double> > jj;
+
+	incidentBeamModel incidentBeam;
+	vector<double> incidentBeamParams;
 
 	vector<vDistModel> vDist;
 	vector<double> vDistParams;
