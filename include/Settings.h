@@ -17,7 +17,7 @@ enum class vDistModel{arb, zero, mb, mba};
 // Enum for different mass attenuation models
 // arb: arbitrary, point-wise defined mass attenuation
 // nist: using tabulated data from NIST
-enum class mAttModel{arb, nist};
+enum class mAttModel{constant, arb, nist};
 
 // Enum for incident beam intensity distribution
 // constant: constant intensity over the whole energy range

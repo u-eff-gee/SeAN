@@ -13,19 +13,12 @@ using std::string;
 #define COMMENT "#"
 
 // Define directories
-#define V_DIR "velocity_distribution/"
-#define MU_DIR "mass_attenuation/"
-#define BEAM_DIR "beam/"
-#define MASS_DIR "atomic_mass/"
+//#define V_DIR "velocity_distribution/"
+//#define MU_DIR "mass_attenuation/"
+//#define BEAM_DIR "beam/"
+//#define MASS_DIR "atomic_mass/"
 #define TXT_OUTPUT_DIR "output/"
 #define PLOT_OUTPUT_DIR "output/"
-
-// Coordinates in AME file
-#define AME_HEADER_LENGTH 38
-#define AME_MASS_NUMBER 16
-#define AME_ISOTOPE 20
-#define AME_MASS_START 96
-#define AME_MASS_LENGTH 13
 
 // Coordinates in NIST file
 #define NIST_XRAY 0

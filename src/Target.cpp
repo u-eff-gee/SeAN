@@ -59,46 +59,6 @@ Target::~Target(){
 	delete &transmitted_beam_bins;
 };
 
-void Target::readAME(string isotope){
-	unsigned int separator = 0;
-
-	for(unsigned int i = 1; i <= isotope.length(); ++i){
-		if(regex_search(isotope.substr(0,i), regex("[a-zA-Z]"))){
-			separator = i - 1;
-			break;
-		}
-	}
-
-	int mass_number = atoi(isotope.substr(0,separator).c_str());
-	string string_mass_number = isotope.substr(0,separator);
-	string isotope_name = isotope.substr(separator, isotope.length() - separator + 1);
-
-	stringstream filename;
-	filename << MASS_DIR << "mass_list.txt";
-	ifstream ifile(filename.str());	
-
-        if(!ifile.is_open()){
-                cout << "Error: Target.cc: readAME(): File '" << filename.str() << "' not found." << endl;
-		abort();
-	}
-        cout << "> Reading input file '" << filename.str() << "'" << endl;
-
-        string line;
-	unsigned int nline = 0;
-
-        while(getline(ifile, line)){
-		if(nline > AME_HEADER_LENGTH){
-			if(atoi(line.substr(AME_MASS_NUMBER, 3).c_str()) == mass_number && regex_replace(line.substr(AME_ISOTOPE, 2), regex("\\s+"), "") == isotope_name){
-				mass = atof(regex_replace(line.substr(AME_MASS_START, AME_MASS_LENGTH), regex("\\s+"), "").c_str())*1.0e-6;
-				break;
-
-			}
-		}
-		++nline;
-	}
-
-}
-
 void Target::boost(){
 	double beta = vz/SPEEDOFLIGHT;
 	for(unsigned int i = 0; i < e0_at_rest_list.size(); ++i)

@@ -10,6 +10,7 @@
 using std::cout;
 using std::endl;
 using std::ifstream;
+using std::stringstream;
 using std::istringstream;
 using std::getline;
 using std::string;
@@ -30,7 +31,7 @@ void InputReader::readFile(const char* filename, Settings &settings){
         string line, value;
 	unsigned int ntarget = 0;
 	unsigned int nline = 0;
-	size_t start, stop;
+	//size_t start, stop;
 
         while(getline(ifile, line)){
 		if(line.substr(0,1) == COMMENT)
@@ -59,6 +60,10 @@ void InputReader::readFile(const char* filename, Settings &settings){
 					settings.incidentBeam= incidentBeamModel::gauss;
 					getline(stream, value, DELIMITER);
 					settings.incidentBeamParams.push_back(atof(value.c_str()));
+					getline(stream, value, DELIMITER);
+					settings.incidentBeamParams.push_back(atof(value.c_str()));
+					getline(stream, value, DELIMITER);
+					settings.incidentBeamParams.push_back(atof(value.c_str()));
 				} 
 				
 				else{
@@ -71,13 +76,13 @@ void InputReader::readFile(const char* filename, Settings &settings){
 
 			case 2:
 				getline(stream, value, DELIMITER);
-				settings.nbins_e = atof(value.c_str());
+				settings.nbins_e = (unsigned int) atoi(value.c_str());
 				++nline;
 				break;
 
 			case 3:
 				getline(stream, value, DELIMITER);
-				settings.nbins_z = atof(value.c_str());
+				settings.nbins_z = (unsigned int) atoi(value.c_str());
 				++nline;
 				break;
 
@@ -90,10 +95,109 @@ void InputReader::readFile(const char* filename, Settings &settings){
 				settings.energy.push_back(vector<double>());
 				while(getline(stream, value, DELIMITER)){
 					settings.energy[ntarget].push_back(atof(value.c_str()));
-					cout << value << endl;
 				}
+				++nline;
 				break;
-				
+
+			case 6:
+				settings.gamma0.push_back(vector<double>());
+				while(getline(stream, value, DELIMITER)){
+					settings.gamma0[ntarget].push_back(atof(value.c_str()));
+				}
+				++nline;
+				break;
+
+			case 7:
+				settings.gamma.push_back(vector<double>());
+				while(getline(stream, value, DELIMITER)){
+					settings.gamma[ntarget].push_back(atof(value.c_str()));
+				}
+				++nline;
+				break;
+
+			case 8:
+				settings.ji.push_back(vector<double>());
+				while(getline(stream, value, DELIMITER)){
+					settings.ji[ntarget].push_back(atof(value.c_str()));
+				}
+				++nline;
+				break;
+
+			case 9:
+				settings.jj.push_back(vector<double>());
+				while(getline(stream, value, DELIMITER)){
+					settings.jj[ntarget].push_back(atof(value.c_str()));
+				}
+				++nline;
+				break;
+
+			case 10:
+				getline(stream, value, DELIMITER);
+				if(value == "zero"){
+					settings.vDist.push_back(vDistModel::zero);
+					getline(stream, value, DELIMITER);
+					settings.incidentBeamParams.push_back(atof(value.c_str()));
+				}
+				else if(value == "maxwell_boltzmann"){
+					settings.vDist.push_back(vDistModel::mb);
+					getline(stream, value, DELIMITER);
+					settings.incidentBeamParams.push_back(atof(value.c_str()));
+				}
+				else if(value == "maxwell_boltzmann_approximation"){
+					settings.vDist.push_back(vDistModel::mba);
+					getline(stream, value, DELIMITER);
+					settings.incidentBeamParams.push_back(atof(value.c_str()));
+				}
+
+				else{
+					cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
+					cout << " readFile(): Unknown option '" << value << "' for velocity distribution." << endl;
+					abort();
+				}
+				++nline;
+				break;
+
+			case 11:
+				if(regex_search(line, regex("[a-zA-Z]"))){
+					settings.mass.push_back(readAME(line));
+				} else{
+					settings.mass.push_back(atof(line.c_str()));
+				}
+				++nline;
+				break;
+
+			case 12:
+				getline(stream, value, DELIMITER);
+				if(value == "const"){
+					settings.mAtt.push_back(mAttModel::constant);
+					getline(stream, value, DELIMITER);
+					settings.mAttParams.push_back(atof(value.c_str()));
+				}
+// Not clear how to read/store the NIST data
+//				else if(value == "nist"){
+//					settings.mAtt.push_back(mAttModel::nist);
+//					getline(stream, value, DELIMITER);
+//					settings.mAttParams.push_back(atof(value.c_str()));
+//				}
+				else{
+					cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
+					cout << " readFile(): Unknown option '" << value << "' for mass attenuation." << endl;
+					abort();
+				}
+				++nline;
+				break;
+
+			case 13:
+				getline(stream, value, DELIMITER);
+				settings.thickness.push_back(atof(value.c_str()));
+				++nline;
+				break;
+
+			case 14:
+				getline(stream, value, DELIMITER);
+				settings.velocity.push_back(atof(value.c_str()));
+				++nline;
+				break;
 		}
 //		if(nline == 0){
 //			start = 0;
@@ -261,3 +365,43 @@ void InputReader::readFile(const char* filename, Settings &settings){
 
 	ifile.close();
 }
+
+double InputReader::readAME(string isotope){
+	unsigned int separator = 0;
+
+	for(unsigned int i = 1; i <= isotope.length(); ++i){
+		if(regex_search(isotope.substr(0,i), regex("[a-zA-Z]"))){
+			separator = i - 1;
+			break;
+		}
+	}
+
+	int mass_number = atoi(isotope.substr(0,separator).c_str());
+	string string_mass_number = isotope.substr(0,separator);
+	string isotope_name = isotope.substr(separator, isotope.length() - separator + 1);
+
+	stringstream filename;
+	filename << MASS_DIR << "mass_list.txt";
+	ifstream ifile(filename.str());	
+
+        if(!ifile.is_open()){
+                cout << "Error: Target.cc: readAME(): File '" << filename.str() << "' not found." << endl;
+		abort();
+	}
+        cout << "> Reading input file '" << filename.str() << "'" << endl;
+
+        string line;
+	unsigned int nline = 0;
+
+        while(getline(ifile, line)){
+		if(nline > AME_HEADER_LENGTH){
+			if(atoi(line.substr(AME_MASS_NUMBER, 3).c_str()) == mass_number && regex_replace(line.substr(AME_ISOTOPE, 2), regex("\\s+"), "") == isotope_name){
+				return atof(regex_replace(line.substr(AME_MASS_START, AME_MASS_LENGTH), regex("\\s+"), "").c_str())*1.0e-6;
+			}
+		}
+		++nline;
+	}
+
+	return 0.;
+}
+

@@ -19,7 +19,7 @@ using std::regex_replace;
 void Absorption::read_massattenuation_NIST(vector<double> &energy_bins, vector<double> &massattenuation_bins, string massAttenuation_ID, double mass){
 	
 	stringstream filename;
-	filename << MU_DIR << massAttenuation_ID << ".dat";
+	filename << "mass_attenuation" << massAttenuation_ID << ".dat";
 
 	string line;
 	nbins_matt = 0;

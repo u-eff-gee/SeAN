@@ -73,9 +73,6 @@ public:
 	// Function to modify resonance energies due to Doppler shift
 	void boost();
 
-	// Function to read the nuclear mass from the AME table
-	void readAME(string isotope);
-
 	// Functions to return private member variables
 	string getName(){ return target_name; };
 
