@@ -40,6 +40,10 @@ struct Settings{
 	unsigned int nbins_e;
 	unsigned int nbins_z;
 
+	incidentBeamModel incidentBeam;
+	vector<double> incidentBeamParams;
+	string incidentBeamFile;
+
 	// Settings for Targets
 	vector<string> targetNames;
 	vector<vector<double> > energy;
@@ -48,9 +52,6 @@ struct Settings{
 	vector<vector<double> > ji;
 	vector<vector<double> > jj;
 
-	incidentBeamModel incidentBeam;
-	vector<double> incidentBeamParams;
-
 	vector<vDistModel> vDist;
 	vector<double> vDistParams;
 
@@ -58,9 +59,14 @@ struct Settings{
 
 	vector<mAttModel> mAtt;
 	vector<double> mAttParams;
+	string mAttFile;
 
 	vector<double> thickness;
 	vector<double> velocity;
+
+	void printOptions();
+	void printExperiment();
+	void printTarget(unsigned int i);
 };
 
 #endif

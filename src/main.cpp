@@ -54,9 +54,12 @@ static struct argp argp = { options, parse_opt, args_doc, doc, 0, 0, 0 };
 int main(int argc, char* argv[]){
 
 	struct Settings settings;
+	argp_parse(&argp, argc, argv, 0, 0, &settings);
 
 	InputReader input;
-	input.readFile("examples/6Li_NRF", settings);
+	input.readFile(settings);
+	settings.printOptions();
+	settings.printExperiment();
 //	argp_parse(&argp, argc, argv, 0, 0, &settings);
 //
 //	if(settings.write && !settings.sudowrite){

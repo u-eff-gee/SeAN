@@ -13,7 +13,7 @@ public:
 	~InputReader(){};
 
 	// Read the SeAN input file
-	void readFile(const char* filename, Settings &settings);
+	void readFile(Settings &settings);
 	// Read a nuclear mass from the AME table
 	double readAME(string isotope);
 
