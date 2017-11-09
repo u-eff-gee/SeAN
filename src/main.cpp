@@ -58,8 +58,7 @@ int main(int argc, char* argv[]){
 
 	InputReader input;
 	input.readFile(settings);
-	settings.printOptions();
-	settings.printExperiment();
+	settings.print();
 //	argp_parse(&argp, argc, argv, 0, 0, &settings);
 //
 //	if(settings.write && !settings.sudowrite){

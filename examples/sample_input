@@ -23,7 +23,7 @@ maxwell_boltzmann, 412.5
 # 7) Nuclear mass in atomic mass units or isotope in the notation AXy, for example 208Pb or 11B
 6Li
 # 8) Mass attenuation coefficient
-Li
+nist, Li
 # 9) Target thickness in atoms/fm^2
 0.000282
 # 10) Velocity of the target along the beam direction in m/s
@@ -47,7 +47,7 @@ maxwell_boltzmann, 412.5
 # 7) Nuclear mass in atomic mass units
 6.01512288742
 # 8) Mass attenuation coefficient
-Li
+nist, Li
 # 9) Target thickness in atoms/fm^2
 0.000282
 # 10) Velocity of the target along the beam direction in m/s

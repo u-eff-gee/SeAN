@@ -49,7 +49,7 @@ struct Settings{
 	vector<vector<double> > energy;
 	vector<vector<double> > gamma0;
 	vector<vector<double> > gamma;
-	vector<vector<double> > ji;
+	vector<double> ji;
 	vector<vector<double> > jj;
 
 	vector<vDistModel> vDist;
@@ -64,6 +64,7 @@ struct Settings{
 	vector<double> thickness;
 	vector<double> velocity;
 
+	void print();
 	void printOptions();
 	void printExperiment();
 	void printTarget(unsigned int i);

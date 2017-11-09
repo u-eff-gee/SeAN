@@ -31,73 +31,120 @@ void InputReader::readFile(Settings &settings){
         string line, value;
 	unsigned int ntarget = 0;
 	unsigned int nline = 0;
-	//size_t start, stop;
 
+	bool emin_emax_found = false;
+
+	// Read EMIN, EMAX
+	while(!emin_emax_found){
+
+		getline(ifile, line);
+		
+		if(line.substr(0,1) == COMMENT)
+			continue;
+
+		istringstream stream(line);
+
+		getline(stream, value, DELIMITER);
+		settings.emin = atof(value.c_str());
+		getline(stream, value, DELIMITER); 
+		settings.emax = atof(value.c_str());
+
+		emin_emax_found = true;
+	}
+
+	bool incident_beam_found = false;
+
+	// Read incident beam
+	while(!incident_beam_found){
+
+		getline(ifile, line);
+
+		if(line.substr(0,1) == COMMENT)
+			continue;
+
+		istringstream stream(line);
+		getline(stream, value, DELIMITER);
+		if(value == "const"){
+			settings.incidentBeam= incidentBeamModel::constant;
+			getline(stream, value, DELIMITER);
+			settings.incidentBeamParams.push_back(atof(value.c_str()));
+			incident_beam_found = true;
+		}
+
+		else if(value == "gauss"){
+			settings.incidentBeam= incidentBeamModel::gauss;
+			getline(stream, value, DELIMITER);
+			settings.incidentBeamParams.push_back(atof(value.c_str()));
+			getline(stream, value, DELIMITER);
+			settings.incidentBeamParams.push_back(atof(value.c_str()));
+			getline(stream, value, DELIMITER);
+			settings.incidentBeamParams.push_back(atof(value.c_str()));
+			incident_beam_found = true;
+		} 
+
+		else if(value == "arb"){
+			settings.incidentBeam= incidentBeamModel::arb;
+			getline(stream, value, DELIMITER);
+			settings.incidentBeamFile = value;				
+			incident_beam_found = true;
+		}
+		
+		else{
+			cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
+			cout << " readFile(): Unknown option '" << value << "' for incident beam." << endl;
+			abort();
+		}
+
+	}
+
+	bool nbins_e_found = false;
+
+	// Read NBINS_ENERGY
+	while(!nbins_e_found){
+
+		getline(ifile, line);
+
+		if(line.substr(0,1) == COMMENT)
+			continue;
+
+		istringstream stream(line);
+		getline(stream, value, DELIMITER);
+		settings.nbins_e = (unsigned int) atoi(value.c_str());
+
+		nbins_e_found = true;
+	}
+
+	bool nbins_z_found = false;
+
+	// Read NBINS_Z
+	while(!nbins_z_found){
+
+		getline(ifile, line);
+
+		if(line.substr(0,1) == COMMENT)
+			continue;
+
+		istringstream stream(line);
+		getline(stream, value, DELIMITER);
+		settings.nbins_z = (unsigned int) atoi(value.c_str());
+
+		nbins_z_found = true;
+	}
+
+	// Read information about targets
         while(getline(ifile, line)){
 		if(line.substr(0,1) == COMMENT)
 			continue;
 
 		istringstream stream(line);
 
-		switch(nline % (N_EXPERIMENT_SETTINGS + N_TARGET_SETTINGS)){
+		switch(nline % N_TARGET_SETTINGS){
 			case 0:
-				getline(stream, value, DELIMITER);
-				settings.emin = atof(value.c_str());
-				getline(stream, value, DELIMITER); 
-				settings.emax = atof(value.c_str());
-				++nline;
-				break;
-
-			case 1:
-				getline(stream, value, DELIMITER);
-				if(value == "const"){
-					settings.incidentBeam= incidentBeamModel::constant;
-					getline(stream, value, DELIMITER);
-					settings.incidentBeamParams.push_back(atof(value.c_str()));
-				}
-
-				else if(value == "gauss"){
-					settings.incidentBeam= incidentBeamModel::gauss;
-					getline(stream, value, DELIMITER);
-					settings.incidentBeamParams.push_back(atof(value.c_str()));
-					getline(stream, value, DELIMITER);
-					settings.incidentBeamParams.push_back(atof(value.c_str()));
-					getline(stream, value, DELIMITER);
-					settings.incidentBeamParams.push_back(atof(value.c_str()));
-				} 
-
-				else if(value == "arb"){
-					settings.incidentBeam= incidentBeamModel::arb;
-					getline(stream, value, DELIMITER);
-					settings.incidentBeamFile = value;				
-				}
-				
-				else{
-					cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
-					cout << " readFile(): Unknown option '" << value << "' for incident beam." << endl;
-					abort();
-				}
-				++nline;
-				break;
-
-			case 2:
-				getline(stream, value, DELIMITER);
-				settings.nbins_e = (unsigned int) atoi(value.c_str());
-				++nline;
-				break;
-
-			case 3:
-				getline(stream, value, DELIMITER);
-				settings.nbins_z = (unsigned int) atoi(value.c_str());
-				++nline;
-				break;
-
-			case 4:
 				settings.targetNames.push_back(stream.str());
 				++nline;
 				break;
 			
-			case 5:
+			case 1:
 				settings.energy.push_back(vector<double>());
 				while(getline(stream, value, DELIMITER)){
 					settings.energy[ntarget].push_back(atof(value.c_str()));
@@ -105,7 +152,7 @@ void InputReader::readFile(Settings &settings){
 				++nline;
 				break;
 
-			case 6:
+			case 2:
 				settings.gamma0.push_back(vector<double>());
 				while(getline(stream, value, DELIMITER)){
 					settings.gamma0[ntarget].push_back(atof(value.c_str()));
@@ -113,7 +160,7 @@ void InputReader::readFile(Settings &settings){
 				++nline;
 				break;
 
-			case 7:
+			case 3:
 				settings.gamma.push_back(vector<double>());
 				while(getline(stream, value, DELIMITER)){
 					settings.gamma[ntarget].push_back(atof(value.c_str()));
@@ -121,15 +168,14 @@ void InputReader::readFile(Settings &settings){
 				++nline;
 				break;
 
-			case 8:
-				settings.ji.push_back(vector<double>());
+			case 4:
 				while(getline(stream, value, DELIMITER)){
-					settings.ji[ntarget].push_back(atof(value.c_str()));
+					settings.ji.push_back(atof(value.c_str()));
 				}
 				++nline;
 				break;
 
-			case 9:
+			case 5:
 				settings.jj.push_back(vector<double>());
 				while(getline(stream, value, DELIMITER)){
 					settings.jj[ntarget].push_back(atof(value.c_str()));
@@ -137,7 +183,7 @@ void InputReader::readFile(Settings &settings){
 				++nline;
 				break;
 
-			case 10:
+			case 6:
 				getline(stream, value, DELIMITER);
 				if(value == "zero"){
 					settings.vDist.push_back(vDistModel::zero);
@@ -163,7 +209,7 @@ void InputReader::readFile(Settings &settings){
 				++nline;
 				break;
 
-			case 11:
+			case 7:
 				if(regex_search(line, regex("[a-zA-Z]"))){
 					settings.mass.push_back(readAME(line));
 				} else{
@@ -172,7 +218,7 @@ void InputReader::readFile(Settings &settings){
 				++nline;
 				break;
 
-			case 12:
+			case 8:
 				getline(stream, value, DELIMITER);
 				if(value == "const"){
 					settings.mAtt.push_back(mAttModel::constant);
@@ -197,16 +243,17 @@ void InputReader::readFile(Settings &settings){
 				++nline;
 				break;
 
-			case 13:
+			case 9:
 				getline(stream, value, DELIMITER);
 				settings.thickness.push_back(atof(value.c_str()));
 				++nline;
 				break;
 
-			case 14:
+			case 10:
 				getline(stream, value, DELIMITER);
 				settings.velocity.push_back(atof(value.c_str()));
 				++nline;
+				++ntarget;
 				break;
 		}
         }
