@@ -54,16 +54,19 @@ struct Settings{
 
 	vector<vDistModel> vDist;
 	vector<double> vDistParams;
+	vector<string> vDistFile;
 
 	vector<double> mass;
 
 	vector<mAttModel> mAtt;
 	vector<double> mAttParams;
-	string mAttFile;
+	vector<string> mAttFile;
 
 	vector<double> thickness;
 	vector<double> velocity;
 
+	// Methods to print settings
+	const char* HORIZONTAL_LINE = "##############################################################";
 	void print();
 	void printOptions();
 	void printExperiment();

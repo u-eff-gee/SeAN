@@ -8,73 +8,51 @@
 #include "CrossSection.h"
 #include "Absorption.h"
 #include "Settings.h"
+#include "InputReader.h"
 
 using std::string;
 using std::vector;
 
 class Target{
 private:
-	vector< vector<double> > crosssection_bins;
-	vector< vector<double> > velocity_bins;
-	vector< vector<double> > vdist_bins;
+	Settings settings;
+
+	vector< vector<double> > crosssection_histogram;
+	vector< vector<double> > velocity_distribution_bins;
+	vector< vector<double> > velocity_distribution_histogram;
 	vector<double> z_bins;
 
-	vector<double> e0_at_rest_list;
-	vector<double> e0_list;
-	vector<double> gamma0_list;
-	vector<double> gamma_list;
-	vector<double> jj_list;
-	vector<double> vDistParams;
+	vector<double> energy_boosted;
 	vector<double> vdist_norm;
 	vector<unsigned int> vdist_centroid;
 
+	vector<vector <double> > photon_flux_density_histogram;
+	vector<vector <double> > resonance_absorption_density_histogram;
+
+	vector<double> incident_beam_histogram;
+	vector<double> dopplercs_histogram;
+	vector<double> massattenuation_histogram;
+	vector<double> transmitted_beam_histogram;
+
 	CrossSection *crossSection;
 	Absorption *absorption;
-
-	vector<vector <double> > photon_flux_density_bins;
-	vector<vector <double> > resonance_absorption_density_bins;
-
-	vector<double> incident_beam_bins;
-	vector<double> dopplercs_bins;
-	vector<double> massattenuation_bins;
-	vector<double> transmitted_beam_bins;
-
-	string target_name;
-	string vDist_ID;
-	string massAttenuation_ID;
-	double j0;
-	double mass;
-	double z;
-	double vz;
+	InputReader *inputReader;
 
 	unsigned int target_number;
 
 public:	
 	Target(unsigned int ne, unsigned int nz, string name, unsigned int number);
+	Target(unsigned int n, Settings &s){ 
+		settings = s; 
+		target_number = n;
+	};
 	
 	~Target();
 
-	// Functions to set private member variables
-	void addEnergy(double e){ e0_list.push_back(e); };
-	void addEnergyAtRest(double e){ e0_at_rest_list.push_back(e); };
-	void addGamma0(double g0){ gamma0_list.push_back(g0); };
-	void addGamma(double g){ gamma_list.push_back(g); };
-	void addJJ(double j){ jj_list.push_back(j); };
-	void setJ0(double j){ j0 = j; };
-	void setMass(double m){ mass = m; };
-	void setZ(double zz){ z = zz; };
-	void setVZ(double vvz){ vz = vvz; };
-
-	void setVDist(string vDist){vDist_ID = vDist; };
-	void addVDistParameter(double p){ vDistParams.push_back(p); };
-
-	void setMassAttenuation(string mAtt){ massAttenuation_ID = mAtt; };
+	void initialize();
 
 	// Function to modify resonance energies due to Doppler shift
-	void boost();
-
-	// Functions to return private member variables
-	string getName(){ return target_name; };
+	void boostEnergies();
 
 	// Function to print information to the command line
 	void print();
@@ -109,7 +87,7 @@ public:
 	void print2DVector(vector<vector<double> > &vec, string column, string filename);
 
 	// Function to set the incident beam and return the transmitted beam
-	double& getTransmittedBeam(){ return transmitted_beam_bins[0]; };
+	double& getTransmittedBeam(){ return transmitted_beam_histogram[0]; };
 	void setIncidentBeam(double &trans_beam_bins);
 
 	// Functions to integrate over 2D histograms

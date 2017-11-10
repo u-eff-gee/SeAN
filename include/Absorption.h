@@ -32,7 +32,7 @@ public:
 		delete &matt;
 	};
 
-	void read_massattenuation_NIST(vector<double> &energy_bins, vector<double> &massattenuation_bins, string massAttenuation_ID, double mass);
+	//void read_massattenuation_NIST(vector<double> &energy_bins, vector<double> &massattenuation_bins, string massAttenuation_ID, double mass);
 
 	void const_beam(vector<double> &energy_bins, vector<double> &incident_beam_bins, vector<double> beamParams);
 

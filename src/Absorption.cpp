@@ -16,47 +16,47 @@ using std::endl;
 using std::regex;
 using std::regex_replace;
 
-void Absorption::read_massattenuation_NIST(vector<double> &energy_bins, vector<double> &massattenuation_bins, string massAttenuation_ID, double mass){
-	
-	stringstream filename;
-	filename << "mass_attenuation" << massAttenuation_ID << ".dat";
-
-	string line;
-	nbins_matt = 0;
-	ifstream ifile;
-
-	ifile.open(filename.str().c_str());	
-
-        if(!ifile.is_open()){
-                cout << "Error: Absorption.cc: read_massattenuation(): File '" << filename.str() << "' not found." << endl;
-		abort();
-	}
-        cout << "> Reading input file '" << filename.str() << "'" << endl;
-
-	while(getline(ifile, line)){
-		if(line.substr(0,1) == COMMENT)
-			continue;
-
-		// Ignore lines with x-ray resonances since they have the same energy value as the previous bins. Those steps can not be interpolated.
-		if(regex_replace(line.substr(NIST_XRAY, NIST_XRAY_LENGTH), regex("\\s+"), "") != "")
-			continue;	
-		
-		matt[0].push_back(atof(line.substr(NIST_ENERGY, NIST_ENERGY_LENGTH).c_str()));
-		matt[1].push_back(atof(line.substr(NIST_MU, NIST_MU_LENGTH).c_str()));
-
-		++nbins_matt;
-	}
-
-	inter = new ROOT::Math::Interpolator(nbins_matt - 1, ROOT::Math::Interpolation::kCSPLINE);
-	inter->SetData(nbins_matt - 1, &matt[0][0], &matt[1][0]);
-
-	// Conversion from cm2/g to fm2/atom
-	double conversion_factor = mass*AtomicMassUnitG*1.e26;
-
-	for(unsigned int i = 0; i < NBINS; ++i){
-		massattenuation_bins[i] = conversion_factor*inter->Eval(energy_bins[i]*0.000001);
-	}
-}
+//void Absorption::read_massattenuation_NIST(vector<double> &energy_bins, vector<double> &massattenuation_bins, string massAttenuation_ID, double mass){
+//	
+//	stringstream filename;
+//	filename << "mass_attenuation" << massAttenuation_ID << ".dat";
+//
+//	string line;
+//	nbins_matt = 0;
+//	ifstream ifile;
+//
+//	ifile.open(filename.str().c_str());	
+//
+//        if(!ifile.is_open()){
+//                cout << "Error: Absorption.cc: read_massattenuation(): File '" << filename.str() << "' not found." << endl;
+//		abort();
+//	}
+//        cout << "> Reading input file '" << filename.str() << "'" << endl;
+//
+//	while(getline(ifile, line)){
+//		if(line.substr(0,1) == COMMENT)
+//			continue;
+//
+//		// Ignore lines with x-ray resonances since they have the same energy value as the previous bins. Those steps can not be interpolated.
+//		if(regex_replace(line.substr(NIST_XRAY, NIST_XRAY_LENGTH), regex("\\s+"), "") != "")
+//			continue;	
+//		
+//		matt[0].push_back(atof(line.substr(NIST_ENERGY, NIST_ENERGY_LENGTH).c_str()));
+//		matt[1].push_back(atof(line.substr(NIST_MU, NIST_MU_LENGTH).c_str()));
+//
+//		++nbins_matt;
+//	}
+//
+//	inter = new ROOT::Math::Interpolator(nbins_matt - 1, ROOT::Math::Interpolation::kCSPLINE);
+//	inter->SetData(nbins_matt - 1, &matt[0][0], &matt[1][0]);
+//
+//	// Conversion from cm2/g to fm2/atom
+//	double conversion_factor = mass*AtomicMassUnitG*1.e26;
+//
+//	for(unsigned int i = 0; i < NBINS; ++i){
+//		massattenuation_bins[i] = conversion_factor*inter->Eval(energy_bins[i]*0.000001);
+//	}
+//}
 
 void Absorption::const_beam(vector<double> &energy_bins, vector<double> &incident_beam_bins, vector<double> beamParams){
 

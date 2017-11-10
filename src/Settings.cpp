@@ -17,10 +17,12 @@ void Settings::print(){
 	unsigned int ntargets = (unsigned int) targetNames.size();
 	for(unsigned int i = 0; i < ntargets; ++i)
 		printTarget(i);
+
+	cout << HORIZONTAL_LINE << endl;
 }
 
 void Settings::printOptions(){
-	cout << "###################################################" << endl;
+	cout << HORIZONTAL_LINE << endl;
 	cout << ">>> SeAN INPUT" << endl;
 	cout << "FILE:\t" << inputfile << endl;
 	cout << "COMMAND LINE OPTIONS: " << endl;
@@ -37,7 +39,7 @@ void Settings::printOptions(){
 void Settings::printExperiment(){
 	long int default_precision = cout.precision();
 
-	cout << "###################################################" << endl;
+	cout << HORIZONTAL_LINE << endl;
 	cout << ">>> EXPERIMENT" << endl;
 	// Since eV is the standard energy unit of SeAN, but the absolute energy of resonances is in the order of several MeV, increase the precision for the output of double numbers and reset it later
 	cout << setprecision(7) << "EMIN\t\t:\t" << scientific << emin << " eV" << endl;
@@ -65,7 +67,7 @@ void Settings::printExperiment(){
 void Settings::printTarget(unsigned int i){
 	long int default_precision = cout.precision();
 
-	cout << "###################################################" << endl;
+	cout << HORIZONTAL_LINE << endl;
 	cout << ">>> TARGET #" << (i + 1) << " : " << targetNames[i]  << endl;
 	cout << "RESONANCES:\tENERGY\tGAMMA0\tGAMMA\tJ0\tJ" << endl;
 
@@ -77,17 +79,40 @@ void Settings::printTarget(unsigned int i){
 	// Reset precision
 	cout << defaultfloat << setprecision((int) default_precision);
 
-	cout << "MASS ATTENUATION\t:\t";
-	switch(mAtt){
-		case mAttModel::constant:
-			cout << "constant, " << mAttParams[0] << endl;
+	cout << "VELOCITY DISTRIBUTION:\t";
+	switch(vDist[i]){
+		case vDistModel::zero:
+			cout << "zero" << endl;
 			break;
-		case mAttModel::nist:
-			cout << "nist, " << mAttFile << endl;
+		case vDistModel::arb:
+			cout << "arb, " << vDistFile[i] << endl;
 			break;
-		case mAttModel::arb:
+		case vDistModel::mb:
+			cout << "Maxwell-Boltzmann, T_eff = " << vDistParams[0] << " K" << endl;
+			break;
+		case vDistModel::mba:
+			cout << "Maxwell-Boltzmann (using approximation), T_eff = " << vDistParams[0] << " K " << endl;
 			break;
 		default: break;
 	}
 
+	cout << "ATOMIC MASS:\t\t" << mass[i] << " u" << endl;
+
+	cout << "MASS ATTENUATION:\t";
+	switch(mAtt[i]){
+		case mAttModel::constant:
+			cout << "constant, " << mAttParams[0] << endl;
+			break;
+		case mAttModel::nist:
+			cout << "nist, " << mAttFile[i] << endl;
+			break;
+		case mAttModel::arb:
+			cout << "arb" << mAttFile[i] << endl;
+			break;
+		default: break;
+	}
+
+	cout << "TARGET THICKNESS:\t" << thickness[i] << " atoms/fm^2" << endl;
+
+	cout << "VELOCITY:\t\t" << velocity[i] << " m/s" << endl;
 }

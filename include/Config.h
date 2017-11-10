@@ -20,14 +20,6 @@ using std::string;
 #define TXT_OUTPUT_DIR "output/"
 #define PLOT_OUTPUT_DIR "output/"
 
-// Coordinates in NIST file
-#define NIST_XRAY 0
-#define NIST_XRAY_LENGTH 3
-#define NIST_ENERGY 3
-#define NIST_ENERGY_LENGTH 11
-#define NIST_MU 16
-#define NIST_MU_LENGTH 9
-
 //************************************
 // Definitions of input parameters
 //************************************

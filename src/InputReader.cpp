@@ -139,11 +139,13 @@ void InputReader::readFile(Settings &settings){
 		istringstream stream(line);
 
 		switch(nline % N_TARGET_SETTINGS){
+			// Read target name
 			case 0:
 				settings.targetNames.push_back(stream.str());
 				++nline;
 				break;
 			
+			// Read resonance energies
 			case 1:
 				settings.energy.push_back(vector<double>());
 				while(getline(stream, value, DELIMITER)){
@@ -151,7 +153,7 @@ void InputReader::readFile(Settings &settings){
 				}
 				++nline;
 				break;
-
+			// Read Gamma0
 			case 2:
 				settings.gamma0.push_back(vector<double>());
 				while(getline(stream, value, DELIMITER)){
@@ -160,6 +162,7 @@ void InputReader::readFile(Settings &settings){
 				++nline;
 				break;
 
+			// Read Gamma
 			case 3:
 				settings.gamma.push_back(vector<double>());
 				while(getline(stream, value, DELIMITER)){
@@ -168,6 +171,7 @@ void InputReader::readFile(Settings &settings){
 				++nline;
 				break;
 
+			// Read Ji
 			case 4:
 				while(getline(stream, value, DELIMITER)){
 					settings.ji.push_back(atof(value.c_str()));
@@ -175,6 +179,7 @@ void InputReader::readFile(Settings &settings){
 				++nline;
 				break;
 
+			// Read Jj
 			case 5:
 				settings.jj.push_back(vector<double>());
 				while(getline(stream, value, DELIMITER)){
@@ -183,20 +188,29 @@ void InputReader::readFile(Settings &settings){
 				++nline;
 				break;
 
+			// Read velocity distribution
 			case 6:
 				getline(stream, value, DELIMITER);
 				if(value == "zero"){
 					settings.vDist.push_back(vDistModel::zero);
+					settings.vDistFile.push_back("");
 					getline(stream, value, DELIMITER);
-					settings.incidentBeamParams.push_back(atof(value.c_str()));
+					settings.vDistParams.push_back(0.);
+				}
+				else if(value == "arb"){
+					settings.vDist.push_back(vDistModel::arb);
+					getline(stream, value, DELIMITER);
+					settings.vDistFile.push_back(value);
 				}
 				else if(value == "maxwell_boltzmann"){
 					settings.vDist.push_back(vDistModel::mb);
+					settings.vDistFile.push_back("");
 					getline(stream, value, DELIMITER);
-					settings.incidentBeamParams.push_back(atof(value.c_str()));
+					settings.vDistParams.push_back(atof(value.c_str()));
 				}
 				else if(value == "maxwell_boltzmann_approximation"){
 					settings.vDist.push_back(vDistModel::mba);
+					settings.vDistFile.push_back("");
 					getline(stream, value, DELIMITER);
 					settings.incidentBeamParams.push_back(atof(value.c_str()));
 				}
@@ -209,6 +223,7 @@ void InputReader::readFile(Settings &settings){
 				++nline;
 				break;
 
+			// Read atomic mass
 			case 7:
 				if(regex_search(line, regex("[a-zA-Z]"))){
 					settings.mass.push_back(readAME(line));
@@ -218,22 +233,26 @@ void InputReader::readFile(Settings &settings){
 				++nline;
 				break;
 
+			// Read mass attenuation
 			case 8:
 				getline(stream, value, DELIMITER);
 				if(value == "const"){
 					settings.mAtt.push_back(mAttModel::constant);
 					getline(stream, value, DELIMITER);
 					settings.mAttParams.push_back(atof(value.c_str()));
+					settings.mAttFile.push_back("");
 				}
 				else if(value == "nist"){
 					settings.mAtt.push_back(mAttModel::nist);
 					getline(stream, value, DELIMITER);
-					settings.mAttFile = value;
+					settings.mAttParams.push_back(0.);
+					settings.mAttFile.push_back(value);
 				}
 				else if(value == "arb"){
 					settings.mAtt.push_back(mAttModel::arb);
 					getline(stream, value, DELIMITER);
-					settings.mAttFile = value;
+					settings.mAttParams.push_back(0.);
+					settings.mAttFile.push_back(value);
 				}
 				else{
 					cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
@@ -243,12 +262,14 @@ void InputReader::readFile(Settings &settings){
 				++nline;
 				break;
 
+			// Read target thickness
 			case 9:
 				getline(stream, value, DELIMITER);
 				settings.thickness.push_back(atof(value.c_str()));
 				++nline;
 				break;
 
+			// Read target velocity
 			case 10:
 				getline(stream, value, DELIMITER);
 				settings.velocity.push_back(atof(value.c_str()));
@@ -276,11 +297,12 @@ double InputReader::readAME(string isotope){
 	string isotope_name = isotope.substr(separator, isotope.length() - separator + 1);
 
 	stringstream filename;
-	filename << MASS_DIR << "mass_list.txt";
+	filename << MASS_DIR << AME_FILE_NAME;
 	ifstream ifile(filename.str());	
 
         if(!ifile.is_open()){
-                cout << "Error: Target.cc: readAME(): File '" << filename.str() << "' not found." << endl;
+		cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
+		cout << " readAME(): File '" << filename.str() << "' not found." << endl;
 		abort();
 	}
         cout << "> Reading input file '" << filename.str() << "'" << endl;
@@ -300,3 +322,67 @@ double InputReader::readAME(string isotope){
 	return 0.;
 }
 
+void InputReader::readNIST(vector< vector<double> > &matt, string massAttenuation_ID){
+
+	stringstream filename;
+	filename << "mass_attenuation" << massAttenuation_ID << ".dat";
+
+	string line;
+	unsigned int nbins_matt = 0;
+	ifstream ifile;
+
+	ifile.open(filename.str().c_str());	
+
+        if(!ifile.is_open()){
+		cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
+		cout << " readNIST(): File '" << filename.str() << "' not found." << endl;
+		abort();
+	}
+        cout << "> Reading input file '" << filename.str() << "'" << endl;
+
+	while(getline(ifile, line)){
+		if(line.substr(0,1) == COMMENT)
+			continue;
+
+		// Ignore lines with x-ray resonances since they have the same energy value as the previous bins. Those steps can not be interpolated.
+		if(regex_replace(line.substr(NIST_XRAY, NIST_XRAY_LENGTH), regex("\\s+"), "") != "")
+			continue;	
+		
+		matt[0].push_back(atof(line.substr(NIST_ENERGY, NIST_ENERGY_LENGTH).c_str()));
+		matt[1].push_back(atof(line.substr(NIST_MU, NIST_MU_LENGTH).c_str()));
+
+		++nbins_matt;
+	}
+}
+
+void InputReader::read2ColumnFile(vector< vector<double> > &data, string filename){
+
+	string line, value;
+	ifstream ifile;
+
+	ifile.open(filename);	
+
+        if(!ifile.is_open()){
+		cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
+		cout << " read2ColumnFile(): File '" << filename << "' not found." << endl;
+		abort();
+	}
+        cout << "> Reading input file '" << filename << "'" << endl;
+
+	data.push_back(vector<double>());
+	data.push_back(vector<double>());
+	
+	while(getline(ifile, line)){
+		if(line.substr(0,1) == COMMENT)
+			continue;
+
+		istringstream stream(line);
+
+		getline(stream, value, DELIMITER);
+		data[0].push_back(atof(value.c_str()));
+		cout << value;
+		getline(stream, value, DELIMITER); 
+		data[1].push_back(atof(value.c_str()));
+		cout << ", " << value << endl;
+	}
+}

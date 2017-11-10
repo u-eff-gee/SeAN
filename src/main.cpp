@@ -59,8 +59,10 @@ int main(int argc, char* argv[]){
 	InputReader input;
 	input.readFile(settings);
 	settings.print();
-//	argp_parse(&argp, argc, argv, 0, 0, &settings);
-//
+
+	Experiment experiment(settings);
+	experiment.initialize();
+
 //	if(settings.write && !settings.sudowrite){
 //		string answer;
 //		if(NBINS*NBINS_Z > TXT_OUTPUT_WARNING_THRESHOLD){

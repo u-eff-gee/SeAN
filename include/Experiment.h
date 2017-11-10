@@ -13,10 +13,6 @@ class Experiment{
 private:
 	vector<double> energy_bins;
 	vector<Target*> targets;
-	vector<double> beamParams;
-
-	string ifname;
-	string beam_ID;
 
 	Settings settings;
 
@@ -25,17 +21,13 @@ public:
 	~Experiment(){};
 
 	// Functions to manage the calculation process
-	void readInputFile (const char* filename);
+	void initialize();
 	void crossSections();
 	void transmission();
-	void print();
-	void init();
-
-	// Functions to return private members
-	Target* getTarget(unsigned int i){ return targets[i]; };
 
 private:
 	void createEnergyBins(double emin, double emax);
+	void createTargets();
 };
 
 #endif

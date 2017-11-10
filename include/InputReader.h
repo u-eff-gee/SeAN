@@ -16,6 +16,10 @@ public:
 	void readFile(Settings &settings);
 	// Read a nuclear mass from the AME table
 	double readAME(string isotope);
+	// Read an energy-dependent mass-attenuation coefficient from a file with the NIST format
+	void readNIST(vector< vector<double> > &matt, string massAttenuation_ID);
+	// Read any file with two columns
+	void read2ColumnFile(vector< vector<double> > &data, string filename);
 
 
 private:
@@ -29,13 +33,23 @@ private:
 	string MU_DIR = "mass_attenuation/";
 	string BEAM_DIR = "beam/";
 	string MASS_DIR = "atomic_mass/";
+	string AME_FILE_NAME = "mass16.txt";
 
 	// Coordinates in AME file
-	unsigned int AME_HEADER_LENGTH = 38;
-	unsigned int AME_MASS_NUMBER = 16;
-	unsigned int AME_ISOTOPE = 20;
-	unsigned int AME_MASS_START = 96;
-	unsigned int AME_MASS_LENGTH = 13;
+const 	unsigned int AME_HEADER_LENGTH = 38;
+const 	unsigned int AME_MASS_NUMBER = 16;
+const 	unsigned int AME_ISOTOPE = 20;
+const 	unsigned int AME_MASS_START = 96;
+const 	unsigned int AME_MASS_LENGTH = 13;
+	
+	// Coordinates in NIST file
+const 	unsigned int NIST_XRAY =  0;
+const 	unsigned int NIST_XRAY_LENGTH = 3;
+const 	unsigned int NIST_ENERGY = 3;
+const 	unsigned int NIST_ENERGY_LENGTH = 11;
+const 	unsigned int NIST_MU = 16;
+const 	unsigned int NIST_MU_LENGTH = 9;
+
 };
 
 #endif
