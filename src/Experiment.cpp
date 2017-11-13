@@ -39,7 +39,7 @@ void Experiment::createTargets(){
 
 	for(unsigned int i = 0; i < ntargets; ++i){
 		targets.push_back(new Target(i, settings));
-		targets[i]->initialize();
+		targets[i]->initialize(energy_bins);
 	}
 }
 

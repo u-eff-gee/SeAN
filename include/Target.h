@@ -17,20 +17,25 @@ class Target{
 private:
 	Settings settings;
 
-	vector< vector<double> > crosssection_histogram;
+	vector<double> z_bins;
+	vector<double> energy_boosted;
+
+	// Cross section at rest
+	vector< vector<double> > crosssection_at_rest_histogram;
+
+	// Velocity distribution
 	vector< vector<double> > velocity_distribution_bins;
 	vector< vector<double> > velocity_distribution_histogram;
-	vector<double> z_bins;
-
-	vector<double> energy_boosted;
 	vector<double> vdist_norm;
 	vector<unsigned int> vdist_centroid;
+
+	// Cross section transformed by velocity distribution
+	vector<double> crosssection_histogram;
 
 	vector<vector <double> > photon_flux_density_histogram;
 	vector<vector <double> > resonance_absorption_density_histogram;
 
 	vector<double> incident_beam_histogram;
-	vector<double> dopplercs_histogram;
 	vector<double> massattenuation_histogram;
 	vector<double> transmitted_beam_histogram;
 
@@ -49,7 +54,7 @@ public:
 	
 	~Target();
 
-	void initialize();
+	void initialize(vector<double> &energy_bins);
 
 	// Function to modify resonance energies due to Doppler shift
 	void boostEnergies();
@@ -58,7 +63,7 @@ public:
 	void print();
 
 	// Functions to calculate histograms
-	void calculateCrossSection(vector<double> &energy_bins);
+	void calculateCrossSectionAtRest(vector<double> &energy_bins);
 	void calculateVelocityDistribution(vector<double> &energy_bins);
 	void calculateDopplerShift(vector<double> &energy_bins);
 	void calculateDopplerShiftFFT(vector<double> &energy_bins);
@@ -94,7 +99,7 @@ public:
 	double integrateEZHistogram(vector<double> &energy_bins, vector<double> &z_bins, vector<vector<double> > &ezhist);
 	double integrateEEHistogram(vector<double> &energy_bins, vector<vector<double> > &eehist);
 
-	void vDistInfo(vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &vdist_norm, vector<unsigned int> &vdist_centroid);
+	void vDistInfo();
 };
 
 #endif

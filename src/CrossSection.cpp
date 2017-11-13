@@ -16,16 +16,18 @@ using std::endl;
 using std::upper_bound;
 using std::max_element;
 
-void CrossSection::breit_wigner(vector<double> &energy_bins, vector<double> (&crosssection_bins), double e0, double gamma0, double gamma, double jj, double j0){
+void CrossSection::breit_wigner(vector<double> &energy_bins, vector<vector<double> > &crosssection_at_rest_bins, vector<double> &energy_boosted, unsigned int target_number){
 
-	double cs_max = PI*0.5*HBARC2/(e0*e0)*(2.*jj + 1.)/(2.*j0 + 1.)*gamma0*gamma;
-	
-	for(unsigned int j = 0; j < NBINS; ++j){
-		crosssection_bins[j] += cs_max / ((energy_bins[j] - e0)*(energy_bins[j] - e0) + 0.25*gamma*gamma);
+	for(unsigned int i = 0; i < energy_boosted.size(); ++i){
+		double cs_max = PI*0.5*HBARC2/(energy_boosted[i]*energy_boosted[i])*(2.*settings.jj[target_number][i] + 1.)/(2.*settings.ji[target_number] + 1.)*settings.gamma0[target_number][i]*settings.gamma[target_number][i];
+		
+		for(unsigned int j = 0; j < settings.nbins_e; ++j){
+			crosssection_at_rest_bins[i][j] += cs_max / ((energy_bins[j] - energy_boosted[i])*(energy_bins[j] - energy_boosted[i]) + 0.25*settings.gamma[target_number][i]*settings.gamma[target_number][i]);
+		}
 	}
 }
 
-void CrossSection::calculateVelocityBins(vector<double> &energy_bins, vector<double> &velocity_bins, double e0){
+void CrossSection::calculateVelocityBins(vector<double> &energy_bins, vector< vector<double> > &velocity_distribution_bins, vector<double> &energy_boosted, unsigned int target_number){
 
 	// SeAN uses non-equidistant velocity bins. Here, velocity_bins[i] is the velocity that is needed to shift energy_bins[j] to energy_bins[i].
 	double energy_ratio = 1.;
@@ -34,20 +36,24 @@ void CrossSection::calculateVelocityBins(vector<double> &energy_bins, vector<dou
 //	long int resonance_position = upper_bound(energy_bins, energy_bins + NBINS, e0) - energy_bins;
 //	double resonance_energy = energy_bins[resonance_position];
 
-	for(unsigned int i = 0; i < NBINS; ++i){
-		energy_ratio = energy_bins[i]/e0;
-		velocity_bins[i] = (1. - energy_ratio*energy_ratio)/(1. + energy_ratio*energy_ratio);
+	for(unsigned int i = 0; i < energy_boosted.size(); ++i){
+		for(unsigned int j = 0; j < settings.nbins_e; ++j){
+			energy_ratio = energy_bins[j]/energy_boosted[i];
+			velocity_distribution_bins[i][j] = (1. - energy_ratio*energy_ratio)/(1. + energy_ratio*energy_ratio);
+		}
 	}
 }
 
-void CrossSection::maxwell_boltzmann(vector<double> &energy_bins, vector<double> &velocity_bins, vector<double> &vdist_bins, vector<double> &params, double mass, double e0){
+void CrossSection::maxwell_boltzmann(vector<double> &energy_bins, vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, vector<double> &energy_boosted, unsigned int target_number){
 
-	double c1 = sqrt(mass*AtomicMassUnit/(2*PI*kB*params[0]));
-      	double c2 = -1./pow(delta(params[0], mass), 2);
+	double c1 = sqrt(settings.mass[target_number]*AtomicMassUnit/(2*PI*kB*settings.vDistParams[target_number][0]));
+      	double c2 = -1./pow(delta(settings.vDistParams[target_number][0], settings.mass[target_number]), 2);
 
-      	for(unsigned int i = 0; i < NBINS; ++i){
-              	vdist_bins[i] = c1*exp(c2*velocity_bins[i]*velocity_bins[i]);
-      	}
+      	for(unsigned int i = 0; i < energy_boosted.size(); ++i){
+		for(unsigned int j = 0; j < settings.nbins_e; ++j){
+			velocity_distribution_histogram[i][j] = c1*exp(c2*velocity_distribution_bins[i][j]*velocity_distribution_bins[i][j]);
+		}
+	}
 }
 
 void CrossSection::maxwell_boltzmann_debye(vector<double> &energy_bins, vector<double> &velocity_bins, vector<double> &vdist_bins, vector<double> &params, double mass, double e0){

@@ -205,14 +205,16 @@ void InputReader::readFile(Settings &settings){
 				else if(value == "maxwell_boltzmann"){
 					settings.vDist.push_back(vDistModel::mb);
 					settings.vDistFile.push_back("");
+					settings.vDistParams.push_back(vector<double>());
 					getline(stream, value, DELIMITER);
-					settings.vDistParams.push_back(atof(value.c_str()));
+					settings.vDistParams.[ntarget].push_back(atof(value.c_str()));
 				}
 				else if(value == "maxwell_boltzmann_approximation"){
 					settings.vDist.push_back(vDistModel::mba);
 					settings.vDistFile.push_back("");
+					settings.vDistParams.push_back(vector<double>());
 					getline(stream, value, DELIMITER);
-					settings.incidentBeamParams.push_back(atof(value.c_str()));
+					settings.vDistParams.[ntarget].push_back(atof(value.c_str()));
 				}
 
 				else{

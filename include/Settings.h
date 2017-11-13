@@ -53,7 +53,7 @@ struct Settings{
 	vector<vector<double> > jj;
 
 	vector<vDistModel> vDist;
-	vector<double> vDistParams;
+	vector< vector<double> > vDistParams;
 	vector<string> vDistFile;
 
 	vector<double> mass;

@@ -37,7 +37,7 @@ Target::~Target(){
 	delete crossSection;
 	delete absorption;
 
-	delete &crosssection_histogram;
+	delete &crosssection_at_rest_histogram;
 	delete &velocity_distribution_histogram;
 	delete &velocity_distribution_histogram;
 	delete &z_bins;
@@ -49,12 +49,12 @@ Target::~Target(){
 	delete &resonance_absorption_density_histogram;
 
 	delete &incident_beam_histogram;
-	delete &dopplercs_histogram;
+	delete &crosssection_histogram;
 	delete &massattenuation_histogram;
 	delete &transmitted_beam_histogram;
 };
 
-void Target::initialize(){
+void Target::initialize(vector<double> &energy_bins){
 	unsigned int nenergies = (unsigned int) settings.energy[target_number].size();
 
 	// Reserve space for the histograms
@@ -75,12 +75,19 @@ void Target::initialize(){
 	inputReader = new InputReader();
 
 	// Initialize calculators
-	crossSection = new CrossSection();
+	crossSection = new CrossSection(settings);
 	absorption = new Absorption();
 
-	// Calculate bins
+	// Shift resonance energies due to target velocity
 	boostEnergies();
+	// Calculate z bins
 	calculateZBins();
+	// Calculate cross section
+	calculateCrossSectionAtRest(energy_bins);
+	// Calculate velocity distribution
+	calculateVelocityDistribution(energy_bins);
+
+
 }
 
 void Target::boostEnergies(){
@@ -92,14 +99,42 @@ void Target::boostEnergies(){
 		energy_boosted.push_back((1. + beta)/sqrt(1. - beta*beta)*settings.energy[target_number][i]);
 }
 
-//void Target::calculateCrossSection(vector<double> &energy_bins){
-//	for(unsigned int i = 0; i < e0_list.size(); ++i){
-//		 //The vector of cross section bins is 3 times as large as the required energy range, because of the folding procedure
-//		crosssection_bins.push_back(vector <double>(NBINS, 0.));
-//		crossSection->breit_wigner(energy_bins, crosssection_bins[i], e0_list[i], gamma0_list[i], gamma_list[i], jj_list[i], j0);
-//	}
-//}
-//
+void Target::calculateCrossSectionAtRest(vector<double> &energy_bins){
+
+	for(unsigned int i = 0; i < settings.energy.size(); ++i){
+		crosssection_at_rest_histogram.push_back(vector <double>(settings.nbins_e, 0.));
+	}
+
+	crossSection->breit_wigner(energy_bins, crosssection_at_rest_histogram, energy_boosted, target_number);
+}
+
+void Target::calculateVelocityDistribution(vector<double> &energy_bins){
+	for(unsigned int i = 0; i < settings.energy.size(); ++i){
+		velocity_distribution_bins.push_back(vector<double> (NBINS));
+		velocity_distribution_histogram.push_back(vector<double> (NBINS));
+		crossSection->calculateVelocityBins(energy_bins, velocity_distribution_bins, energy_boosted, target_number);
+	}
+
+	switch(settings.vDist[target_number]){
+		case vDistModel::zero:
+			for(unsigned int i = 0; i < settings.nbins_e; ++i){
+				for(unsigned int j = 0; j < crosssection_at_rest_histogram.size(); ++j){
+					crosssection_histogram[i] = crosssection_at_rest_histogram[i][j];
+				}
+			}
+			break;
+
+		case vDistModel::mb:
+		case vDistModel::mba:
+			crossSection->maxwell_boltzmann(energy_bins, velocity_distribution_bins, velocity_distribution_histogram, energy_boosted, target_number);
+			break;
+
+		case vDistModel::arb:
+			break;
+	}
+
+	vDistInfo();
+}
 //void Target::plotCrossSection(vector<double> &energy_bins){
 //
 //	stringstream filename;
@@ -115,35 +150,8 @@ void Target::boostEnergies(){
 //	canvas->SaveAs(filename.str().c_str());
 //	delete canvas;
 //}
-//
-//void Target::calculateVelocityDistribution(vector<double> &energy_bins){
-//	for(unsigned int i = 0; i < e0_list.size(); ++i){
-//		velocity_bins.push_back(vector<double> (NBINS));
-//		vdist_bins.push_back(vector<double> (NBINS));
-//		crossSection->calculateVelocityBins(energy_bins, velocity_bins[i], e0_list[i]);
-//	}
-//
-//	if(vDist_ID == "absolute_zero"){
-//		for(unsigned int i = 0; i < NBINS; ++i){
-//			for(unsigned int j = 0; j < crosssection_bins.size(); ++j){
-//				dopplercs_bins[i] = crosssection_bins[i][j];
-//			}
-//		}
-//	}
-//
-//	if(vDist_ID == "maxwell_boltzmann"){
-//		for(unsigned int i = 0; i < e0_list.size(); ++i){
-//			crossSection->maxwell_boltzmann(energy_bins, velocity_bins[i], vdist_bins[i], vDistParams, mass, e0_list[i]);
-//		}
-//	}
-//
-//	if(vDist_ID == "maxwell_boltzmann_approximation"){
-//		crossSection->maxwell_boltzmann_approximation(dopplercs_bins, energy_bins, velocity_bins, vdist_bins, e0_list, gamma0_list, gamma0_list, jj_list, j0, vDistParams, mass);
-//	}
-//
-//	vDistInfo(velocity_bins, vdist_bins, vdist_norm, vdist_centroid);
-//}
-//
+
+
 //void Target::calculateIncidentBeam(vector<double> &energy_bins, string beam_ID, vector<double> beamParams){
 //	if(beam_ID == "const")
 //		absorption->const_beam(energy_bins, incident_beam_bins, beamParams);
@@ -449,34 +457,34 @@ void Target::calculateZBins(){
 //	}
 //}
 //
-//void Target::vDistInfo(vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &vdist_norm, vector<unsigned int> &vdist_centroid){
-//	
-//	// Determine the integral of the velocity distribution and the centroid of the distribution.
-//	// The integral is needed to normalize the pseudo-convolution with the cross section, since this should conserve the area under the resonance curve.
-//	// The centroid is needed for the FFT convolution. The algorithm which is used re-orders the input array by the shift of the centroid of the velocity distribution from the array centroid.
-//	double norm = 0.;
-//	double sum = 0.;
-//	double weightedsum = 0.;
-//	double velocity_bin_low = 0.;
-//	double velocity_bin_high = 0.;
-//	double vdist = 0.;
-//
-//	for(unsigned int i = 0; i < vdist_bins.size(); ++i){
-//
-//		sum = 0.;
-//		norm = 0.;
-//		weightedsum = 0.;
-//
-//		for(unsigned int j = 0; j < NBINS - 1; ++j){
-//			vdist = vdist_bins[i][j];
-//			velocity_bin_low = velocity_bins[i][j];
-//			velocity_bin_high = velocity_bins[i][j + 1];
-//			norm += vdist*(velocity_bin_high - velocity_bin_low);
-//			weightedsum += vdist*j;
-//			sum += vdist;
-//		}
-//
-//		vdist_norm.push_back(fabs(norm));
-//		vdist_centroid.push_back((unsigned int) (weightedsum/sum));
-//	}
-//}
+void Target::vDistInfo(){
+	
+//	 Determine the integral of the velocity distribution and the centroid of the distribution.
+//	 The integral is needed to normalize the pseudo-convolution with the cross section, since this should conserve the area under the resonance curve.
+//	 The centroid is needed for the FFT convolution. The algorithm which is used re-orders the input array by the shift of the centroid of the velocity distribution from the array centroid.
+	double norm = 0.;
+	double sum = 0.;
+	double weightedsum = 0.;
+	double velocity_bin_low = 0.;
+	double velocity_bin_high = 0.;
+	double vdist = 0.;
+
+	for(unsigned int i = 0; i < velocity_distribution_bins.size(); ++i){
+
+		sum = 0.;
+		norm = 0.;
+		weightedsum = 0.;
+
+		for(unsigned int j = 0; j < NBINS - 1; ++j){
+			vdist = velocity_distribution_bins[i][j];
+			velocity_bin_low = velocity_distribution_histogram[i][j];
+			velocity_bin_high = velocity_distribution_histogram[i][j + 1];
+			norm += vdist*(velocity_bin_high - velocity_bin_low);
+			weightedsum += vdist*j;
+			sum += vdist;
+		}
+
+		vdist_norm.push_back(fabs(norm));
+		vdist_centroid.push_back((unsigned int) (weightedsum/sum));
+	}
+}
