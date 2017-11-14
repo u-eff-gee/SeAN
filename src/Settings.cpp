@@ -88,10 +88,10 @@ void Settings::printTarget(unsigned int i){
 			cout << "arb, " << vDistFile[i] << endl;
 			break;
 		case vDistModel::mb:
-			cout << "Maxwell-Boltzmann, T_eff = " << vDistParams[0] << " K" << endl;
+			cout << "Maxwell-Boltzmann, T_eff = " << vDistParams[i][0] << " K" << endl;
 			break;
 		case vDistModel::mba:
-			cout << "Maxwell-Boltzmann (using approximation), T_eff = " << vDistParams[0] << " K " << endl;
+			cout << "Maxwell-Boltzmann (using approximation), T_eff = " << vDistParams[i][0] << " K " << endl;
 			break;
 		default: break;
 	}

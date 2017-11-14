@@ -9,6 +9,8 @@
 #include "Absorption.h"
 #include "Settings.h"
 #include "InputReader.h"
+#include "Plotter.h"
+#include "Writer.h"
 
 using std::string;
 using std::vector;
@@ -42,6 +44,8 @@ private:
 	CrossSection *crossSection;
 	Absorption *absorption;
 	InputReader *inputReader;
+	Plotter *plotter;
+	Writer *writer;
 
 	unsigned int target_number;
 
@@ -55,12 +59,16 @@ public:
 	~Target();
 
 	void initialize(vector<double> &energy_bins);
+	void calculateCrossSection(vector<double> &energy_bins);
 
 	// Function to modify resonance energies due to Doppler shift
 	void boostEnergies();
 
 	// Function to print information to the command line
 	void print();
+
+	// Function to plot histograms
+	void plot(vector<double> &energy_bins);
 
 	// Functions to calculate histograms
 	void calculateCrossSectionAtRest(vector<double> &energy_bins);
@@ -77,14 +85,14 @@ public:
 	void calculateAbsorption(vector<double> &energy_bins);
 
 	// Functions to plot histograms
-	void plotCrossSection(vector<double> &energy_bins);
-	void plotVelocityDistribution();
-	void plotDopplerShift(vector<double> &energy_bins);
-	void plotMassAttenuation(vector<double> &energy_bins);
-	void plotMu();
-	void plotPhotonFluxDensity(vector<double> &energy_bins);
-	void plotTestIntegration(vector<double> &energy_bins);
-	void plotResonanceAbsorptionDensity(vector<double> &energy_bins);
+//	void plotCrossSection(vector<double> &energy_bins);
+//	void plotVelocityDistribution();
+//	void plotDopplerShift(vector<double> &energy_bins);
+//	void plotMassAttenuation(vector<double> &energy_bins);
+//	void plotMu();
+//	void plotPhotonFluxDensity(vector<double> &energy_bins);
+//	void plotTestIntegration(vector<double> &energy_bins);
+//	void plotResonanceAbsorptionDensity(vector<double> &energy_bins);
 
 	// Functions to write histograms to file
 	void write(vector<double> &energy_bins);

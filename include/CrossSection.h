@@ -16,8 +16,8 @@ using std::vector;
 using std::string;
 
 class CrossSection{
-	vector< vector<double> > pconv_crosssection_bins;
-	vector< vector<double> > pconv_vdist_bins;
+	vector< vector<double> > pconv_crosssection_histogram;
+	vector< vector<double> > pconv_velocity_distribution_histogram;
 
 	Settings settings;
 
@@ -25,8 +25,8 @@ public:
 	CrossSection(Settings &s){ settings = s; };
 	
 	~CrossSection(){
-		delete &pconv_crosssection_bins;
-		delete &pconv_vdist_bins;
+		delete &pconv_crosssection_histogram;
+		delete &pconv_velocity_distribution_histogram;
 	};
 
 	// Cross section at rest calculators
@@ -42,19 +42,23 @@ public:
 
 	void maxwell_boltzmann_debye(vector<double> &energy_bins, vector<double> &velocity_bins, vector<double> &vdist_bins, vector<double> &params, double mass, double e0);
 
-	void fft_input(vector<double> &energy_bins, vector< vector<double> > &crosssection_bins, vector< vector<double> > &vdist_bins, vector<double> e0_list);
+	// Cross section calculators
+	// Using FFT
+	void fft_input(vector<double> &energy_bins, vector< vector<double> > &crosssection_histogram, vector< vector<double> > &velocity_distribution_histogram, vector<double> energy_boosted);
 
+	void dopplershiftFFT(vector<double> &energy_bins, vector<double> &crosssection_histogram, vector< vector <double> > &crosssection_at_rest_histogram, vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, vector<double> &vdist_norm, vector<unsigned int> &vdist_centroid);
+
+	// Using trapezoidal rule
 	void integration_input(vector< vector<double> > &crosssection_bins, vector< vector<double> > &vdist_bins);
 
 	void dopplershift(vector<double> &dopplercs_bins, vector<double> &energy_bins, vector< vector <double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &vdist_norm, vector<double> &e0_list);
 
-	void dopplershiftFFT(vector<double> &dopplercs_bins, vector<double> &energy_bins, vector< vector <double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &vdist_norm, vector<unsigned int> &vdist_centroid);
 
-	void plot_crosssection(vector<double> &energy_bins, vector< vector<double> > &crosssection, string title, TCanvas* canvas, TLegend* legend, string legend_entry);
-
-	void plot_vdist(vector<double> &velocity_bins, vector<double> &vdist_bins, string title, TCanvas* canvas, TLegend* legend, string legend_entry);
-
-	void plot_dopplershift(vector<double> &energy_bins, vector< vector<double> > &crosssection_bins, vector<double> &dopplercs_bins, string title, TCanvas* canvas, TLegend* legend, string legend_entry);
+//	void plot_crosssection(vector<double> &energy_bins, vector< vector<double> > &crosssection, string title, TCanvas* canvas, TLegend* legend, string legend_entry);
+//
+//	void plot_vdist(vector<double> &velocity_bins, vector<double> &vdist_bins, string title, TCanvas* canvas, TLegend* legend, string legend_entry);
+//
+//	void plot_dopplershift(vector<double> &energy_bins, vector< vector<double> > &crosssection_bins, vector<double> &dopplercs_bins, string title, TCanvas* canvas, TLegend* legend, string legend_entry);
 
 private:
 	double eGamma(double energy, double velocity){

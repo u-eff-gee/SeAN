@@ -56,36 +56,44 @@ int main(int argc, char* argv[]){
 	struct Settings settings;
 	argp_parse(&argp, argc, argv, 0, 0, &settings);
 
+	if(settings.write && !settings.sudowrite){
+		string answer;
+		if(NBINS*NBINS_Z > TXT_OUTPUT_WARNING_THRESHOLD){
+			cout << "> Warning: main.cpp: main(): Text output requested, but NBINS*NBINS_Z = " << NBINS*NBINS_Z << " > " << TXT_OUTPUT_WARNING_THRESHOLD << endl;	
+			cout << "\tVery large output files may be created. Proceed?" << endl;	
+			cout << "\t(To force file-writing, use the '-W' option instead of '-w')" << endl;
+			cout << "\t'y' yes" << endl;
+			cout << "\t'n' no" << endl; 
+			while(true){
+				cin >> answer;
+				if(answer == "y"){
+					break;
+				}else if(answer == "n"){
+					abort();
+				}else{
+					continue;
+				}
+			}
+		}
+	}
+
+	if(settings.sudowrite)
+		settings.write = true;
+
 	InputReader input;
 	input.readFile(settings);
 	settings.print();
 
 	Experiment experiment(settings);
 	experiment.initialize();
+	experiment.crossSections();
+	if(settings.plot){
+		experiment.plot();
+	}
+	if(settings.write){
+		experiment.write();
+	}
 
-//	if(settings.write && !settings.sudowrite){
-//		string answer;
-//		if(NBINS*NBINS_Z > TXT_OUTPUT_WARNING_THRESHOLD){
-//			cout << "> Warning: main.cpp: main(): Text output requested, but NBINS*NBINS_Z = " << NBINS*NBINS_Z << " > " << TXT_OUTPUT_WARNING_THRESHOLD << endl;	
-//			cout << "\tVery large output files may be created. Proceed?" << endl;	
-//			cout << "\t(To force file-writing, use the '-W' option instead of '-w')" << endl;
-//			cout << "\t'y' yes" << endl;
-//			cout << "\t'n' no" << endl; 
-//			while(true){
-//				cin >> answer;
-//				if(answer == "y"){
-//					break;
-//				}else if(answer == "n"){
-//					abort();
-//				}else{
-//					continue;
-//				}
-//			}
-//		}
-//	}
-//
-//	if(settings.sudowrite)
-//		settings.write = true;
 //
 //	high_resolution_clock::time_point start = high_resolution_clock::now();
 //

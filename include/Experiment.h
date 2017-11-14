@@ -25,6 +25,10 @@ public:
 	void crossSections();
 	void transmission();
 
+	// Functions for output
+	void plot();
+	void write();
+
 private:
 	void createEnergyBins(double emin, double emax);
 	void createTargets();

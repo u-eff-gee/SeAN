@@ -59,11 +59,12 @@ void Target::initialize(vector<double> &energy_bins){
 
 	// Reserve space for the histograms
 	for(unsigned int i = 0; i < nenergies; ++i){
-		crosssection_histogram.push_back(vector<double>(settings.nbins_e, 0.));
+		crosssection_at_rest_histogram.push_back(vector<double>(settings.nbins_e, 0.));
 		velocity_distribution_bins.push_back(vector<double>(settings.nbins_e, 0.));
 		velocity_distribution_histogram.push_back(vector<double>(settings.nbins_e, 0.));
 	}
 
+	crosssection_histogram.reserve(settings.nbins_e);
 	z_bins.reserve(settings.nbins_z);
 
 	photon_flux_density_histogram.reserve(settings.nbins_e*settings.nbins_z);
@@ -78,6 +79,9 @@ void Target::initialize(vector<double> &energy_bins){
 	crossSection = new CrossSection(settings);
 	absorption = new Absorption();
 
+	// Initialize plotter
+	plotter = new Plotter();
+
 	// Shift resonance energies due to target velocity
 	boostEnergies();
 	// Calculate z bins
@@ -87,7 +91,16 @@ void Target::initialize(vector<double> &energy_bins){
 	// Calculate velocity distribution
 	calculateVelocityDistribution(energy_bins);
 
+}
 
+void Target::calculateCrossSection(vector<double> &energy_bins){
+
+	if(settings.exact){
+		;
+	} else{
+		crossSection->fft_input(energy_bins, crosssection_at_rest_histogram, velocity_distribution_histogram, energy_boosted);
+		crossSection->dopplershiftFFT(energy_bins, crosssection_histogram, crosssection_at_rest_histogram, velocity_distribution_bins, velocity_distribution_histogram, vdist_norm, vdist_centroid);
+	}
 }
 
 void Target::boostEnergies(){
@@ -109,11 +122,8 @@ void Target::calculateCrossSectionAtRest(vector<double> &energy_bins){
 }
 
 void Target::calculateVelocityDistribution(vector<double> &energy_bins){
-	for(unsigned int i = 0; i < settings.energy.size(); ++i){
-		velocity_distribution_bins.push_back(vector<double> (NBINS));
-		velocity_distribution_histogram.push_back(vector<double> (NBINS));
-		crossSection->calculateVelocityBins(energy_bins, velocity_distribution_bins, energy_boosted, target_number);
-	}
+
+	crossSection->calculateVelocityBins(energy_bins, velocity_distribution_bins, energy_boosted, target_number);
 
 	switch(settings.vDist[target_number]){
 		case vDistModel::zero:
@@ -135,6 +145,12 @@ void Target::calculateVelocityDistribution(vector<double> &energy_bins){
 
 	vDistInfo();
 }
+
+void Target::plot(vector<double> &energy_bins){
+	
+	plotter->plot1DHistogram(energy_bins, crosssection_histogram, "crosssection");
+}
+
 //void Target::plotCrossSection(vector<double> &energy_bins){
 //
 //	stringstream filename;
@@ -200,7 +216,7 @@ void Target::calculateZBins(){
 //}
 //
 //void Target::setIncidentBeam(double &trans_beam_bins){
-//	for(unsigned int i = 0; i < NBINS; ++i)
+//	for(unsigned int i = 0; i < settings.nbins_e; ++i)
 //		incident_beam_bins[i] = (&trans_beam_bins)[i];
 //}
 //
@@ -209,7 +225,7 @@ void Target::calculateZBins(){
 //}
 //
 //void Target::calculateTransmittedBeam(){
-//	for(unsigned int i = 0; i < NBINS; ++i)
+//	for(unsigned int i = 0; i < settings.nbins_e; ++i)
 //		transmitted_beam_bins[i] = photon_flux_density_bins[i][NBINS_Z - 1];
 //}
 //
@@ -222,11 +238,11 @@ void Target::calculateZBins(){
 //	// Area of a bin in 2D plane
 //	double bin_area = (energy_bins[1] - energy_bins[0])*(z_bins[1] - z_bins[0]);
 //
-//	// Crude implementation of the Riemann integral as a sum of bin contents times their dimension in energy- and z-direction. Since there are only NBINS-1 spaces between NBINS bins, leave out the last bin in each loop.
+//	// Crude implementation of the Riemann integral as a sum of bin contents times their dimension in energy- and z-direction. Since there are only settings.nbins_e-1 spaces between settings.nbins_e bins, leave out the last bin in each loop.
 //	double integral = 0.;
 //
 //	#pragma omp parallel for reduction (+:integral)
-//	for(unsigned int i = 0; i < NBINS - 1; ++i){
+//	for(unsigned int i = 0; i < settings.nbins_e - 1; ++i){
 //		for(unsigned int j = 0; j < NBINS_Z - 1; ++j){
 //			integral += ezhist[i][j]; 
 //		}
@@ -234,7 +250,7 @@ void Target::calculateZBins(){
 //
 //	// Implementation that starts at the 1st and not the 0th bin to check the validity of this approximation
 ////	double integral = 0.;
-////	for(int i = 1; i < NBINS; ++i){
+////	for(int i = 1; i < settings.nbins_e; ++i){
 ////		for(int j = 1; j < NBINS_Z; ++j){
 ////			integral += bin_area*ezhist[i][j]; 
 ////		}
@@ -248,11 +264,11 @@ void Target::calculateZBins(){
 //	// Area of a bin in 2D plane
 //	double bin_area = (energy_bins[1] - energy_bins[0])*(energy_bins[1] - energy_bins[0]);
 //
-//	// Crude implementation of the Riemann integral as a sum of bin contents times their dimension in energy- and z-direction. Since there are only NBINS-1 spaces between NBINS bins, leave out the last bin in each loop.
+//	// Crude implementation of the Riemann integral as a sum of bin contents times their dimension in energy- and z-direction. Since there are only settings.nbins_e-1 spaces between settings.nbins_e bins, leave out the last bin in each loop.
 //	double integral = 0.;
 //
-//	for(unsigned int i = 0; i < NBINS - 1; ++i){
-//		for(unsigned int j = 0; j < NBINS - 1; ++j){
+//	for(unsigned int i = 0; i < settings.nbins_e - 1; ++i){
+//		for(unsigned int j = 0; j < settings.nbins_e - 1; ++j){
 //			integral += bin_area*eehist[i][j]; 
 //		}
 //	}
@@ -399,7 +415,12 @@ void Target::calculateZBins(){
 //	cout << "TARGET VELOCITY = " << vz << " m/s" << endl;
 //}
 //
-//void Target::write(vector<double> &energy_bins){
+void Target::write(vector<double> &energy_bins){
+	
+	stringstream filename;
+	filename << settings.targetNames[target_number] << "_energy_bins";
+	writer->write1DHistogram(energy_bins, filename.str(), "Energy / eV");
+
 //	print1DVector(energy_bins,  "Energy / eV", TXT_OUTPUT_DIR + target_name + "_energy_bins.txt");
 //	print1DVector(incident_beam_bins, "Incident beam / a.u.", TXT_OUTPUT_DIR + target_name + "_incident_beam.txt");
 //	print1DVector(dopplercs_bins, "Doppler-broadened cross section / eV fm^2", TXT_OUTPUT_DIR + target_name + "_doppler_shift.txt");
@@ -413,7 +434,7 @@ void Target::calculateZBins(){
 //	print2DVector(crosssection_bins, "Cross section / eV fm^2", TXT_OUTPUT_DIR + target_name + "_cross_section.txt");
 //	print2DVector(velocity_bins, "Velocity / c", TXT_OUTPUT_DIR + target_name + "_velocity_bins.txt");
 //	print2DVector(vdist_bins, "Velocity distribution", TXT_OUTPUT_DIR + target_name + "_velocity_distribution.txt");
-//}
+}
 //
 //void Target::print1DVector(vector<double> &vec, string column, string filename){
 //	
@@ -475,10 +496,10 @@ void Target::vDistInfo(){
 		norm = 0.;
 		weightedsum = 0.;
 
-		for(unsigned int j = 0; j < NBINS - 1; ++j){
-			vdist = velocity_distribution_bins[i][j];
-			velocity_bin_low = velocity_distribution_histogram[i][j];
-			velocity_bin_high = velocity_distribution_histogram[i][j + 1];
+		for(unsigned int j = 0; j < settings.nbins_e - 1; ++j){
+			vdist = velocity_distribution_histogram[i][j];
+			velocity_bin_low = velocity_distribution_bins[i][j];
+			velocity_bin_high = velocity_distribution_bins[i][j + 1];
 			norm += vdist*(velocity_bin_high - velocity_bin_low);
 			weightedsum += vdist*j;
 			sum += vdist;

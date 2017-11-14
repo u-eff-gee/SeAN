@@ -190,12 +190,13 @@ void InputReader::readFile(Settings &settings){
 
 			// Read velocity distribution
 			case 6:
+				settings.vDistParams.push_back(vector<double>());
 				getline(stream, value, DELIMITER);
 				if(value == "zero"){
 					settings.vDist.push_back(vDistModel::zero);
 					settings.vDistFile.push_back("");
 					getline(stream, value, DELIMITER);
-					settings.vDistParams.push_back(0.);
+					settings.vDistParams[ntarget].push_back(0.);
 				}
 				else if(value == "arb"){
 					settings.vDist.push_back(vDistModel::arb);
@@ -205,16 +206,14 @@ void InputReader::readFile(Settings &settings){
 				else if(value == "maxwell_boltzmann"){
 					settings.vDist.push_back(vDistModel::mb);
 					settings.vDistFile.push_back("");
-					settings.vDistParams.push_back(vector<double>());
 					getline(stream, value, DELIMITER);
-					settings.vDistParams.[ntarget].push_back(atof(value.c_str()));
+					settings.vDistParams[ntarget].push_back(atof(value.c_str()));
 				}
 				else if(value == "maxwell_boltzmann_approximation"){
 					settings.vDist.push_back(vDistModel::mba);
 					settings.vDistFile.push_back("");
-					settings.vDistParams.push_back(vector<double>());
 					getline(stream, value, DELIMITER);
-					settings.vDistParams.[ntarget].push_back(atof(value.c_str()));
+					settings.vDistParams[ntarget].push_back(atof(value.c_str()));
 				}
 
 				else{

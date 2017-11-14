@@ -17,8 +17,6 @@ using std::string;
 //#define MU_DIR "mass_attenuation/"
 //#define BEAM_DIR "beam/"
 //#define MASS_DIR "atomic_mass/"
-#define TXT_OUTPUT_DIR "output/"
-#define PLOT_OUTPUT_DIR "output/"
 
 //************************************
 // Definitions of input parameters

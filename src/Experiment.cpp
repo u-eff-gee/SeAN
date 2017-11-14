@@ -14,8 +14,6 @@ using std::regex_replace;
 
 Experiment::Experiment(Settings &s){
 	settings = s;
-	settings.nbins_e = 0;
-	settings.nbins_z = 0;
 }
 
 void Experiment::initialize(){
@@ -29,7 +27,7 @@ void Experiment::createEnergyBins(double emin, double emax){
 
 	double delta_e = (double) (emax - emin)/(NBINS - 1);
 
-	for(unsigned int i = 0; i < NBINS; ++i)
+	for(unsigned int i = 0; i < settings.nbins_e; ++i)
 		energy_bins.push_back(emin + i*delta_e);
 };
 
@@ -44,6 +42,12 @@ void Experiment::createTargets(){
 }
 
 void Experiment::crossSections(){
+
+	unsigned int ntargets = (unsigned int) settings.targetNames.size();	
+
+	for(unsigned int i = 0; i < ntargets; ++i){
+		targets[i]->calculateCrossSection(energy_bins);
+	}
 //	for(unsigned int i = 0; i < targets.size(); ++i){
 //		targets[i]->calculateCrossSection(energy_bins);
 //		if(settings.exact){
@@ -85,4 +89,22 @@ void Experiment::transmission(){
 //			targets[i]->write(energy_bins);
 //		}
 //	}
+}
+
+void Experiment::plot(){
+
+	unsigned int ntargets = (unsigned int) settings.targetNames.size();	
+
+	for(unsigned int i = 0; i < ntargets; ++i){
+		targets[i]->plot(energy_bins);
+	}
+}
+
+void Experiment::write(){
+
+	unsigned int ntargets = (unsigned int) settings.targetNames.size();	
+
+	for(unsigned int i = 0; i < ntargets; ++i){
+		targets[i]->write(energy_bins);
+	}
 }
