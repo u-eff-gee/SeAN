@@ -16,23 +16,6 @@ using std::stringstream;
 using std::regex;
 using std::scientific;
 
-
-//Target::Target(unsigned int ne, unsigned int nz, string name, unsigned int number) : z_bins(nz, 0.), incident_beam_bins(ne, 0.), dopplercs_bins(ne, 0.), massattenuation_bins(ne, 0.), transmitted_beam_bins(ne, 0.){
-//	target_name = name;
-//	target_number = number;
-//
-//	crossSection = new CrossSection();
-//	absorption = new Absorption();
-//
-//	photon_flux_density_bins.reserve(ne*nz);
-//	resonance_absorption_density_bins.reserve(ne*nz);
-//
-//	for(unsigned int i = 0; i < nz; ++i){
-//		photon_flux_density_bins.push_back(vector<double>(ne, 0.));
-//		resonance_absorption_density_bins.push_back(vector<double>(ne, 0.));
-//	}
-//};
-
 Target::~Target(){
 	delete crossSection;
 	delete absorption;
@@ -64,8 +47,8 @@ void Target::initialize(vector<double> &energy_bins){
 		velocity_distribution_histogram.push_back(vector<double>(settings.nbins_e, 0.));
 	}
 
-	crosssection_histogram.reserve(settings.nbins_e);
-	z_bins.reserve(settings.nbins_z);
+	crosssection_histogram = vector<double>(settings.nbins_e, 0.);
+	z_bins = vector<double>(settings.nbins_z, 0.);
 
 	photon_flux_density_histogram.reserve(settings.nbins_e*settings.nbins_z);
 	resonance_absorption_density_histogram.reserve(settings.nbins_e*settings.nbins_z);
@@ -82,6 +65,9 @@ void Target::initialize(vector<double> &energy_bins){
 	// Initialize plotter
 	plotter = new Plotter();
 
+	// Initialize writer
+	writer = new Writer();
+
 	// Shift resonance energies due to target velocity
 	boostEnergies();
 	// Calculate z bins
@@ -96,7 +82,8 @@ void Target::initialize(vector<double> &energy_bins){
 void Target::calculateCrossSection(vector<double> &energy_bins){
 
 	if(settings.exact){
-		;
+		crossSection->integration_input(crosssection_at_rest_histogram, velocity_distribution_histogram);
+		crossSection->dopplershift(energy_bins, crosssection_histogram, crosssection_at_rest_histogram, velocity_distribution_bins, velocity_distribution_histogram, vdist_norm, energy_boosted);
 	} else{
 		crossSection->fft_input(energy_bins, crosssection_at_rest_histogram, velocity_distribution_histogram, energy_boosted);
 		crossSection->dopplershiftFFT(energy_bins, crosssection_histogram, crosssection_at_rest_histogram, velocity_distribution_bins, velocity_distribution_histogram, vdist_norm, vdist_centroid);
@@ -113,11 +100,6 @@ void Target::boostEnergies(){
 }
 
 void Target::calculateCrossSectionAtRest(vector<double> &energy_bins){
-
-	for(unsigned int i = 0; i < settings.energy.size(); ++i){
-		crosssection_at_rest_histogram.push_back(vector <double>(settings.nbins_e, 0.));
-	}
-
 	crossSection->breit_wigner(energy_bins, crosssection_at_rest_histogram, energy_boosted, target_number);
 }
 
@@ -147,26 +129,34 @@ void Target::calculateVelocityDistribution(vector<double> &energy_bins){
 }
 
 void Target::plot(vector<double> &energy_bins){
+
+	stringstream filename;
 	
-	plotter->plot1DHistogram(energy_bins, crosssection_histogram, "crosssection");
+	// Plot cross section at rest
+	for(unsigned int i = 0; i < crosssection_at_rest_histogram.size(); ++i){
+		filename.str("");
+		filename.clear();
+
+		filename << settings.targetNames[target_number] << "_crosssection_at_rest_" << i;
+		plotter->plot1DHistogram(energy_bins, crosssection_at_rest_histogram[i], filename.str());
+	}
+
+	// Plot velocity distribution
+	// In fact, each resonance has its own binning, but plot only the velocity distribution for the first one since they only differ in the binning
+	filename.str("");
+	filename.clear();
+
+	filename << settings.targetNames[target_number] << "_velocity_distribution";
+
+	plotter->plot1DHistogram(velocity_distribution_bins[0], velocity_distribution_histogram[0], filename.str());
+
+	// Plot cross section
+	filename.str("");
+	filename.clear();
+
+	filename << settings.targetNames[target_number] << "_crosssection";
+	plotter->plot1DHistogram(energy_bins, crosssection_histogram, filename.str());
 }
-
-//void Target::plotCrossSection(vector<double> &energy_bins){
-//
-//	stringstream filename;
-//	filename << PLOT_OUTPUT_DIR << target_name << "_cross_section.pdf";
-//	stringstream canvasname;
-//	canvasname << target_name << "_canvas";
-//	TCanvas *canvas = new TCanvas(canvasname.str().c_str(), target_name.c_str(), 0, 0, 800, 500);
-//	TLegend *legend = new TLegend(CS_PLOT_LEGEND_X1, CS_PLOT_LEGEND_Y1, CS_PLOT_LEGEND_X2, CS_PLOT_LEGEND_Y2);
-//
-//	crossSection->plot_crosssection(energy_bins, crosssection_bins, target_name, canvas, legend, "Cross section");
-//
-//	legend->Draw();
-//	canvas->SaveAs(filename.str().c_str());
-//	delete canvas;
-//}
-
 
 //void Target::calculateIncidentBeam(vector<double> &energy_bins, string beam_ID, vector<double> beamParams){
 //	if(beam_ID == "const")
@@ -184,7 +174,7 @@ void Target::calculateZBins(){
 		z_bins[i] = i*delta_z;
 	}
 }
-//
+
 //void Target::calculateZBins(double z0, double z1){
 //	
 //	double delta_z = (z1-z0)/NBINS_Z;
@@ -388,38 +378,40 @@ void Target::calculateZBins(){
 //	
 //}
 //
-//void Target::print(){
-//	cout << "TARGET #" << target_number << ": '" << target_name << "'" << endl;
-//	cout << "GROUND STATE J = " << j0 << endl;
-//	cout << "RESONANCES:" << endl;
-//	cout << "E0 AT REST/eV\tE0 BOOSTED/eV\tGAMMA0\tGAMMA\tJ" << endl;
-//	
-//	for(unsigned int i = 0; i < e0_list.size(); ++i)
-//		cout << e0_at_rest_list[i] << "\t" << e0_list[i] << "\t" << gamma0_list[i] << "\t" << gamma_list[i] << "\t" << jj_list[i] << endl;
-//
-//	cout << "VELOCITY DISTRIBUTION = " << vDist_ID;
-//
-//	if( vDistParams.size() ){
-//		cout << " ( ";
-//		for(unsigned int i = 0; i < vDistParams.size(); ++i)
-//			cout << vDistParams[i] << " ";
-//
-//		cout << ")" << endl;
-//	} else{
-//		cout << endl;
-//	}
-//
-//	cout << "MASS = " << mass << " u" << endl;
-//	cout << "MASS ATTENUATION = " << massAttenuation_ID << endl;
-//	cout << "TARGET THICKNESS = " << z << " atoms / fm^2" << endl;
-//	cout << "TARGET VELOCITY = " << vz << " m/s" << endl;
-//}
-//
 void Target::write(vector<double> &energy_bins){
 	
 	stringstream filename;
+
+	// Write energy bins
 	filename << settings.targetNames[target_number] << "_energy_bins";
 	writer->write1DHistogram(energy_bins, filename.str(), "Energy / eV");
+	
+	// Write cross section at rest
+	
+	for(unsigned int i = 0; i < energy_boosted.size(); ++i){
+		filename.str("");
+		filename.clear();
+
+		filename << settings.targetNames[target_number] << "_crosssection_at_rest_" << i;
+
+		writer->write1DHistogram(crosssection_at_rest_histogram[i], filename.str(), "Cross section / fm^2");
+	}
+
+	// Write velocity distribution 
+	// In fact, each resonance has its own binning, but write only the velocity distribution for the first one
+	
+	filename.str("");
+	filename.clear();
+
+	filename << settings.targetNames[target_number] << "_velocity_bins";
+	writer->write1DHistogram(velocity_distribution_bins[0], filename.str(), "Velocity / c");
+
+	filename.str("");
+	filename.clear();
+
+	filename << settings.targetNames[target_number] << "_velocity_histogram";
+	writer->write1DHistogram(velocity_distribution_histogram[0], filename.str(), "Velocity distribution");
+
 
 //	print1DVector(energy_bins,  "Energy / eV", TXT_OUTPUT_DIR + target_name + "_energy_bins.txt");
 //	print1DVector(incident_beam_bins, "Incident beam / a.u.", TXT_OUTPUT_DIR + target_name + "_incident_beam.txt");

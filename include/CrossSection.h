@@ -51,14 +51,8 @@ public:
 	// Using trapezoidal rule
 	void integration_input(vector< vector<double> > &crosssection_bins, vector< vector<double> > &vdist_bins);
 
-	void dopplershift(vector<double> &dopplercs_bins, vector<double> &energy_bins, vector< vector <double> > &crosssection_bins, vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &vdist_norm, vector<double> &e0_list);
+	void dopplershift(vector<double> &energy_bins, vector<double> &crosssection_histogram, vector< vector <double> > &crosssection_bins, vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, vector<double> &vdist_norm, vector<double> &energy_boosted);
 
-
-//	void plot_crosssection(vector<double> &energy_bins, vector< vector<double> > &crosssection, string title, TCanvas* canvas, TLegend* legend, string legend_entry);
-//
-//	void plot_vdist(vector<double> &velocity_bins, vector<double> &vdist_bins, string title, TCanvas* canvas, TLegend* legend, string legend_entry);
-//
-//	void plot_dopplershift(vector<double> &energy_bins, vector< vector<double> > &crosssection_bins, vector<double> &dopplercs_bins, string title, TCanvas* canvas, TLegend* legend, string legend_entry);
 
 private:
 	double eGamma(double energy, double velocity){

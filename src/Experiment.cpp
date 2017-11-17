@@ -25,7 +25,7 @@ void Experiment::createEnergyBins(double emin, double emax){
 
 	energy_bins.reserve(settings.nbins_e);
 
-	double delta_e = (double) (emax - emin)/(NBINS - 1);
+	double delta_e = (double) (emax - emin)/(settings.nbins_e - 1);
 
 	for(unsigned int i = 0; i < settings.nbins_e; ++i)
 		energy_bins.push_back(emin + i*delta_e);
@@ -48,22 +48,6 @@ void Experiment::crossSections(){
 	for(unsigned int i = 0; i < ntargets; ++i){
 		targets[i]->calculateCrossSection(energy_bins);
 	}
-//	for(unsigned int i = 0; i < targets.size(); ++i){
-//		targets[i]->calculateCrossSection(energy_bins);
-//		if(settings.exact){
-//			targets[i]->calculateVelocityDistribution(energy_bins);
-//			targets[i]->calculateDopplerShift(energy_bins);
-//		} else{
-//			targets[i]->calculateVelocityDistribution(energy_bins);
-//			targets[i]->calculateDopplerShiftFFT(energy_bins);
-//		}
-//
-//		if(settings.plot){
-//			targets[i]->plotCrossSection(energy_bins);
-//			targets[i]->plotVelocityDistribution();
-//			targets[i]->plotDopplerShift(energy_bins);
-//		}
-//	}
 };
 
 void Experiment::transmission(){

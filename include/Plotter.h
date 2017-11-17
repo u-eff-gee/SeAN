@@ -16,6 +16,8 @@ public:
 	~Plotter(){};
 
 	void plot1DHistogram(vector<double> &bins, vector<double> &histogram, string name);
+
+	void plotMultiple1DHistograms(vector<double> &bins, vector< vector<double> > &histograms, string name);
 };
 
 #endif
