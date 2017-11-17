@@ -8,6 +8,7 @@
 #include "omp.h"
 #include "fftw3.h"
 
+#include "Math/Interpolator.h"
 #include "TGraph.h"
 #include "TAxis.h"
 
@@ -44,20 +45,33 @@ void CrossSection::calculateVelocityBins(vector<double> &energy_bins, vector< ve
 	}
 }
 
-void CrossSection::maxwell_boltzmann(vector<double> &energy_bins, vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, vector<double> &energy_boosted, unsigned int target_number){
+void CrossSection::maxwell_boltzmann(vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, unsigned int target_number){
 
 	double c1 = sqrt(settings.mass[target_number]*AtomicMassUnit/(2*PI*kB*settings.vDistParams[target_number][0]));
       	double c2 = -1./pow(delta(settings.vDistParams[target_number][0], settings.mass[target_number]), 2);
 
-      	for(unsigned int i = 0; i < energy_boosted.size(); ++i){
+      	for(unsigned int i = 0; i < velocity_distribution_bins.size(); ++i){
 		for(unsigned int j = 0; j < settings.nbins_e; ++j){
 			velocity_distribution_histogram[i][j] = c1*exp(c2*velocity_distribution_bins[i][j]*velocity_distribution_bins[i][j]);
 		}
 	}
 }
 
-void CrossSection::maxwell_boltzmann_debye(vector<double> &energy_bins, vector<double> &velocity_bins, vector<double> &vdist_bins, vector<double> &params, double mass, double e0){
+void CrossSection::maxwell_boltzmann_debye(vector<double> &velocity_bins, vector<double> &vdist_bins, vector<double> &params, double mass, double e0){
 	;
+}
+
+void CrossSection::arbitrary_velocity_distribution(vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, vector< vector<double> > &velocity_distribution_file, vector<double> &energy_boosted, unsigned int target_number){
+	// Interpolate data from file	
+	ROOT::Math::Interpolator inter((unsigned int) velocity_distribution_file[0].size(), ROOT::Math::Interpolation::kCSPLINE);
+	inter.SetData((unsigned int) velocity_distribution_file[0].size(), &velocity_distribution_file[0][0], &velocity_distribution_file[1][0]);
+
+	// Evaluate at the given velocity bins
+	for(unsigned int i = 0; i < velocity_distribution_bins.size(); ++i){
+		for(unsigned int j = 0; j < settings.nbins_e; ++j){
+			velocity_distribution_histogram[i][j] = inter.Eval(velocity_distribution_bins[i][j]);		
+		}
+	}
 }
 
 void CrossSection::integration_input(vector< vector<double> > &crosssection_histogram, vector< vector<double> > &vdist_bins){
@@ -154,7 +168,7 @@ void CrossSection::dopplershiftFFT(vector<double> &energy_bins, vector<double> &
 	}
 }
 
-void CrossSection::maxwell_boltzmann_approximation(vector<double> &dopplercs_bins, vector<double> &energy_bins, vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &e0_list, vector<double> &gamma0_list, vector<double> &gamma_list, vector<double> &jj_list, double j0, vector<double> &params, double mass){
+void CrossSection::maxwell_boltzmann_approximation(vector<double> &energy_bins, vector<double> &dopplercs_bins, vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &e0_list, vector<double> &gamma0_list, vector<double> &gamma_list, vector<double> &jj_list, double j0, vector<double> &params, double mass){
 
 // Calculate velocity distribution as in maxwell_boltzmann
 

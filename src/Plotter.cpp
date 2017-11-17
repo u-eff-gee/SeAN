@@ -47,3 +47,33 @@ void Plotter::plotMultiple1DHistograms(vector<double> &bins, vector< vector<doub
 	canvas->SaveAs(filename.str().c_str());
 	delete canvas;
 }
+
+void Plotter::plotMultiple1DHistogramsAndSum(vector<double> &bins, vector< vector<double> > &histograms, string name){
+	vector<double> sum(bins.size(), 0.);
+
+	for(unsigned int i = 0; i < histograms.size(); ++i){
+		for(unsigned int j = 0; j < bins.size(); ++j){
+			sum[j] += histograms[i][j];
+		}	
+	}	
+
+	stringstream filename;
+	filename << PLOT_OUTPUT_DIR << name << ".pdf";
+	stringstream canvasname;
+	canvasname << name << "_canvas";
+	TCanvas *canvas = new TCanvas(canvasname.str().c_str(), name.c_str(), 0, 0, 800, 500);
+
+	TGraph *graph = new TGraph((int) bins.size(), &bins[0], &sum[0]);
+	graph->SetTitle(name.c_str());
+	graph->Draw();
+	
+	for(unsigned int i = 0; i < histograms.size(); ++i){
+		TGraph *graph = new TGraph((int) bins.size(), &bins[0], &histograms[i][0]);
+		graph->SetLineStyle(2);
+		graph->Draw("same");
+	}
+
+
+	canvas->SaveAs(filename.str().c_str());
+	delete canvas;
+}

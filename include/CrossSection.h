@@ -36,11 +36,13 @@ public:
 	// Calculator for the velocity bins that correspond to the energy bins
 	void calculateVelocityBins(vector<double> &energy_bins, vector< vector<double> > &velocity_distribution_bins, vector<double> &energy_boosted, unsigned int target_number);
 
-	void maxwell_boltzmann(vector<double> &energy_bins, vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, vector<double> &energy_boosted, unsigned int target_number);
+	void maxwell_boltzmann(vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, unsigned int target_number);
 
-	void maxwell_boltzmann_approximation(vector<double> &dopplercs_bins, vector<double> &energy_bins, vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &e0_list, vector<double> &gamma0_list, vector<double> &gamma_list, vector<double> &jj_list, double j0, vector<double> &params, double mass);
+	void maxwell_boltzmann_approximation(vector<double> &energy_bins, vector<double> &dopplercs_bins, vector< vector<double> > &velocity_bins, vector< vector<double> > &vdist_bins, vector<double> &e0_list, vector<double> &gamma0_list, vector<double> &gamma_list, vector<double> &jj_list, double j0, vector<double> &params, double mass);
 
-	void maxwell_boltzmann_debye(vector<double> &energy_bins, vector<double> &velocity_bins, vector<double> &vdist_bins, vector<double> &params, double mass, double e0);
+	void maxwell_boltzmann_debye(vector<double> &velocity_bins, vector<double> &vdist_bins, vector<double> &params, double mass, double e0);
+
+	void arbitrary_velocity_distribution(vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, vector< vector<double> > &velocity_distribution_file, vector<double> &energy_boosted, unsigned int target_number);
 
 	// Cross section calculators
 	// Using FFT

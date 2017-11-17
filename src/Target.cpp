@@ -81,7 +81,19 @@ void Target::initialize(vector<double> &energy_bins){
 
 void Target::calculateCrossSection(vector<double> &energy_bins){
 
-	if(settings.exact){
+	// Need to treat the two special cases
+	// 1. Velocity distribution at T = 0 K
+	// 2. Maxwell-Boltzmann with approximation
+	// separately, because it is possible to calculate the doppler-shifted cross section without the expensive double integral 
+	if(settings.vDist[target_number] == vDistModel::zero){
+		;
+	}
+
+	else if(settings.vDist[target_number] == vDistModel::mba){
+		;
+	}
+
+	else if(settings.exact){
 		crossSection->integration_input(crosssection_at_rest_histogram, velocity_distribution_histogram);
 		crossSection->dopplershift(energy_bins, crosssection_histogram, crosssection_at_rest_histogram, velocity_distribution_bins, velocity_distribution_histogram, vdist_norm, energy_boosted);
 	} else{
@@ -109,19 +121,23 @@ void Target::calculateVelocityDistribution(vector<double> &energy_bins){
 
 	switch(settings.vDist[target_number]){
 		case vDistModel::zero:
-			for(unsigned int i = 0; i < settings.nbins_e; ++i){
-				for(unsigned int j = 0; j < crosssection_at_rest_histogram.size(); ++j){
-					crosssection_histogram[i] = crosssection_at_rest_histogram[i][j];
+			for(unsigned int i = 0; i < crosssection_at_rest_histogram.size(); ++i){
+				for(unsigned int j = 0; j < settings.nbins_e; ++j){
+					crosssection_histogram[i] += crosssection_at_rest_histogram[i][j];
 				}
 			}
 			break;
 
 		case vDistModel::mb:
 		case vDistModel::mba:
-			crossSection->maxwell_boltzmann(energy_bins, velocity_distribution_bins, velocity_distribution_histogram, energy_boosted, target_number);
+			crossSection->maxwell_boltzmann(velocity_distribution_bins, velocity_distribution_histogram, target_number);
 			break;
 
 		case vDistModel::arb:
+			stringstream filename;
+			filename << "velocity_distribution/" << settings.vDistFile[target_number];
+			inputReader->read2ColumnFile(velocity_distribution_file, filename.str());
+			crossSection->arbitrary_velocity_distribution(velocity_distribution_bins, velocity_distribution_histogram, velocity_distribution_file, energy_boosted, target_number);
 			break;
 	}
 
@@ -132,14 +148,9 @@ void Target::plot(vector<double> &energy_bins){
 
 	stringstream filename;
 	
-	// Plot cross section at rest
-	for(unsigned int i = 0; i < crosssection_at_rest_histogram.size(); ++i){
-		filename.str("");
-		filename.clear();
+	filename << settings.targetNames[target_number] << "_crosssection_at_rest";
 
-		filename << settings.targetNames[target_number] << "_crosssection_at_rest_" << i;
-		plotter->plot1DHistogram(energy_bins, crosssection_at_rest_histogram[i], filename.str());
-	}
+	plotter->plotMultiple1DHistogramsAndSum(energy_bins, crosssection_at_rest_histogram, filename.str());
 
 	// Plot velocity distribution
 	// In fact, each resonance has its own binning, but plot only the velocity distribution for the first one since they only differ in the binning
@@ -165,7 +176,7 @@ void Target::plot(vector<double> &energy_bins){
 //	if(beam_ID == "gauss")
 //		absorption->gauss_beam(energy_bins, incident_beam_bins, beamParams);
 //}
-//
+
 void Target::calculateZBins(){
 	
 	double delta_z = settings.thickness[target_number]/settings.nbins_z;
@@ -175,29 +186,6 @@ void Target::calculateZBins(){
 	}
 }
 
-//void Target::calculateZBins(double z0, double z1){
-//	
-//	double delta_z = (z1-z0)/NBINS_Z;
-//
-//	for(unsigned int i = 0; i < NBINS_Z; ++i){
-//		z_bins[i] = i*delta_z + z0;
-//	}
-//}
-//
-//void Target::calculateDopplerShift(vector<double> &energy_bins){
-//	if(vDist_ID != "maxwell_boltzmann_approximation"){
-//		crossSection->integration_input(crosssection_bins, vdist_bins);
-//		crossSection->dopplershift(dopplercs_bins, energy_bins, crosssection_bins, velocity_bins, vdist_bins, vdist_norm, e0_list);
-//	}
-//}
-//
-//void Target::calculateDopplerShiftFFT(vector<double> &energy_bins){
-//	if(vDist_ID != "maxwell_boltzmann_approximation"){
-//		crossSection->fft_input(energy_bins, crosssection_bins, vdist_bins, e0_list);
-//		crossSection->dopplershiftFFT(dopplercs_bins, energy_bins, crosssection_bins, velocity_bins, vdist_bins, vdist_norm, vdist_centroid);
-//	}
-//}
-//
 //void Target::calculateMassAttenuation(vector<double> &energy_bins){
 //	if(massAttenuation_ID == "0"){
 //	;} else{

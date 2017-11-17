@@ -26,6 +26,7 @@ private:
 	vector< vector<double> > crosssection_at_rest_histogram;
 
 	// Velocity distribution
+	vector< vector<double> > velocity_distribution_file;
 	vector< vector<double> > velocity_distribution_bins;
 	vector< vector<double> > velocity_distribution_histogram;
 	vector<double> vdist_norm;

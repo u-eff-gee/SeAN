@@ -326,7 +326,7 @@ double InputReader::readAME(string isotope){
 void InputReader::readNIST(vector< vector<double> > &matt, string massAttenuation_ID){
 
 	stringstream filename;
-	filename << "mass_attenuation" << massAttenuation_ID << ".dat";
+	filename << "mass_attenuation/" << massAttenuation_ID << ".dat";
 
 	string line;
 	unsigned int nbins_matt = 0;
@@ -381,9 +381,7 @@ void InputReader::read2ColumnFile(vector< vector<double> > &data, string filenam
 
 		getline(stream, value, DELIMITER);
 		data[0].push_back(atof(value.c_str()));
-		cout << value;
 		getline(stream, value, DELIMITER); 
 		data[1].push_back(atof(value.c_str()));
-		cout << ", " << value << endl;
 	}
 }
