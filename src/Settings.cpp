@@ -59,6 +59,7 @@ void Settings::printExperiment(){
 			cout << "gauss, MU = " << incidentBeamParams[0] << " eV, SIGMA = " << incidentBeamParams[1] << " eV, NORM = " << incidentBeamParams[2] << endl;
 			break;
 		case incidentBeamModel::arb:
+			cout << "arb, " << incidentBeamFile << endl;
 			break;
 		default: break;
 	}

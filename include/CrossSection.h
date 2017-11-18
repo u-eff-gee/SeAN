@@ -16,6 +16,8 @@ using std::vector;
 using std::string;
 
 class CrossSection{
+
+private:
 	vector< vector<double> > pconv_crosssection_histogram;
 	vector< vector<double> > pconv_velocity_distribution_histogram;
 
@@ -54,7 +56,6 @@ public:
 	void integration_input(vector< vector<double> > &crosssection_bins, vector< vector<double> > &vdist_bins);
 
 	void dopplershift(vector<double> &energy_bins, vector<double> &crosssection_histogram, vector< vector <double> > &crosssection_bins, vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, vector<double> &vdist_norm, vector<double> &energy_boosted);
-
 
 private:
 	double eGamma(double energy, double velocity){

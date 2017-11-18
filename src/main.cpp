@@ -77,6 +77,11 @@ int main(int argc, char* argv[]){
 		}
 	}
 
+
+	// Start the clock
+	high_resolution_clock::time_point start = high_resolution_clock::now();
+
+
 	if(settings.sudowrite)
 		settings.write = true;
 
@@ -87,16 +92,20 @@ int main(int argc, char* argv[]){
 	Experiment experiment(settings);
 	experiment.initialize();
 	experiment.crossSections();
+	experiment.transmission();
 	if(settings.plot){
 		experiment.plot();
 	}
 	if(settings.write){
 		experiment.write();
 	}
+	
+	// Stop the clock
+	high_resolution_clock::time_point stop = high_resolution_clock::now();
+	duration<double> delta_t = duration_cast< duration<double>>(stop - start);
 
-//
-//	high_resolution_clock::time_point start = high_resolution_clock::now();
-//
+	cout << "> main.cpp: Execution took " << delta_t.count() << " seconds" << endl;
+
 //	Experiment experiment(settings);
 //
 //	experiment.readInputFile(settings.inputfile);
@@ -105,8 +114,4 @@ int main(int argc, char* argv[]){
 //	experiment.crossSections();
 //	experiment.transmission();
 //
-//	high_resolution_clock::time_point stop = high_resolution_clock::now();
-//	duration<double> delta_t = duration_cast< duration<double>>(stop - start);
-//
-//	cout << "> main.cpp: Execution took " << delta_t.count() << " seconds" << endl;
 }

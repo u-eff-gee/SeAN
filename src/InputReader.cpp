@@ -85,7 +85,7 @@ void InputReader::readFile(Settings &settings){
 		else if(value == "arb"){
 			settings.incidentBeam= incidentBeamModel::arb;
 			getline(stream, value, DELIMITER);
-			settings.incidentBeamFile = value;				
+			settings.incidentBeamFile = regex_replace(value, regex("\\s+"), "");				
 			incident_beam_found = true;
 		}
 		
@@ -201,7 +201,7 @@ void InputReader::readFile(Settings &settings){
 				else if(value == "arb"){
 					settings.vDist.push_back(vDistModel::arb);
 					getline(stream, value, DELIMITER);
-					settings.vDistFile.push_back(value);
+					settings.vDistFile.push_back(regex_replace(value, regex("\\s+"), ""));
 				}
 				else if(value == "maxwell_boltzmann"){
 					settings.vDist.push_back(vDistModel::mb);

@@ -48,6 +48,8 @@ void Target::initialize(vector<double> &energy_bins){
 	}
 
 	crosssection_histogram = vector<double>(settings.nbins_e, 0.);
+	incident_beam_histogram = vector<double>(settings.nbins_e, 0.);
+
 	z_bins = vector<double>(settings.nbins_z, 0.);
 
 	photon_flux_density_histogram.reserve(settings.nbins_e*settings.nbins_z);
@@ -60,7 +62,7 @@ void Target::initialize(vector<double> &energy_bins){
 
 	// Initialize calculators
 	crossSection = new CrossSection(settings);
-	absorption = new Absorption();
+	absorption = new Absorption(settings);
 
 	// Initialize plotter
 	plotter = new Plotter();
@@ -167,15 +169,32 @@ void Target::plot(vector<double> &energy_bins){
 
 	filename << settings.targetNames[target_number] << "_crosssection";
 	plotter->plot1DHistogram(energy_bins, crosssection_histogram, filename.str());
+
+	// Plot incident beam
+	filename.str("");
+	filename.clear();
+
+	filename << settings.targetNames[target_number] << "_incident_beam";
+	plotter->plot1DHistogram(energy_bins, incident_beam_histogram, filename.str());
 }
 
-//void Target::calculateIncidentBeam(vector<double> &energy_bins, string beam_ID, vector<double> beamParams){
-//	if(beam_ID == "const")
-//		absorption->const_beam(energy_bins, incident_beam_bins, beamParams);
-//
-//	if(beam_ID == "gauss")
-//		absorption->gauss_beam(energy_bins, incident_beam_bins, beamParams);
-//}
+void Target::calculateIncidentBeam(const vector<double> &energy_bins){
+	
+	switch(settings.incidentBeam){
+		case incidentBeamModel::constant:
+			absorption->const_beam(energy_bins, incident_beam_histogram);
+			break;
+		case incidentBeamModel::gauss:
+			absorption->gauss_beam(energy_bins, incident_beam_histogram);
+			break;
+		case incidentBeamModel::arb:
+			stringstream filename;
+			filename << "beam/" << settings.incidentBeamFile;
+			inputReader->read2ColumnFile(incident_beam_file, filename.str());
+			absorption->arbitrary_beam(energy_bins, incident_beam_histogram, incident_beam_file);
+			break;
+	}
+};
 
 void Target::calculateZBins(){
 	
@@ -400,64 +419,16 @@ void Target::write(vector<double> &energy_bins){
 	filename << settings.targetNames[target_number] << "_velocity_histogram";
 	writer->write1DHistogram(velocity_distribution_histogram[0], filename.str(), "Velocity distribution");
 
+	// Write incident beam
 
-//	print1DVector(energy_bins,  "Energy / eV", TXT_OUTPUT_DIR + target_name + "_energy_bins.txt");
-//	print1DVector(incident_beam_bins, "Incident beam / a.u.", TXT_OUTPUT_DIR + target_name + "_incident_beam.txt");
-//	print1DVector(dopplercs_bins, "Doppler-broadened cross section / eV fm^2", TXT_OUTPUT_DIR + target_name + "_doppler_shift.txt");
-//	print1DVector(massattenuation_bins, "Mass attenuation / fm^2 / atom", TXT_OUTPUT_DIR + target_name + "_mass_attenuation.txt");
-//	print1DVector(z_bins, "z / atoms / fm^2", TXT_OUTPUT_DIR + target_name + "_z_bins.txt");
-//	print1DVector(transmitted_beam_bins, "Transmitted beam / a.u.", TXT_OUTPUT_DIR + target_name + "_transmitted_beam.txt");
-//
-//	print2DVector(photon_flux_density_bins, "Photon flux density / a.u.", TXT_OUTPUT_DIR + target_name + "_phi.txt");
-//	print2DVector(resonance_absorption_density_bins, "Resonance absorption density / a.u.", TXT_OUTPUT_DIR + target_name + "_alpha.txt");
-//
-//	print2DVector(crosssection_bins, "Cross section / eV fm^2", TXT_OUTPUT_DIR + target_name + "_cross_section.txt");
-//	print2DVector(velocity_bins, "Velocity / c", TXT_OUTPUT_DIR + target_name + "_velocity_bins.txt");
-//	print2DVector(vdist_bins, "Velocity distribution", TXT_OUTPUT_DIR + target_name + "_velocity_distribution.txt");
+	filename.str("");
+	filename.clear();
+
+	filename << settings.targetNames[target_number] << "_incident_beam";
+	writer->write1DHistogram(incident_beam_histogram, filename.str(), "Beam intensity distribution");
+
 }
-//
-//void Target::print1DVector(vector<double> &vec, string column, string filename){
-//	
-//	ofstream ofile(filename);
-//
-//        if(!ofile.is_open()){
-//                cout << "Error: Target.cpp: print1DVector(): File '" << filename << "' could not be opened." << endl;
-//		abort();
-//	}
-//        cout << "> Writing output file '" << filename << "'" << endl;
-//
-//	ofile.precision(8);
-//	ofile << COMMENT << " " << column << endl;
-//	for(unsigned int i = 0; i < vec.size(); ++i){
-//		ofile << scientific << vec[i] << endl;
-//	}
-//}
-//
-//void Target::print2DVector(vector< vector<double> > (&vec), string column, string filename){
-//	
-//	ofstream ofile(filename);
-//
-//        if(!ofile.is_open()){
-//                cout << "Error: Target.cpp: print2DVector(): File '" << filename << "' could not be opened." << endl;
-//		abort();
-//	}
-//        cout << "> Writing output file '" << filename << "'" << endl;
-//
-//	ofile.precision(8);
-//	ofile << COMMENT << " "  << column << endl;
-//	ofile << COMMENT << " f(E0, z0)" << endl;
-//	ofile << COMMENT << " f(E0, z1)" << endl;
-//	ofile << COMMENT << " ... " << endl;
-//	ofile << COMMENT << " f(E1, z0)" << endl;
-//	ofile << COMMENT << " f(E1, z1)" << endl;
-//	ofile << COMMENT << " ... " << endl;
-//	for(unsigned int i = 0; i < vec.size(); ++i){
-//		for(unsigned int j = 0; j < vec[i].size(); ++j){
-//			ofile << scientific << vec[i][j] << endl;
-//		}
-//	}
-//}
-//
+
 void Target::vDistInfo(){
 	
 //	 Determine the integral of the velocity distribution and the centroid of the distribution.

@@ -35,10 +35,13 @@ private:
 	// Cross section transformed by velocity distribution
 	vector<double> crosssection_histogram;
 
+	// Incident beam
+	vector< vector<double> > incident_beam_file;
+	vector<double> incident_beam_histogram;
+
 	vector<vector <double> > photon_flux_density_histogram;
 	vector<vector <double> > resonance_absorption_density_histogram;
 
-	vector<double> incident_beam_histogram;
 	vector<double> massattenuation_histogram;
 	vector<double> transmitted_beam_histogram;
 
@@ -61,6 +64,8 @@ public:
 
 	void initialize(vector<double> &energy_bins);
 	void calculateCrossSection(vector<double> &energy_bins);
+	void calculateIncidentBeam(const vector<double> &energy_bins);
+	void calculateIncidentBeam(vector<vector<double> > &photon_flux_density_histogram);
 
 	// Function to modify resonance energies due to Doppler shift
 	void boostEnergies();

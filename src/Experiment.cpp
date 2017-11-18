@@ -51,6 +51,17 @@ void Experiment::crossSections(){
 };
 
 void Experiment::transmission(){
+
+	unsigned int ntargets = (unsigned int) settings.targetNames.size();	
+
+	for(unsigned int i = 0; i < ntargets; ++i){
+		// The incident beam on the first target is user-defined, the rest is determined by the transmission of the previous target
+		if(i == 0){
+			targets[i]->calculateIncidentBeam(energy_bins);
+		} else{
+			;
+		}
+	}
 	//targets[0]->calculateIncidentBeam(energy_bins, beam_ID, beamParams);
 //	for(unsigned int i = 0; i < targets.size(); ++i){
 //		targets[i]->calculateMassAttenuation(energy_bins);
