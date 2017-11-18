@@ -33,7 +33,7 @@ Target::~Target(){
 
 	delete &incident_beam_histogram;
 	delete &crosssection_histogram;
-	delete &massattenuation_histogram;
+	delete &mass_attenuation_histogram;
 	delete &transmitted_beam_histogram;
 };
 
@@ -49,6 +49,9 @@ void Target::initialize(vector<double> &energy_bins){
 
 	crosssection_histogram = vector<double>(settings.nbins_e, 0.);
 	incident_beam_histogram = vector<double>(settings.nbins_e, 0.);
+	mass_attenuation_histogram = vector<double>(settings.nbins_e, 0.);
+	mass_attenuation_file.push_back(vector<double>());
+	mass_attenuation_file.push_back(vector<double>());
 
 	z_bins = vector<double>(settings.nbins_z, 0.);
 
@@ -78,6 +81,8 @@ void Target::initialize(vector<double> &energy_bins){
 	calculateCrossSectionAtRest(energy_bins);
 	// Calculate velocity distribution
 	calculateVelocityDistribution(energy_bins);
+	// Calculate mass attenuation
+	calculateMassAttenuation(energy_bins);
 
 }
 
@@ -201,12 +206,21 @@ void Target::calculateZBins(){
 	}
 }
 
-//void Target::calculateMassAttenuation(vector<double> &energy_bins){
-//	if(massAttenuation_ID == "0"){
-//	;} else{
-//		//absorption->read_massattenuation_NIST(energy_bins, massattenuation_bins, massAttenuation_ID, mass);
-//	}
-//}
+void Target::calculateMassAttenuation(vector<double> &energy_bins){
+	
+	switch(settings.mAtt[target_number]){
+		case mAttModel::constant:
+			break;
+		case mAttModel::arb:
+			break;
+		case mAttModel::nist:
+			stringstream filename;
+			filename << "mass_attenuation/" << settings.mAttFile[target_number];
+			inputReader->readNIST(mass_attenuation_file, filename.str()); 
+			absorption->arbitrary_mass_attenuation(energy_bins, mass_attenuation_file, mass_attenuation_histogram);
+			break;
+	}
+}
 //
 //void Target::setIncidentBeam(double &trans_beam_bins){
 //	for(unsigned int i = 0; i < settings.nbins_e; ++i)

@@ -42,7 +42,8 @@ private:
 	vector<vector <double> > photon_flux_density_histogram;
 	vector<vector <double> > resonance_absorption_density_histogram;
 
-	vector<double> massattenuation_histogram;
+	vector< vector<double> > mass_attenuation_file;
+	vector<double> mass_attenuation_histogram;
 	vector<double> transmitted_beam_histogram;
 
 	CrossSection *crossSection;
@@ -62,13 +63,17 @@ public:
 	
 	~Target();
 
+	// The order of the following functions represents the order in which they are called in a normal calculation. Indented functions are called by the function above.
 	void initialize(vector<double> &energy_bins);
+		// Function to modify resonance energies due to Doppler shift
+		void boostEnergies();
+		void calculateCrossSectionAtRest(vector<double> &energy_bins);
+		void calculateVelocityDistribution(vector<double> &energy_bins);
+		void calculateMassAttenuation(vector<double> &energy_bins);
 	void calculateCrossSection(vector<double> &energy_bins);
 	void calculateIncidentBeam(const vector<double> &energy_bins);
 	void calculateIncidentBeam(vector<vector<double> > &photon_flux_density_histogram);
 
-	// Function to modify resonance energies due to Doppler shift
-	void boostEnergies();
 
 	// Function to print information to the command line
 	void print();
@@ -77,12 +82,7 @@ public:
 	void plot(vector<double> &energy_bins);
 
 	// Functions to calculate histograms
-	void calculateCrossSectionAtRest(vector<double> &energy_bins);
-	void calculateVelocityDistribution(vector<double> &energy_bins);
-	void calculateDopplerShift(vector<double> &energy_bins);
-	void calculateDopplerShiftFFT(vector<double> &energy_bins);
-	void calculateMassAttenuation(vector<double> &energy_bins);
-	void calculateIncidentBeam(vector<double> &energy_bins, string beam_ID, vector<double> beamParams);
+
 	void calculateTransmittedBeam();
 	void calculateZBins();
 	void calculateZBins(double z0, double z1);

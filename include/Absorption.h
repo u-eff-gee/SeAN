@@ -28,13 +28,15 @@ public:
 		delete &matt;
 	};
 
-	//void read_massattenuation_NIST(vector<double> &energy_bins, vector<double> &massattenuation_bins, string massAttenuation_ID, double mass);
-
+	// Incident beam calculators
 	void const_beam(const vector<double> &energy_bins, vector<double> &incident_beam_histogram);
 
 	void gauss_beam(const vector<double> &energy_bins, vector<double> &incident_beam_histogram);
 
 	void arbitrary_beam(const vector<double> &energy_bins, vector<double> &incident_beam_histogram, const vector< vector<double> > &incident_beam_file);
+
+	// Mass attenuation calculators
+	void arbitrary_mass_attenuation(const vector<double> &energy_bins, const vector< vector<double> > mass_attenuation_file, vector<double> &mass_attenuation_histogram);
 
 	void photon_flux_density(vector<double> &dopplercs_bins, vector<double> &massattenuation_bins, vector<double> &z_bins, vector<double> &incident_beam_bins, vector<vector<double> > &photon_flux_density_bins);
 

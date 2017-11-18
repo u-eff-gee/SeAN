@@ -247,13 +247,13 @@ void InputReader::readFile(Settings &settings){
 					settings.mAtt.push_back(mAttModel::nist);
 					getline(stream, value, DELIMITER);
 					settings.mAttParams.push_back(0.);
-					settings.mAttFile.push_back(value);
+					settings.mAttFile.push_back(regex_replace(value, regex("\\s+"), ""));
 				}
 				else if(value == "arb"){
 					settings.mAtt.push_back(mAttModel::arb);
 					getline(stream, value, DELIMITER);
 					settings.mAttParams.push_back(0.);
-					settings.mAttFile.push_back(value);
+					settings.mAttFile.push_back(regex_replace(value, regex("\\s+"), ""));
 				}
 				else{
 					cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
@@ -323,23 +323,18 @@ double InputReader::readAME(string isotope){
 	return 0.;
 }
 
-void InputReader::readNIST(vector< vector<double> > &matt, string massAttenuation_ID){
+void InputReader::readNIST(vector< vector<double> > &mass_attenuation_file, const string mass_attenuation_filename){
 
-	stringstream filename;
-	filename << "mass_attenuation/" << massAttenuation_ID << ".dat";
-
-	string line;
-	unsigned int nbins_matt = 0;
-	ifstream ifile;
-
-	ifile.open(filename.str().c_str());	
+	ifstream ifile(mass_attenuation_filename);
 
         if(!ifile.is_open()){
 		cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
-		cout << " readNIST(): File '" << filename.str() << "' not found." << endl;
+		cout << " readNIST(): File '" << mass_attenuation_filename << "' not found." << endl;
 		abort();
 	}
-        cout << "> Reading input file '" << filename.str() << "'" << endl;
+        cout << "> Reading input file '" << mass_attenuation_filename << "'" << endl;
+
+	string line;
 
 	while(getline(ifile, line)){
 		if(line.substr(0,1) == COMMENT)
@@ -349,10 +344,8 @@ void InputReader::readNIST(vector< vector<double> > &matt, string massAttenuatio
 		if(regex_replace(line.substr(NIST_XRAY, NIST_XRAY_LENGTH), regex("\\s+"), "") != "")
 			continue;	
 		
-		matt[0].push_back(atof(line.substr(NIST_ENERGY, NIST_ENERGY_LENGTH).c_str()));
-		matt[1].push_back(atof(line.substr(NIST_MU, NIST_MU_LENGTH).c_str()));
-
-		++nbins_matt;
+		mass_attenuation_file[0].push_back(atof(line.substr(NIST_ENERGY, NIST_ENERGY_LENGTH).c_str()));
+		mass_attenuation_file[1].push_back(atof(line.substr(NIST_MU, NIST_MU_LENGTH).c_str()));
 	}
 }
 

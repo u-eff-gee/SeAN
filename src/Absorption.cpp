@@ -86,6 +86,18 @@ void Absorption::arbitrary_beam(const vector<double> &energy_bins, vector<double
 	}
 }
 
+void Absorption::arbitrary_mass_attenuation(const vector<double> &energy_bins, const vector< vector<double> > mass_attenuation_file, vector<double> &mass_attenuation_histogram){
+
+	// Interpolate data from file	
+	ROOT::Math::Interpolator inter((unsigned int) mass_attenuation_file[0].size(), ROOT::Math::Interpolation::kCSPLINE);
+	inter.SetData((unsigned int) mass_attenuation_file[0].size(), &mass_attenuation_file[0][0], &mass_attenuation_file[1][0]);
+
+	// Evaluate at the given velocity bins
+	for(unsigned int i = 0; i < mass_attenuation_histogram.size(); ++i){
+		mass_attenuation_histogram[i] = inter.Eval(energy_bins[i]);		
+	}
+}
+
 //void Absorption::photon_flux_density(vector<double> &dopplercs_bins, vector<double> &massattenuation_bins, vector<double> &z_bins, vector<double> &incident_beam_bins, vector<vector<double> > &photon_flux_density_bins){
 //
 //	//#pragma omp parallel for
