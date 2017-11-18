@@ -90,20 +90,8 @@ public:
 	void calculateResonanceAbsorptionDensity();
 	void calculateAbsorption(vector<double> &energy_bins);
 
-	// Functions to plot histograms
-//	void plotCrossSection(vector<double> &energy_bins);
-//	void plotVelocityDistribution();
-//	void plotDopplerShift(vector<double> &energy_bins);
-//	void plotMassAttenuation(vector<double> &energy_bins);
-//	void plotMu();
-//	void plotPhotonFluxDensity(vector<double> &energy_bins);
-//	void plotTestIntegration(vector<double> &energy_bins);
-//	void plotResonanceAbsorptionDensity(vector<double> &energy_bins);
-
 	// Functions to write histograms to file
 	void write(vector<double> &energy_bins);
-	void print1DVector(vector<double> &vec, string column, string filename);
-	void print2DVector(vector<vector<double> > &vec, string column, string filename);
 
 	// Function to set the incident beam and return the transmitted beam
 	double& getTransmittedBeam(){ return transmitted_beam_histogram[0]; };

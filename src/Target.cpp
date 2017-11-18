@@ -88,11 +88,11 @@ void Target::calculateCrossSection(vector<double> &energy_bins){
 	// 2. Maxwell-Boltzmann with approximation
 	// separately, because it is possible to calculate the doppler-shifted cross section without the expensive double integral 
 	if(settings.vDist[target_number] == vDistModel::zero){
-		;
+		crossSection->no_dopplershift(crosssection_at_rest_histogram, crosssection_histogram);
 	}
 
 	else if(settings.vDist[target_number] == vDistModel::mba){
-		;
+		crossSection->maxwell_boltzmann_approximation(energy_bins, crosssection_histogram, energy_boosted, target_number);
 	}
 
 	else if(settings.exact){
@@ -123,11 +123,7 @@ void Target::calculateVelocityDistribution(vector<double> &energy_bins){
 
 	switch(settings.vDist[target_number]){
 		case vDistModel::zero:
-			for(unsigned int i = 0; i < crosssection_at_rest_histogram.size(); ++i){
-				for(unsigned int j = 0; j < settings.nbins_e; ++j){
-					crosssection_histogram[i] += crosssection_at_rest_histogram[i][j];
-				}
-			}
+			crossSection->absolute_zero(velocity_distribution_bins, velocity_distribution_histogram, target_number);
 			break;
 
 		case vDistModel::mb:
