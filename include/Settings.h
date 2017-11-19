@@ -59,7 +59,7 @@ struct Settings{
 	vector<double> mass;
 
 	vector<mAttModel> mAtt;
-	vector<double> mAttParams;
+	vector<vector<double> > mAttParams;
 	vector<string> mAttFile;
 
 	vector<double> thickness;

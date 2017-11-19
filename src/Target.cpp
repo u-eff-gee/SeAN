@@ -37,7 +37,7 @@ Target::~Target(){
 	delete &transmitted_beam_histogram;
 };
 
-void Target::initialize(vector<double> &energy_bins){
+void Target::initialize(const vector<double> &energy_bins){
 	unsigned int nenergies = (unsigned int) settings.energy[target_number].size();
 
 	// Reserve space for the histograms
@@ -55,8 +55,10 @@ void Target::initialize(vector<double> &energy_bins){
 
 	z_bins = vector<double>(settings.nbins_z, 0.);
 
-	photon_flux_density_histogram.reserve(settings.nbins_e*settings.nbins_z);
-	resonance_absorption_density_histogram.reserve(settings.nbins_e*settings.nbins_z);
+	for(unsigned int i = 0; i < settings.nbins_z; ++i){
+		photon_flux_density_histogram.push_back(vector<double>(settings.nbins_e, 0.));
+		resonance_absorption_density_histogram.push_back(vector<double>(settings.nbins_e, 0.));
+	}
 
 	energy_boosted.reserve(nenergies);
 
@@ -86,7 +88,7 @@ void Target::initialize(vector<double> &energy_bins){
 
 }
 
-void Target::calculateCrossSection(vector<double> &energy_bins){
+void Target::calculateCrossSection(const vector<double> &energy_bins){
 
 	// Need to treat the two special cases
 	// 1. Velocity distribution at T = 0 K
@@ -118,11 +120,11 @@ void Target::boostEnergies(){
 		energy_boosted.push_back((1. + beta)/sqrt(1. - beta*beta)*settings.energy[target_number][i]);
 }
 
-void Target::calculateCrossSectionAtRest(vector<double> &energy_bins){
+void Target::calculateCrossSectionAtRest(const vector<double> &energy_bins){
 	crossSection->breit_wigner(energy_bins, crosssection_at_rest_histogram, energy_boosted, target_number);
 }
 
-void Target::calculateVelocityDistribution(vector<double> &energy_bins){
+void Target::calculateVelocityDistribution(const vector<double> &energy_bins){
 
 	crossSection->calculateVelocityBins(energy_bins, velocity_distribution_bins, energy_boosted, target_number);
 
@@ -147,7 +149,7 @@ void Target::calculateVelocityDistribution(vector<double> &energy_bins){
 	vDistInfo();
 }
 
-void Target::plot(vector<double> &energy_bins){
+void Target::plot(const vector<double> &energy_bins){
 
 	stringstream filename;
 	
@@ -177,6 +179,13 @@ void Target::plot(vector<double> &energy_bins){
 
 	filename << settings.targetNames[target_number] << "_incident_beam";
 	plotter->plot1DHistogram(energy_bins, incident_beam_histogram, filename.str());
+
+	// Plot mass attenuation
+	filename.str("");
+	filename.clear();
+
+	filename << settings.targetNames[target_number] << "_mass_attenuation";
+	plotter->plot1DHistogram(energy_bins, mass_attenuation_histogram, filename.str());
 }
 
 void Target::calculateIncidentBeam(const vector<double> &energy_bins){
@@ -197,6 +206,13 @@ void Target::calculateIncidentBeam(const vector<double> &energy_bins){
 	}
 };
 
+void Target::calculateIncidentBeam(const vector< vector<double> > &photon_flux_density_histogram){
+
+	for(unsigned int i = 0; i < settings.nbins_e; ++i){
+		incident_beam_histogram[i] = photon_flux_density_histogram[settings.nbins_z - 1][i];
+	}
+}
+
 void Target::calculateZBins(){
 	
 	double delta_z = settings.thickness[target_number]/settings.nbins_z;
@@ -206,21 +222,34 @@ void Target::calculateZBins(){
 	}
 }
 
-void Target::calculateMassAttenuation(vector<double> &energy_bins){
+void Target::calculateMassAttenuation(const vector<double> &energy_bins){
 	
+	stringstream filename;
+
 	switch(settings.mAtt[target_number]){
 		case mAttModel::constant:
+			absorption->const_mass_attenuation(mass_attenuation_histogram, target_number);
 			break;
 		case mAttModel::arb:
+			filename << "mass_attenuation/" << settings.mAttFile[target_number];
+			inputReader->read2ColumnFile(mass_attenuation_file, filename.str()); 
+			absorption->arbitrary_mass_attenuation(energy_bins, mass_attenuation_file, mass_attenuation_histogram);
 			break;
 		case mAttModel::nist:
-			stringstream filename;
 			filename << "mass_attenuation/" << settings.mAttFile[target_number];
 			inputReader->readNIST(mass_attenuation_file, filename.str()); 
-			absorption->arbitrary_mass_attenuation(energy_bins, mass_attenuation_file, mass_attenuation_histogram);
+			absorption->nist_mass_attenuation(energy_bins, mass_attenuation_file, mass_attenuation_histogram, target_number);
 			break;
 	}
 }
+
+void Target::calculateTransmission(const vector<double> energy_bins){
+	
+	absorption->photon_flux_density(crosssection_histogram, mass_attenuation_histogram, z_bins, incident_beam_histogram, photon_flux_density_histogram);
+
+	absorption->resonance_absorption_density(crosssection_histogram, photon_flux_density_histogram, resonance_absorption_density_histogram);
+}
+
 //
 //void Target::setIncidentBeam(double &trans_beam_bins){
 //	for(unsigned int i = 0; i < settings.nbins_e; ++i)
@@ -289,40 +318,6 @@ void Target::calculateMassAttenuation(vector<double> &energy_bins){
 //
 //	cout << "TARGET #" << target_number << ": '" << target_name << "'" << endl;
 //	cout << "INT ALPHA dE dZ = " << absorption << endl;
-//}
-//
-//void Target::plotVelocityDistribution(){
-//
-//	stringstream filename;
-//	filename << PLOT_OUTPUT_DIR << target_name << "_velocity_distribution.pdf";
-//	stringstream canvasname;
-//	canvasname << target_name << "_canvas";
-//	TCanvas *canvas = new TCanvas(canvasname.str().c_str(), target_name.c_str(), 0, 0, 800, 500);
-//	TLegend *legend = new TLegend(V_PLOT_LEGEND_X1, V_PLOT_LEGEND_Y1, V_PLOT_LEGEND_X2, V_PLOT_LEGEND_Y2);
-//
-//	// It is enough to plot the velocity distribution in the binning of one of the excited states, because it is the same for all states of a target.
-//	crossSection->plot_vdist(velocity_bins[0], vdist_bins[0], target_name, canvas, legend, "Velocity Distribution");
-//
-//	legend->Draw();
-//	canvas->SaveAs(filename.str().c_str());
-//	delete canvas;
-//}
-//
-//void Target::plotDopplerShift(vector<double> &energy_bins){
-//
-//	stringstream filename;
-//	filename << PLOT_OUTPUT_DIR << target_name << "_doppler_shift.pdf";
-//	stringstream canvasname;
-//	canvasname << target_name << "_canvas";
-//	TCanvas *canvas = new TCanvas(canvasname.str().c_str(), target_name.c_str(), 0, 0, 800, 500);
-//	TLegend *legend = new TLegend(CS_PLOT_LEGEND_X1, CS_PLOT_LEGEND_Y1, CS_PLOT_LEGEND_X2, CS_PLOT_LEGEND_Y2);
-//
-//	crossSection->plot_dopplershift(energy_bins, crosssection_bins, dopplercs_bins, target_name, canvas, legend, "Doppler-shifted cross section");
-//
-//	legend->Draw();
-//	canvas->SaveAs(filename.str().c_str());
-//	delete canvas;
-//	
 //}
 //
 //void Target::plotMassAttenuation(vector<double> &energy_bins){
@@ -395,7 +390,7 @@ void Target::calculateMassAttenuation(vector<double> &energy_bins){
 //	
 //}
 //
-void Target::write(vector<double> &energy_bins){
+void Target::write(const vector<double> &energy_bins){
 	
 	stringstream filename;
 
@@ -437,6 +432,12 @@ void Target::write(vector<double> &energy_bins){
 	filename << settings.targetNames[target_number] << "_incident_beam";
 	writer->write1DHistogram(incident_beam_histogram, filename.str(), "Beam intensity distribution");
 
+	// Write mass attenuation
+	filename.str("");
+	filename.clear();
+
+	filename << settings.targetNames[target_number] << "_mass_attenuation";
+	writer->write1DHistogram(mass_attenuation_histogram, filename.str(), "Mass attenuation / fm^2 / atom");
 }
 
 void Target::vDistInfo(){

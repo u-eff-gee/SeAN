@@ -16,7 +16,7 @@ public:
 	Writer(){};
 	~Writer(){};
 
-	void write1DHistogram(vector<double> &histogram, string name, string column_name);
+	void write1DHistogram(const vector<double> &histogram, const string name, const string column_name);
 };
 
 #endif

@@ -102,7 +102,7 @@ void Settings::printTarget(unsigned int i){
 	cout << "MASS ATTENUATION:\t";
 	switch(mAtt[i]){
 		case mAttModel::constant:
-			cout << "constant, " << mAttParams[0] << endl;
+			cout << "constant, " << mAttParams[i][0] << endl;
 			break;
 		case mAttModel::nist:
 			cout << "nist, " << mAttFile[i] << endl;

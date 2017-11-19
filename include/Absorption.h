@@ -36,15 +36,18 @@ public:
 	void arbitrary_beam(const vector<double> &energy_bins, vector<double> &incident_beam_histogram, const vector< vector<double> > &incident_beam_file);
 
 	// Mass attenuation calculators
+	void const_mass_attenuation(vector<double> &mass_attenuation_histogram, const unsigned int target_number);
+
+	void nist_mass_attenuation(const vector<double> &energy_bins, vector<double> &mass_attenuation_histogram, const unsigned int target_number);
+
 	void arbitrary_mass_attenuation(const vector<double> &energy_bins, const vector< vector<double> > mass_attenuation_file, vector<double> &mass_attenuation_histogram);
 
-	void photon_flux_density(vector<double> &dopplercs_bins, vector<double> &massattenuation_bins, vector<double> &z_bins, vector<double> &incident_beam_bins, vector<vector<double> > &photon_flux_density_bins);
+	void nist_mass_attenuation(const vector<double> &energy_bins, const vector< vector<double> > mass_attenuation_file, vector<double> &mass_attenuation_histogram, const unsigned int target_number);
 
-	void resonance_absorption_density(vector<double> &dopplercs_bins, vector<vector<double> > &photon_flux_density_bins, vector<vector<double> > &resonance_absorption_density_bins);
+	// Transmission calculators
+	void photon_flux_density(const vector<double> &crosssection_histogram, const vector<double> &mass_attenuation_histogram, const vector<double> &z_bins, const vector<double> &incident_beam_histogram, vector<vector<double> > &photon_flux_density_histogram);
 
-	void plot_massattenuation(vector<double> &energy_bins, vector<double> &massattenuation_bins, string title, TCanvas *canvas, TLegend* legend, string legend_entry);
-
-	void plot_total_massattenuation(string title, TCanvas *canvas, TLegend* legend, string legend_entry);
+	void resonance_absorption_density(const vector<double> &crosssection_histogram, const vector<vector<double> > &photon_flux_density_histogram, vector< vector<double> > &resonance_absorption_density_histogram);
 
 	void plot_photon_flux_density(vector<double> &energy_bins, vector<double> &z_bins, vector<vector<double> > &photon_flux_density_bins, string title, TCanvas *canvas, TLegend* legend, string legend_entry);
 

@@ -16,48 +16,6 @@ using std::endl;
 using std::regex;
 using std::regex_replace;
 
-//void Absorption::read_massattenuation_NIST(vector<double> &energy_bins, vector<double> &massattenuation_bins, string massAttenuation_ID, double mass){
-//	
-//	stringstream filename;
-//	filename << "mass_attenuation" << massAttenuation_ID << ".dat";
-//
-//	string line;
-//	nbins_matt = 0;
-//	ifstream ifile;
-//
-//	ifile.open(filename.str().c_str());	
-//
-//        if(!ifile.is_open()){
-//                cout << "Error: Absorption.cc: read_massattenuation(): File '" << filename.str() << "' not found." << endl;
-//		abort();
-//	}
-//        cout << "> Reading input file '" << filename.str() << "'" << endl;
-//
-//	while(getline(ifile, line)){
-//		if(line.substr(0,1) == COMMENT)
-//			continue;
-//
-//		// Ignore lines with x-ray resonances since they have the same energy value as the previous bins. Those steps can not be interpolated.
-//		if(regex_replace(line.substr(NIST_XRAY, NIST_XRAY_LENGTH), regex("\\s+"), "") != "")
-//			continue;	
-//		
-//		matt[0].push_back(atof(line.substr(NIST_ENERGY, NIST_ENERGY_LENGTH).c_str()));
-//		matt[1].push_back(atof(line.substr(NIST_MU, NIST_MU_LENGTH).c_str()));
-//
-//		++nbins_matt;
-//	}
-//
-//	inter = new ROOT::Math::Interpolator(nbins_matt - 1, ROOT::Math::Interpolation::kCSPLINE);
-//	inter->SetData(nbins_matt - 1, &matt[0][0], &matt[1][0]);
-//
-//	// Conversion from cm2/g to fm2/atom
-//	double conversion_factor = mass*AtomicMassUnitG*1.e26;
-//
-//	for(unsigned int i = 0; i < NBINS; ++i){
-//		massattenuation_bins[i] = conversion_factor*inter->Eval(energy_bins[i]*0.000001);
-//	}
-//}
-
 void Absorption::const_beam(const vector<double> &energy_bins, vector<double> &incident_beam_histogram){
 
 	for(unsigned int i = 0; i < settings.nbins_e; ++i)
@@ -86,6 +44,13 @@ void Absorption::arbitrary_beam(const vector<double> &energy_bins, vector<double
 	}
 }
 
+void Absorption::const_mass_attenuation(vector<double> &mass_attenuation_histogram, const unsigned int target_number){
+
+	for(unsigned int i = 0; i < mass_attenuation_histogram.size(); ++i){
+		mass_attenuation_histogram[i] = settings.mAttParams[target_number][0];
+	}
+}
+
 void Absorption::arbitrary_mass_attenuation(const vector<double> &energy_bins, const vector< vector<double> > mass_attenuation_file, vector<double> &mass_attenuation_histogram){
 
 	// Interpolate data from file	
@@ -98,52 +63,43 @@ void Absorption::arbitrary_mass_attenuation(const vector<double> &energy_bins, c
 	}
 }
 
-//void Absorption::photon_flux_density(vector<double> &dopplercs_bins, vector<double> &massattenuation_bins, vector<double> &z_bins, vector<double> &incident_beam_bins, vector<vector<double> > &photon_flux_density_bins){
-//
-//	//#pragma omp parallel for
-//	for(unsigned int i = 0; i < NBINS; ++i){
-//		for(unsigned int j = 0; j < NBINS_Z; ++j){
-//			photon_flux_density_bins[i][j] = incident_beam_bins[i]*exp(-(dopplercs_bins[i] + massattenuation_bins[i])*z_bins[j]);
-//		}
-//	}
-//}
-//
-//void Absorption::resonance_absorption_density(vector<double> &dopplercs_bins, vector<vector<double> > &photon_flux_density_bins, vector<vector<double> > &resonance_absorption_density_bins){
-//
-//	//#pragma omp parallel for
-//	for(unsigned int i = 0; i < NBINS; ++i){
-//		for(unsigned int j = 0; j < NBINS_Z; ++j){
-//			resonance_absorption_density_bins[i][j] = dopplercs_bins[i]*photon_flux_density_bins[i][j];
-//		}
-//	}
-//}
-//
-//void Absorption::plot_massattenuation(vector<double> &energy_bins, vector<double> &massattenuation_bins, string title, TCanvas *canvas, TLegend* legend, string legend_entry){
-//
-//	TGraph *graph = new TGraph(NBINS, &energy_bins[0], &massattenuation_bins[0]);
-//	graph->SetName(title.c_str());
-//	graph->SetTitle(title.c_str());
-//	graph->GetXaxis()->SetTitle("Energy / eV");
-//	graph->GetYaxis()->SetTitle("#mu / fm^2/atom");
-//	graph->Draw();
-//
-//	legend->AddEntry(graph->GetName(), legend_entry.c_str(), "l");
-//}
-//
-//void Absorption::plot_total_massattenuation(string title, TCanvas *canvas, TLegend* legend, string legend_entry){
-//
-//	TGraph *graph = new TGraph((Int_t) nbins_matt - 1, &matt[0][0], &matt[1][0]);
-//	
-//	graph->SetName(title.c_str());
-//	graph->SetTitle(title.c_str());
-//	graph->GetXaxis()->SetTitle("Energy / MeV");
-//	graph->GetYaxis()->SetTitle("#mu / cm^2/g");
-//	graph->Draw();
-//
-//	legend->AddEntry(graph->GetName(), legend_entry.c_str(), "l");
-//
-//}
-//
+void Absorption::nist_mass_attenuation(const vector<double> &energy_bins, const vector< vector<double> > mass_attenuation_file, vector<double> &mass_attenuation_histogram, const unsigned int target_number){
+
+	// Conversion from cm2/g to fm2/atom
+	double mu_conversion_factor = settings.mass[target_number]*AtomicMassUnitG*1.0e26;
+	// Conversion from eV to MeV
+	double energy_conversion_factor = 1.e-6;
+
+	// Interpolate data from file	
+	ROOT::Math::Interpolator inter((unsigned int) mass_attenuation_file[0].size(), ROOT::Math::Interpolation::kCSPLINE);
+	inter.SetData((unsigned int) mass_attenuation_file[0].size(), &mass_attenuation_file[0][0], &mass_attenuation_file[1][0]);
+
+	// Evaluate at the given energy bins (note the conversion from MeV to eV)
+	for(unsigned int i = 0; i < mass_attenuation_histogram.size(); ++i){
+		mass_attenuation_histogram[i] = mu_conversion_factor*inter.Eval(energy_bins[i]*energy_conversion_factor);
+	}
+}
+
+void Absorption::photon_flux_density(const vector<double> &crosssection_histogram, const vector<double> &mass_attenuation_histogram, const vector<double> &z_bins, const vector<double> &incident_beam_histogram, vector<vector<double> > &photon_flux_density_histogram){
+
+	#pragma omp parallel for
+	for(unsigned int i = 0; i < settings.nbins_z; ++i){
+		for(unsigned int j = 0; j < settings.nbins_e; ++j){
+			photon_flux_density_histogram[i][j] = incident_beam_histogram[j]*exp(-(crosssection_histogram[j] + mass_attenuation_histogram[j])*z_bins[i]);
+		}
+	}
+}
+
+void Absorption::resonance_absorption_density(const vector<double> &crosssection_histogram, const vector<vector<double> > &photon_flux_density_histogram, vector< vector<double> > &resonance_absorption_density_histogram){
+
+	#pragma omp parallel for
+	for(unsigned int i = 0; i < settings.nbins_z; ++i){
+		for(unsigned int j = 0; j < settings.nbins_e; ++j){
+			resonance_absorption_density_histogram[i][j] = crosssection_histogram[j]*photon_flux_density_histogram[i][j];
+		}
+	}
+}
+
 //void Absorption::plot_photon_flux_density(vector<double> &energy_bins, vector<double> &z_bins, vector<vector<double> > &photon_flux_density_bins, string title, TCanvas *canvas, TLegend* legend, string legend_entry){
 //	
 //	// Saveguard for the number of bins used for plotting phi. TGraph2D uses up a lot of memory if the dimension of the matrix for phi is too large.

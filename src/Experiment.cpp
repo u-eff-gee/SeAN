@@ -57,33 +57,13 @@ void Experiment::transmission(){
 	for(unsigned int i = 0; i < ntargets; ++i){
 		// The incident beam on the first target is user-defined, the rest is determined by the transmission of the previous target
 		if(i == 0){
-			targets[i]->calculateIncidentBeam(energy_bins);
+			targets[0]->calculateIncidentBeam(energy_bins);
+			targets[0]->calculateTransmission(energy_bins);
 		} else{
-			;
+			targets[i]->calculateIncidentBeam(targets[i-1]->getPhotonFluxDensity());
+			targets[i]->calculateTransmission(energy_bins);
 		}
 	}
-	//targets[0]->calculateIncidentBeam(energy_bins, beam_ID, beamParams);
-//	for(unsigned int i = 0; i < targets.size(); ++i){
-//		targets[i]->calculateMassAttenuation(energy_bins);
-//		targets[i]->calculateZBins();
-//		if(i > 0){
-//			targets[i]->setIncidentBeam(targets[i-1]->getTransmittedBeam());
-//		}
-//		targets[i]->calculatePhotonFluxDensity();
-//		targets[i]->calculateTransmittedBeam();
-//		targets[i]->calculateResonanceAbsorptionDensity();
-//		targets[i]->calculateAbsorption(energy_bins);
-//
-//		if(settings.plot){
-//			targets[i]->plotMassAttenuation(energy_bins);
-//			targets[i]->plotMu();
-//			targets[i]->plotPhotonFluxDensity(energy_bins);
-//			targets[i]->plotResonanceAbsorptionDensity(energy_bins);
-//		}
-//		if(settings.write){
-//			targets[i]->write(energy_bins);
-//		}
-//	}
 }
 
 void Experiment::plot(){

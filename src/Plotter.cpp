@@ -8,7 +8,7 @@
 
 using std::stringstream;
 
-void Plotter::plot1DHistogram(vector<double> &bins, vector<double> &histogram, string name){
+void Plotter::plot1DHistogram(const vector<double> &bins, const vector<double> &histogram, const string name){
 	stringstream filename;
 	filename << PLOT_OUTPUT_DIR << name << ".pdf";
 	stringstream canvasname;
@@ -27,7 +27,7 @@ void Plotter::plot1DHistogram(vector<double> &bins, vector<double> &histogram, s
 	delete canvas;
 }
 
-void Plotter::plotMultiple1DHistograms(vector<double> &bins, vector< vector<double> > &histograms, string name){
+void Plotter::plotMultiple1DHistograms(const vector<double> &bins, const vector< vector<double> > &histograms, const string name){
 	stringstream filename;
 	filename << PLOT_OUTPUT_DIR << name << ".pdf";
 	stringstream canvasname;
@@ -48,7 +48,7 @@ void Plotter::plotMultiple1DHistograms(vector<double> &bins, vector< vector<doub
 	delete canvas;
 }
 
-void Plotter::plotMultiple1DHistogramsAndSum(vector<double> &bins, vector< vector<double> > &histograms, string name){
+void Plotter::plotMultiple1DHistogramsAndSum(const vector<double> &bins, const vector< vector<double> > &histograms, const string name){
 	vector<double> sum(bins.size(), 0.);
 
 	for(unsigned int i = 0; i < histograms.size(); ++i){

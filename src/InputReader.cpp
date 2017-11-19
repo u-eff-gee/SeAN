@@ -236,23 +236,24 @@ void InputReader::readFile(Settings &settings){
 
 			// Read mass attenuation
 			case 8:
+				settings.mAttParams.push_back(vector<double>());
 				getline(stream, value, DELIMITER);
 				if(value == "const"){
 					settings.mAtt.push_back(mAttModel::constant);
 					getline(stream, value, DELIMITER);
-					settings.mAttParams.push_back(atof(value.c_str()));
+					settings.mAttParams[ntarget].push_back(atof(value.c_str()));
 					settings.mAttFile.push_back("");
 				}
 				else if(value == "nist"){
 					settings.mAtt.push_back(mAttModel::nist);
 					getline(stream, value, DELIMITER);
-					settings.mAttParams.push_back(0.);
+					settings.mAttParams[ntarget].push_back(0.);
 					settings.mAttFile.push_back(regex_replace(value, regex("\\s+"), ""));
 				}
 				else if(value == "arb"){
 					settings.mAtt.push_back(mAttModel::arb);
 					getline(stream, value, DELIMITER);
-					settings.mAttParams.push_back(0.);
+					settings.mAttParams[ntarget].push_back(0.);
 					settings.mAttFile.push_back(regex_replace(value, regex("\\s+"), ""));
 				}
 				else{

@@ -64,22 +64,22 @@ public:
 	~Target();
 
 	// The order of the following functions represents the order in which they are called in a normal calculation. Indented functions are called by the function above.
-	void initialize(vector<double> &energy_bins);
+	void initialize(const vector<double> &energy_bins);
 		// Function to modify resonance energies due to Doppler shift
 		void boostEnergies();
-		void calculateCrossSectionAtRest(vector<double> &energy_bins);
-		void calculateVelocityDistribution(vector<double> &energy_bins);
-		void calculateMassAttenuation(vector<double> &energy_bins);
-	void calculateCrossSection(vector<double> &energy_bins);
+		void calculateCrossSectionAtRest(const vector<double> &energy_bins);
+		void calculateVelocityDistribution(const vector<double> &energy_bins);
+		void calculateMassAttenuation(const vector<double> &energy_bins);
+	void calculateCrossSection(const vector<double> &energy_bins);
 	void calculateIncidentBeam(const vector<double> &energy_bins);
-	void calculateIncidentBeam(vector<vector<double> > &photon_flux_density_histogram);
-
+	void calculateIncidentBeam(const vector<vector<double> > &photon_flux_density_histogram);
+	void calculateTransmission(const vector<double> energy_bins);
 
 	// Function to print information to the command line
 	void print();
 
 	// Function to plot histograms
-	void plot(vector<double> &energy_bins);
+	void plot(const vector<double> &energy_bins);
 
 	// Functions to calculate histograms
 
@@ -91,11 +91,11 @@ public:
 	void calculateAbsorption(vector<double> &energy_bins);
 
 	// Functions to write histograms to file
-	void write(vector<double> &energy_bins);
+	void write(const vector<double> &energy_bins);
 
-	// Function to set the incident beam and return the transmitted beam
-	double& getTransmittedBeam(){ return transmitted_beam_histogram[0]; };
-	void setIncidentBeam(double &trans_beam_bins);
+	// Function to return the photon flux density. The incident beam on the subsequent target will be read off from this.
+	
+	vector< vector<double> >& getPhotonFluxDensity(){ return photon_flux_density_histogram; };
 
 	// Functions to integrate over 2D histograms
 	double integrateEZHistogram(vector<double> &energy_bins, vector<double> &z_bins, vector<vector<double> > &ezhist);

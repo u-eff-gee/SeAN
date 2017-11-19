@@ -15,11 +15,11 @@ public:
 	Plotter(){};
 	~Plotter(){};
 
-	void plot1DHistogram(vector<double> &bins, vector<double> &histogram, string name);
+	void plot1DHistogram(const vector<double> &bins, const vector<double> &histogram, const string name);
 
-	void plotMultiple1DHistograms(vector<double> &bins, vector< vector<double> > &histograms, string name);
+	void plotMultiple1DHistograms(const vector<double> &bins, const vector< vector<double> > &histograms, const string name);
 
-	void plotMultiple1DHistogramsAndSum(vector<double> &bins, vector< vector<double> > &histograms, string name);
+	void plotMultiple1DHistogramsAndSum(const vector<double> &bins, const vector< vector<double> > &histograms, string name);
 };
 
 #endif

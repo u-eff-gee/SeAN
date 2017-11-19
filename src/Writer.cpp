@@ -11,7 +11,7 @@ using std::cout;
 using std::endl;
 using std::scientific;
 
-void Writer::write1DHistogram(vector<double> &histogram, string name, string column_name){
+void Writer::write1DHistogram(const vector<double> &histogram, const string name, const string column_name){
 
 	stringstream filename;
 	filename << TXT_OUTPUT_DIR << name << ".txt";
