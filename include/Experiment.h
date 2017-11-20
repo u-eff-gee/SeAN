@@ -24,9 +24,11 @@ public:
 	void initialize();
 	void crossSections();
 	void transmission();
+	void resonant_scattering();
 
 	// Functions for output
 	void plot();
+	void print_results();
 	void write();
 
 private:

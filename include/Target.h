@@ -11,6 +11,7 @@
 #include "InputReader.h"
 #include "Plotter.h"
 #include "Writer.h"
+#include "Integrator.h"
 
 using std::string;
 using std::vector;
@@ -51,12 +52,14 @@ private:
 	InputReader *inputReader;
 	Plotter *plotter;
 	Writer *writer;
+	Integrator *integrator;
 
+	double n_resonantly_scattered;
 	unsigned int target_number;
 
 public:	
-	Target(unsigned int ne, unsigned int nz, string name, unsigned int number);
-	Target(unsigned int n, Settings &s){ 
+	//Target(unsigned int ne, unsigned int nz, string name, unsigned int number);
+	Target(unsigned int n, Settings &s): n_resonantly_scattered(0.){ 
 		settings = s; 
 		target_number = n;
 	};
@@ -74,9 +77,11 @@ public:
 	void calculateIncidentBeam(const vector<double> &energy_bins);
 	void calculateIncidentBeam(const vector<vector<double> > &photon_flux_density_histogram);
 	void calculateTransmission(const vector<double> energy_bins);
+	void calculateResonantScattering(const vector<double> energy_bins);
 
 	// Function to print information to the command line
 	void print();
+	void print_results();
 
 	// Function to plot histograms
 	void plot(const vector<double> &energy_bins);

@@ -23,18 +23,6 @@ public:
 
 
 private:
-	// Settings for the SeAN input file
-	unsigned int N_EXPERIMENT_SETTINGS = 4; 
-	unsigned int N_TARGET_SETTINGS = 11;
-	char DELIMITER = ',';
-
-	// Settings for the directories
-	string V_DIR = "velocity_distribution/";
-	string MU_DIR = "mass_attenuation/";
-	string BEAM_DIR = "beam/";
-	string MASS_DIR = "atomic_mass/";
-	string AME_FILE_NAME = "mass16.txt";
-
 	// Coordinates in AME file
 const 	unsigned int AME_HEADER_LENGTH = 38;
 const 	unsigned int AME_MASS_NUMBER = 16;
@@ -49,7 +37,6 @@ const 	unsigned int NIST_ENERGY = 3;
 const 	unsigned int NIST_ENERGY_LENGTH = 11;
 const 	unsigned int NIST_MU = 16;
 const 	unsigned int NIST_MU_LENGTH = 9;
-
 };
 
 #endif

@@ -14,7 +14,7 @@ using std::scientific;
 void Writer::write1DHistogram(const vector<double> &histogram, const string name, const string column_name){
 
 	stringstream filename;
-	filename << TXT_OUTPUT_DIR << name << ".txt";
+	filename << "output/" << name << ".txt";
 
 	ofstream ofile(filename.str());
 
@@ -29,5 +29,31 @@ void Writer::write1DHistogram(const vector<double> &histogram, const string name
 	ofile << COMMENT << " " << column_name << endl;
 	for(unsigned int i = 0; i < histogram.size(); ++i){
 		ofile << scientific << histogram[i] << endl;
+	}
+}
+
+void Writer::write2DHistogram(const vector<vector<double> > &histogram, const string name, const string line_name, const string column_name){
+
+	stringstream filename;
+	filename << "output/" << name << ".txt";
+
+	ofstream ofile(filename.str());
+
+        if(!ofile.is_open()){
+                cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
+		cout << " write2DHistogram(): File '" << filename.str() << "' could not be opened." << endl;
+		abort();
+	}
+        cout << "> Writing output file '" << filename.str() << "'" << endl;
+
+	ofile.precision(8);
+	ofile << COMMENT << " Lines   : " << line_name << endl;
+	ofile << COMMENT << " Columns : " << column_name << endl;
+
+	for(unsigned int i = 0; i < histogram.size(); ++i){
+		for(unsigned int j = 0; j < histogram.size(); ++j){
+			ofile << scientific << histogram[i][j] << ", ";
+		}
+		ofile << endl;
 	}
 }

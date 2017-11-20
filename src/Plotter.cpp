@@ -3,6 +3,8 @@
 #include "TCanvas.h"
 #include "TLegend.h"
 #include "TGraph.h"
+#include "TGraph2D.h"
+#include "TStyle.h"
 
 #include <sstream>
 
@@ -76,4 +78,37 @@ void Plotter::plotMultiple1DHistogramsAndSum(const vector<double> &bins, const v
 
 	canvas->SaveAs(filename.str().c_str());
 	delete canvas;
+}
+
+void Plotter::plot2DHistogram(const vector<double> &bins1, const vector<double> &bins2, const vector< vector<double> > &histogram, const string name){
+
+	stringstream filename;
+	filename << PLOT_OUTPUT_DIR << name << ".pdf";
+	stringstream canvasname;
+	canvasname << name << "_canvas";
+
+	unsigned int n1 = (unsigned int) bins1.size();
+	unsigned int n2 = (unsigned int) bins2.size();
+
+	TCanvas *canvas = new TCanvas(canvasname.str().c_str(), name.c_str(), 0, 0, 800, 500);
+
+	TGraph2D *graph = new TGraph2D(((int) n1)*((int) n2));	
+	int npoint = 0;
+	for(unsigned int i = 0; i < n1; ++i){
+		for(unsigned int j = 0; j < n2; ++j){
+			graph->SetPoint(npoint, bins1[i], bins2[j], histogram[i][j]);
+			++npoint;
+		}
+	}
+
+	graph->SetTitle(name.c_str());
+	gStyle->SetPalette(55);
+	graph->Draw("surf1");
+
+	canvas->SetTheta(45.);
+	canvas->SetPhi(250.);
+
+	canvas->SaveAs(filename.str().c_str());
+	delete canvas;
+	delete graph;
 }

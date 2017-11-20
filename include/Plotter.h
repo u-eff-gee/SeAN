@@ -19,7 +19,9 @@ public:
 
 	void plotMultiple1DHistograms(const vector<double> &bins, const vector< vector<double> > &histograms, const string name);
 
-	void plotMultiple1DHistogramsAndSum(const vector<double> &bins, const vector< vector<double> > &histograms, string name);
+	void plotMultiple1DHistogramsAndSum(const vector<double> &bins, const vector< vector<double> > &histograms, const string name);
+
+	void plot2DHistogram(const vector<double> &bins1, const vector<double> &bins2, const vector< vector<double> > &histogram, const string name);
 };
 
 #endif

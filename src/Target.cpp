@@ -140,7 +140,7 @@ void Target::calculateVelocityDistribution(const vector<double> &energy_bins){
 
 		case vDistModel::arb:
 			stringstream filename;
-			filename << "velocity_distribution/" << settings.vDistFile[target_number];
+			filename << VELOCITY_DISTRIBUTION_DIR << settings.vDistFile[target_number];
 			inputReader->read2ColumnFile(velocity_distribution_file, filename.str());
 			crossSection->arbitrary_velocity_distribution(velocity_distribution_bins, velocity_distribution_histogram, velocity_distribution_file, energy_boosted, target_number);
 			break;
@@ -186,6 +186,20 @@ void Target::plot(const vector<double> &energy_bins){
 
 	filename << settings.targetNames[target_number] << "_mass_attenuation";
 	plotter->plot1DHistogram(energy_bins, mass_attenuation_histogram, filename.str());
+
+	// Plot photon flux density
+	filename.str("");
+	filename.clear();
+
+	filename << settings.targetNames[target_number] << "_photon_flux_density";
+	plotter->plot2DHistogram(z_bins, energy_bins, photon_flux_density_histogram, filename.str());
+	
+	// Plot resonance absorptions density
+	filename.str("");
+	filename.clear();
+
+	filename << settings.targetNames[target_number] << "_resonance_absorption_density";
+	plotter->plot2DHistogram(z_bins, energy_bins, resonance_absorption_density_histogram, filename.str());
 }
 
 void Target::calculateIncidentBeam(const vector<double> &energy_bins){
@@ -199,7 +213,7 @@ void Target::calculateIncidentBeam(const vector<double> &energy_bins){
 			break;
 		case incidentBeamModel::arb:
 			stringstream filename;
-			filename << "beam/" << settings.incidentBeamFile;
+			filename << BEAM_DIR << settings.incidentBeamFile;
 			inputReader->read2ColumnFile(incident_beam_file, filename.str());
 			absorption->arbitrary_beam(energy_bins, incident_beam_histogram, incident_beam_file);
 			break;
@@ -231,12 +245,12 @@ void Target::calculateMassAttenuation(const vector<double> &energy_bins){
 			absorption->const_mass_attenuation(mass_attenuation_histogram, target_number);
 			break;
 		case mAttModel::arb:
-			filename << "mass_attenuation/" << settings.mAttFile[target_number];
+			filename << MU_DIR << settings.mAttFile[target_number];
 			inputReader->read2ColumnFile(mass_attenuation_file, filename.str()); 
 			absorption->arbitrary_mass_attenuation(energy_bins, mass_attenuation_file, mass_attenuation_histogram);
 			break;
 		case mAttModel::nist:
-			filename << "mass_attenuation/" << settings.mAttFile[target_number];
+			filename << MU_DIR << settings.mAttFile[target_number];
 			inputReader->readNIST(mass_attenuation_file, filename.str()); 
 			absorption->nist_mass_attenuation(energy_bins, mass_attenuation_file, mass_attenuation_histogram, target_number);
 			break;
@@ -250,146 +264,6 @@ void Target::calculateTransmission(const vector<double> energy_bins){
 	absorption->resonance_absorption_density(crosssection_histogram, photon_flux_density_histogram, resonance_absorption_density_histogram);
 }
 
-//
-//void Target::setIncidentBeam(double &trans_beam_bins){
-//	for(unsigned int i = 0; i < settings.nbins_e; ++i)
-//		incident_beam_bins[i] = (&trans_beam_bins)[i];
-//}
-//
-//void Target::calculatePhotonFluxDensity(){
-//	absorption->photon_flux_density(dopplercs_bins, massattenuation_bins, z_bins, incident_beam_bins, photon_flux_density_bins);
-//}
-//
-//void Target::calculateTransmittedBeam(){
-//	for(unsigned int i = 0; i < settings.nbins_e; ++i)
-//		transmitted_beam_bins[i] = photon_flux_density_bins[i][NBINS_Z - 1];
-//}
-//
-//void Target::calculateResonanceAbsorptionDensity(){
-//	absorption->resonance_absorption_density(dopplercs_bins, photon_flux_density_bins, resonance_absorption_density_bins);
-//}
-//
-//double Target::integrateEZHistogram(vector<double> &energy_bins, vector<double> &z_bins, vector<vector<double> > &ezhist){
-//
-//	// Area of a bin in 2D plane
-//	double bin_area = (energy_bins[1] - energy_bins[0])*(z_bins[1] - z_bins[0]);
-//
-//	// Crude implementation of the Riemann integral as a sum of bin contents times their dimension in energy- and z-direction. Since there are only settings.nbins_e-1 spaces between settings.nbins_e bins, leave out the last bin in each loop.
-//	double integral = 0.;
-//
-//	#pragma omp parallel for reduction (+:integral)
-//	for(unsigned int i = 0; i < settings.nbins_e - 1; ++i){
-//		for(unsigned int j = 0; j < NBINS_Z - 1; ++j){
-//			integral += ezhist[i][j]; 
-//		}
-//	}
-//
-//	// Implementation that starts at the 1st and not the 0th bin to check the validity of this approximation
-////	double integral = 0.;
-////	for(int i = 1; i < settings.nbins_e; ++i){
-////		for(int j = 1; j < NBINS_Z; ++j){
-////			integral += bin_area*ezhist[i][j]; 
-////		}
-////	}
-//
-//	return bin_area*integral;
-//}
-//
-//double Target::integrateEEHistogram(vector<double> &energy_bins, vector<vector<double> > &eehist){
-//
-//	// Area of a bin in 2D plane
-//	double bin_area = (energy_bins[1] - energy_bins[0])*(energy_bins[1] - energy_bins[0]);
-//
-//	// Crude implementation of the Riemann integral as a sum of bin contents times their dimension in energy- and z-direction. Since there are only settings.nbins_e-1 spaces between settings.nbins_e bins, leave out the last bin in each loop.
-//	double integral = 0.;
-//
-//	for(unsigned int i = 0; i < settings.nbins_e - 1; ++i){
-//		for(unsigned int j = 0; j < settings.nbins_e - 1; ++j){
-//			integral += bin_area*eehist[i][j]; 
-//		}
-//	}
-//
-//	return integral;
-//}
-//
-//void Target::calculateAbsorption(vector<double> &energy_bins){
-//
-//	double absorption = integrateEZHistogram(energy_bins, z_bins, resonance_absorption_density_bins);
-//
-//	cout << "TARGET #" << target_number << ": '" << target_name << "'" << endl;
-//	cout << "INT ALPHA dE dZ = " << absorption << endl;
-//}
-//
-//void Target::plotMassAttenuation(vector<double> &energy_bins){
-//
-//	stringstream filename;
-//	filename << PLOT_OUTPUT_DIR << target_name << "_mass_attenuation.pdf";
-//	stringstream canvasname;
-//	canvasname << target_name << "_canvas";
-//	TCanvas *canvas = new TCanvas(canvasname.str().c_str(), target_name.c_str(), 0, 0, 800, 500);
-//	TLegend *legend = new TLegend(MU_PLOT_LEGEND_X1, MU_PLOT_LEGEND_Y1, MU_PLOT_LEGEND_X2, MU_PLOT_LEGEND_Y2);
-//
-//	absorption->plot_massattenuation(energy_bins, massattenuation_bins, target_name, canvas, legend, "Mass attenuation coefficient");
-//
-//	legend->Draw();
-//	canvas->SaveAs(filename.str().c_str());
-//	delete canvas;
-//	
-//}
-//
-//void Target::plotMu(){
-//
-//	stringstream filename;
-//	filename << PLOT_OUTPUT_DIR << target_name << "_mu.pdf";
-//	stringstream canvasname;
-//	canvasname << target_name << "_canvas";
-//	TCanvas *canvas = new TCanvas(canvasname.str().c_str(), target_name.c_str(), 0, 0, 800, 500);
-//	TLegend *legend = new TLegend(MU_PLOT_LEGEND_X1, MU_PLOT_LEGEND_Y1, MU_PLOT_LEGEND_X2, MU_PLOT_LEGEND_Y2);
-//
-//	canvas->SetLogx();
-//	canvas->SetLogy();
-//
-//	absorption->plot_total_massattenuation(target_name, canvas, legend, "Mass attenuation #mu");
-//
-//	legend->Draw();
-//	canvas->SaveAs(filename.str().c_str());
-//	delete canvas;
-//	
-//}
-//
-//void Target::plotPhotonFluxDensity(vector<double> &energy_bins){
-//
-//	stringstream filename;
-//	filename << PLOT_OUTPUT_DIR << target_name << "_phi.pdf";
-//	stringstream canvasname;
-//	canvasname << target_name << "_canvas";
-//	TCanvas *canvas = new TCanvas(canvasname.str().c_str(), target_name.c_str(), 0, 0, 800, 500);
-//	TLegend *legend = new TLegend(MU_PLOT_LEGEND_X1, MU_PLOT_LEGEND_Y1, MU_PLOT_LEGEND_X2, MU_PLOT_LEGEND_Y2);
-//
-//	absorption->plot_photon_flux_density(energy_bins, z_bins, photon_flux_density_bins, target_name, canvas, legend, "Photon flux density #Phi");
-//
-//	legend->Draw();
-//	canvas->SaveAs(filename.str().c_str());
-//	delete canvas;
-//}
-//
-//void Target::plotResonanceAbsorptionDensity(vector<double> &energy_bins){
-//
-//	stringstream filename;
-//	filename << PLOT_OUTPUT_DIR << target_name << "_alpha.pdf";
-//	stringstream canvasname;
-//	canvasname << target_name << "_canvas";
-//	TCanvas *canvas = new TCanvas(canvasname.str().c_str(), target_name.c_str(), 0, 0, 800, 500);
-//	TLegend *legend = new TLegend(MU_PLOT_LEGEND_X1, MU_PLOT_LEGEND_Y1, MU_PLOT_LEGEND_X2, MU_PLOT_LEGEND_Y2);
-//
-//	absorption->plot_resonance_absorption_density(energy_bins, z_bins, resonance_absorption_density_bins, target_name, canvas, legend, "Resonance absorption density #alpha");
-//
-//	legend->Draw();
-//	canvas->SaveAs(filename.str().c_str());
-//	delete canvas;
-//	
-//}
-//
 void Target::write(const vector<double> &energy_bins){
 	
 	stringstream filename;
@@ -438,6 +312,20 @@ void Target::write(const vector<double> &energy_bins){
 
 	filename << settings.targetNames[target_number] << "_mass_attenuation";
 	writer->write1DHistogram(mass_attenuation_histogram, filename.str(), "Mass attenuation / fm^2 / atom");
+	
+	// Write photon flux density
+	filename.str("");
+	filename.clear();
+
+	filename << settings.targetNames[target_number] << "_photon_flux_density";
+	writer->write2DHistogram(photon_flux_density_histogram, filename.str(), "Phi (z, E = const)", "Phi (z = const, E)");
+	
+	// Write resonance absorption density
+	filename.str("");
+	filename.clear();
+
+	filename << settings.targetNames[target_number] << "_resonance_absorption_density";
+	writer->write2DHistogram(resonance_absorption_density_histogram, filename.str(), "Alpha (z, E = const)", "Alpha (z = const, E)");
 }
 
 void Target::vDistInfo(){
@@ -470,4 +358,14 @@ void Target::vDistInfo(){
 		vdist_norm.push_back(fabs(norm));
 		vdist_centroid.push_back((unsigned int) (weightedsum/sum));
 	}
+}
+
+void Target::calculateResonantScattering(const vector<double> energy_bins){
+
+	n_resonantly_scattered = integrator->integrate2DHistogram(z_bins, energy_bins, resonance_absorption_density_histogram);
+
+}
+
+void Target::print_results(){
+	cout << settings.targetNames[target_number] << "\t" << n_resonantly_scattered << endl;
 }

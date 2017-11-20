@@ -66,6 +66,28 @@ void Experiment::transmission(){
 	}
 }
 
+void Experiment::resonant_scattering(){
+
+	unsigned int ntargets = (unsigned int) settings.targetNames.size();	
+
+	for(unsigned int i = 0; i < ntargets; ++i){
+		targets[i]->calculateResonantScattering(energy_bins);
+	}
+}
+
+void Experiment::print_results(){
+
+	unsigned int ntargets = (unsigned int) settings.targetNames.size();	
+
+	cout << ">>> SeAN RESULTS" << endl;
+	cout << settings.HORIZONTAL_LINE << endl;
+	cout << "TARGET NAME\tRESONANT SCATTERING" << endl;
+
+	for(unsigned int i = 0; i < ntargets; ++i){
+		targets[i]->print_results();
+	}
+}
+
 void Experiment::plot(){
 
 	unsigned int ntargets = (unsigned int) settings.targetNames.size();	
