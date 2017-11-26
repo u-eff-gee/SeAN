@@ -2,7 +2,9 @@
 
 \usepackage{cite}
 \usepackage{hyperref}
+\usepackage{amsmath}
 \usepackage{mathtools}
+\usepackage{bbold}
 
 \begin{document}
 \title{SeAN, Self-Absorption Numerical \\ Theoretical background}
@@ -26,6 +28,124 @@ One of the first introductions into the formalism was given by F.R. Metzger in 1
 \newpage
 
 \section{Theory}
+
+\section{Photoabsorption cross section}
+Photoabsorption in this context means the absorption of a photon by an atomic nucleus, causing an excitation of the nucleus. A special focus in the derivation of the absorption cross section will be on the inclusion of effects of the presence of the nucleus inside some system of atoms. The energy scales of nuclear excitations and excitations of, for example, a crystal lattice, differ by about a factor of $10^6$. Nevertheless, as will become clear in the following, the binding in a system of atoms can have an impact on a measurement of nuclear observables.
+%The separation of scales will be used in several cases where expressions can be simplified.
+
+The discussion is based on the article "Capture of Neutrons by Atoms in a Crystal" by Willis E. Lamb \cite{Lam39}. 
+Although Lamb discusses the influence of atomic binding on the absorption of neutrons in particular, the formalism is sufficiently general to allow for the description of photoabsorption as well. In the following text, the notation was sometimes adapted to fit this application or to better illustrate the meaning of variables.
+
+In Ref. \cite{Lam39}, Lamb introduces the probability $W$ for the capture of a projectile particle with the momentum $\mathbf{p}$ by a nucleus $A$ and the subsequent emission of another particle with momentum $\mathbf{k}$ to form a nucleus $B$:
+
+\begin{equation}
+\label{absorption_general}
+W(A, \alpha_s, B, \beta_s) = \left| \sum_{n_s} \frac{\langle B, \beta_s, \mathbf{k} | H | C, n_s \rangle \langle C, n_s | H | A, \alpha_s, \mathbf{p} \rangle }{E - E_0 + E(n_s) - E(\alpha_s) + i/2 \Gamma(n_s)} \right| ^2
+\end{equation}
+
+The transition from nucleus $A$ to $B$ is assumed to proceed via an intermediate nucleus $C$. 
+Furthermore, the expression also accounts for the binding of the atoms in a multi-atom system (in the following only called 'the system'). 
+The system goes from the initial state $\alpha_s$ to the final state $\beta_s$ via intermediate states $n_s$, where the label $s$ indicates a possible degeneracy of these states. 
+The transitions are mediated by an interaction Hamiltonian $H$.
+In the denominator, the energy $E$ is the kinetic energy of the projectile, $E_0$ is the resonance energy at rest and neglecting the recoil of the capturing nucleus, and $E(\alpha_s)$ and $E(n_s)$ are the excitation energies of the states of the system by which the reaction proceeds.
+Finally, $\Gamma(n_s)$ is the width of the excited state $| C, n_s \rangle$, which is related to its half-life $\tau(n_s)$ like:
+
+\begin{equation}
+\label{gamma_tau}
+	\tau \cdot \Gamma = \hbar
+\end{equation}
+
+A sum is taken over all intermediate states of the system $n_s$ to account for the fact that there is often a quasi-continuum of such states available. On the contrary, no sum is taken over the intermediate nuclear states $C$ since the absorption on an isolated state is to be studied.
+The matrix elements
+
+\begin{equation}
+\label{me_to_intermediate}
+	\langle C, n_s | H | A, \alpha_s, \mathbf{p} \rangle
+\end{equation}
+
+and
+
+\begin{equation}
+\label{me_to_final}
+	\langle B, \beta_s, \mathbf{k} | H | C, n_s \rangle
+\end{equation}
+
+describe the excitation of the system and the nucleus from the initial state $| A, \alpha_s \rangle$ to an intermediate state $| C, n_s \rangle$, and the de-excitation to the final state $| B, \beta_s \rangle$.
+
+It is assumed that the interaction consists of an interaction of the nucleus, which is abbreviated as a nuclear matrix element $M^{\mathrm{nucl}}$ and a momentum transfer to the system. 
+A momentum transfer is executed by acting with the operator
+
+\begin{equation}
+	\hat{O} = \exp{\left(i \mathbf{p} \mathbf{x} / \hbar\right)}
+\end{equation}
+
+on the wave function. Here, $\mathbf{p}$ and $\mathbf{x}$ denote the transveral momentum and the position operator.
+Using this separation between the interaction with the nucleus and the system, the matrix elements in Eq. \ref{me_to_intermediate} and \ref{me_to_final} can be factorized into:
+
+\begin{equation}
+\label{me_to_intermediate_factorized}
+\langle n_s | \exp{\left( i \mathbf{p} \cdot \mathbf{x} / \hbar \right)} | \alpha_s \rangle \cdot M^{\mathrm{nucl}}_{A \to C}
+\end{equation}
+
+\begin{equation}
+\label{me_to_final_factorized}
+\langle \beta_s | \exp{\left( - i \mathbf{k} \cdot \mathbf{x} / \hbar \right)} | n_s \rangle \cdot M^{\mathrm{nucl}}_{C \to B}
+\end{equation}
+
+Using the factorized matrix elements, Eq. \ref{absorption_general} becomes:
+
+\begin{equation}
+\label{absorption_general_factorized}
+	W = \left| M^{\mathrm{nucl}}_{C \to B} \right|^2 \cdot \left| M^{\mathrm{nucl}}_{A \to C} \right|^2 \left| \sum_{n_s} \frac{ \langle \beta_s | \exp{\left( - i \mathbf{k} \cdot \mathbf{x} / \hbar \right)} | n_s \rangle \langle n_s | \exp{\left( i \mathbf{p} \cdot \mathbf{x} / \hbar \right)} | \alpha_s \rangle  }{E - E_0 + E(n_s) - E(\alpha_s) + i/2 \Gamma(n_s)} \right| ^2
+\end{equation}
+
+Here, the nuclear matrix elements have already been factored out of the sum.
+
+In fact, for the discussion here, the final state of the system and the nucleus are not important, since the goal is to study the absorption.
+
+Therefore, consider only the probability for absorption by summing over all final states
+
+\begin{equation}
+\label{absorption_general_no_final}
+W(A, \alpha_s) = \sum_{\beta_s} W(A, \alpha_s, B, \beta_s)
+\end{equation}
+
+using the completeness relation
+
+\begin{equation}
+	\label{completeness_relation_system}
+	\sum_{\beta_s} | \beta_s \rangle \langle \beta_s | = \mathbb{1}
+\end{equation}
+
+for the system states.
+
+Furthermore, in constrast to the nucleus, the system is often not in a definite state $\alpha_s$ at the time of the capture, but rather distributed among the set $\{ \alpha_s \}$, with the probability $g(\alpha_s)$ of finding the system in the definite state $\alpha_s$:
+
+\begin{equation}
+	\label{g_alpha}
+	g(\alpha_s) = \langle \alpha_s | \{ \alpha_s \} \rangle
+\end{equation}
+
+To account for this, introduce a weighted sum over $\alpha_s$ in Eq. \ref{absorption_general}:
+
+\begin{equation}
+\label{absorption_general_alpha_s_distribution}
+W(A, \{\alpha_s\}) = \sum_{\alpha_s} g(\alpha_s) W(A, \alpha_s)
+\end{equation}
+
+Executing all the sums and calculating the absolute value in Eq. \ref{absorption_general_factorized} explicity, the result is:
+
+\begin{equation}
+\label{absorption_general_summed}
+W = \left| M^{\mathrm{nucl}}_{C \to B} \right|^2 \cdot \left| M^{\mathrm{nucl}}_{A \to C} \right|^2 \sum_{\alpha_s} g(\alpha_s) \sum_{n_s} \frac{ \left| \langle n_s | \exp{\left( i \mathbf{p} \cdot \mathbf{x} / \hbar \right)} | \alpha_s \rangle \right|^2  }{\left[ E - E_0 + E(n_s) - E(\alpha_s) \right] + 1/4 \left( \Gamma(n_s) \right)^2 }
+\end{equation}
+
+Coming from the general Eq. \ref{absorption_general}, Eq. \ref{absorption_general_summed} contains some adaptations for the photoabsorption experiments which are considered here.
+
+Usually, the nuclear matrix elements $M^{\mathrm{nucl}}$ are the quantities to be measured, so they will be left as "black boxes" in the following. Of course, a good estimate of the size of the nuclear matrix element is crucial for the planning of an experiment.
+
+In the following, different methods of including the influence of the system on the resonant absorption will be described, starting from the most simple ones and getting more sophisticated.
+
 \subsection{Doppler shift}
 
 \begin{equation}
