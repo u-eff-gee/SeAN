@@ -43,9 +43,11 @@ public:
 	void maxwell_boltzmann(const vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, const unsigned int target_number);
 
 	void maxwell_boltzmann_approximation(const vector<double> &energy_bins, vector<double> &crosssection_histogram, const vector<double> &energy_boosted, const unsigned int target_number);
+	void maxwell_boltzmann_approximation_debye(const vector<double> &energy_bins, vector<double> &crosssection_histogram, const vector<double> &energy_boosted, const unsigned int target_number);
 	const double APPROXIMATION_LIMIT = 0.1;
 
-//	void maxwell_boltzmann_debye(vector<double> &velocity_bins, vector<double> &vdist_bins, vector<double> &params, double mass, double e0);
+	double tEff(const double t, const double tD);
+	void maxwell_boltzmann_debye(const vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, const unsigned int target_number);
 
 	void arbitrary_velocity_distribution(const vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, const vector< vector<double> > &velocity_distribution_file, const vector<double> &energy_boosted, const unsigned int target_number);
 
@@ -71,6 +73,18 @@ private:
 	double delta(double t, double mass){
 		return sqrt(2.*kB*t/(mass*AtomicMassUnit));
 	}
+};
+
+class tEff_integrated_function{
+	
+public:
+	double operator()(double t) const {
+		return pow(t,3)*(1./(exp(t) - 1.) + 0.5);
+	}
+
+	double Eval(double t) const {
+		return pow(t,3)*(1./(exp(t) - 1.) + 0.5);
+	};
 };
 
 #endif

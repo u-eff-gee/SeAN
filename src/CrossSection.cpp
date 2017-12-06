@@ -9,6 +9,8 @@
 #include "fftw3.h"
 
 #include "Math/Interpolator.h"
+#include "Math/Integrator.h"
+#include "Math/Functor.h"
 #include "TGraph.h"
 #include "TAxis.h"
 
@@ -81,9 +83,30 @@ void CrossSection::maxwell_boltzmann(const vector< vector<double> > &velocity_di
 	}
 }
 
-//void CrossSection::maxwell_boltzmann_debye(vector<double> &velocity_bins, vector<double> &vdist_bins, vector<double> &params, double mass, double e0){
-//	;
-//}
+double CrossSection::tEff(const double t, const double tD){
+	
+	tEff_integrated_function f;
+	ROOT::Math::Functor1D wf(f);
+	ROOT::Math::Integrator ig(ROOT::Math::IntegrationOneDim::kADAPTIVE);
+	ig.SetFunction(wf);
+	
+	return 3.*pow(t, 4)/pow(tD, 3)*ig.Integral(0, tD/t);
+}
+
+void CrossSection::maxwell_boltzmann_debye(const vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, const unsigned int target_number){
+
+// Calculate effective temperature in debye approximation
+	double teff = tEff(settings.vDistParams[target_number][0], settings.vDistParams[target_number][1]);
+
+	double c1 = sqrt(settings.mass[target_number]*AtomicMassUnit/(2*PI*kB*teff));
+      	double c2 = -1./pow(delta(teff, settings.mass[target_number]), 2);
+
+      	for(unsigned int i = 0; i < velocity_distribution_bins.size(); ++i){
+		for(unsigned int j = 0; j < settings.nbins_e; ++j){
+			velocity_distribution_histogram[i][j] = c1*exp(c2*velocity_distribution_bins[i][j]*velocity_distribution_bins[i][j]);
+		}
+	}
+}
 
 void CrossSection::arbitrary_velocity_distribution(const vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, const vector< vector<double> > &velocity_distribution_file, const vector<double> &energy_boosted, const unsigned int target_number){
 	// Interpolate data from file	
@@ -215,6 +238,32 @@ void CrossSection::maxwell_boltzmann_approximation(const vector<double> &energy_
 			cout << "\tGAMMA = " << settings.gamma[target_number][i] << " eV" << endl;
 			cout << "\tMASS = " << settings.mass[target_number] << " u" << endl;
 			cout << "\tTEFF= " << settings.vDistParams[target_number][0] << " K" << endl;
+		}
+
+		double cs_max = 2.*PI*HBARC2/(energy_boosted[i]*energy_boosted[i])*(2.*settings.jj[target_number][i] + 1.)/(2. * settings.ji[target_number] + 1.)*settings.gamma0[target_number][i]/settings.gamma[target_number][i]*sqrt(PI)/(2.*doppler_width/settings.gamma[target_number][i]);
+		
+		for(unsigned int j = 0; j < settings.nbins_e; ++j){
+			crosssection_histogram[j] += cs_max*exp(-(energy_bins[j] - energy_boosted[i])*(energy_bins[j] - energy_boosted[i])/(doppler_width*doppler_width));
+		}
+	}
+}
+
+void CrossSection::maxwell_boltzmann_approximation_debye(const vector<double> &energy_bins, vector<double> &crosssection_histogram, const vector<double> &energy_boosted, const unsigned int target_number){
+
+// Calculate effective temperature in debye approximation
+	double teff = tEff(settings.vDistParams[target_number][0], settings.vDistParams[target_number][1]);
+
+ // Calculate doppler-shifted cross section directly
+	for(unsigned int i = 0; i < energy_boosted.size(); ++i){
+		double doppler_width = sqrt(2.*kB*teff/(settings.mass[target_number]*AtomicMassUnit))*energy_boosted[i];
+
+		if(settings.gamma[target_number][i]/doppler_width > APPROXIMATION_LIMIT){
+			cout << "Warning: " << __FILE__ << ":" << __LINE__ << ": "; 
+			cout << "maxwell_boltzmann_approximation(): Gamma/Delta = " << settings.gamma[target_number][i]/doppler_width << " > " << APPROXIMATION_LIMIT << ", the approximation of the doppler-shifted cross section may not be good." << endl;
+			cout << "\tE0 = " << energy_boosted[i] << " eV" << endl;
+			cout << "\tGAMMA = " << settings.gamma[target_number][i] << " eV" << endl;
+			cout << "\tMASS = " << settings.mass[target_number] << " u" << endl;
+			cout << "\tTEFF= " << teff << " K" << endl;
 		}
 
 		double cs_max = 2.*PI*HBARC2/(energy_boosted[i]*energy_boosted[i])*(2.*settings.jj[target_number][i] + 1.)/(2. * settings.ji[target_number] + 1.)*settings.gamma0[target_number][i]/settings.gamma[target_number][i]*sqrt(PI)/(2.*doppler_width/settings.gamma[target_number][i]);

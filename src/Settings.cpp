@@ -94,6 +94,12 @@ void Settings::printTarget(unsigned int i){
 		case vDistModel::mba:
 			cout << "Maxwell-Boltzmann (using approximation), T_eff = " << vDistParams[i][0] << " K " << endl;
 			break;
+		case vDistModel::mbd:
+			cout << "Maxwell-Boltzmann (using Debye approximation), T = " << vDistParams[i][0] << " K, T_D = " << vDistParams[i][1] << " K " << endl;
+			break;
+		case vDistModel::mbad:
+			cout << "Maxwell-Boltzmann (using Debye and integral approximation), T = " << vDistParams[i][0] << " K, T_D = " << vDistParams[i][1] << " K " << endl;
+			break;
 		default: break;
 	}
 

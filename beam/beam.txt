@@ -2,5 +2,5 @@
 const, C
 # Gaussian beam profile (C is the value of the beam profile at the maximum)
 gauss, MU, SIGMA, C
-# Bremsstrahlung (C is a normalization factor)
-brems, E0, C
+# Arbitrary beam profile (FILE is a two-column file with columns "Energy / eV" and "Beam intensity / a.u.")
+arb, FILE

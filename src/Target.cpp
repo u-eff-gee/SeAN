@@ -102,6 +102,10 @@ void Target::calculateCrossSection(const vector<double> &energy_bins){
 		crossSection->maxwell_boltzmann_approximation(energy_bins, crosssection_histogram, energy_boosted, target_number);
 	}
 
+	else if(settings.vDist[target_number] == vDistModel::mbad){
+		crossSection->maxwell_boltzmann_approximation_debye(energy_bins, crosssection_histogram, energy_boosted, target_number);
+	}
+
 	else if(settings.exact){
 		crossSection->integration_input(crosssection_at_rest_histogram, velocity_distribution_histogram);
 		crossSection->dopplershift(energy_bins, crosssection_histogram, crosssection_at_rest_histogram, velocity_distribution_bins, velocity_distribution_histogram, vdist_norm, energy_boosted);
@@ -135,7 +139,12 @@ void Target::calculateVelocityDistribution(const vector<double> &energy_bins){
 
 		case vDistModel::mb:
 		case vDistModel::mba:
+		case vDistModel::mbad:
 			crossSection->maxwell_boltzmann(velocity_distribution_bins, velocity_distribution_histogram, target_number);
+			break;
+
+		case vDistModel::mbd:
+			crossSection->maxwell_boltzmann_debye(velocity_distribution_bins, velocity_distribution_histogram, target_number);
 			break;
 
 		case vDistModel::arb:
@@ -155,7 +164,7 @@ void Target::plot(const vector<double> &energy_bins){
 	
 	filename << settings.targetNames[target_number] << "_crosssection_at_rest";
 
-	plotter->plotMultiple1DHistogramsAndSum(energy_bins, crosssection_at_rest_histogram, filename.str());
+	plotter->plotMultiple1DHistogramsAndSum(energy_bins, crosssection_at_rest_histogram, filename.str(), "Energy / eV", "Cross section / fm^{2}");
 
 	// Plot velocity distribution
 	// In fact, each resonance has its own binning, but plot only the velocity distribution for the first one since they only differ in the binning
@@ -164,42 +173,42 @@ void Target::plot(const vector<double> &energy_bins){
 
 	filename << settings.targetNames[target_number] << "_velocity_distribution";
 
-	plotter->plot1DHistogram(velocity_distribution_bins[0], velocity_distribution_histogram[0], filename.str());
+	plotter->plot1DHistogram(velocity_distribution_bins[0], velocity_distribution_histogram[0], filename.str(), "Velocity / c", "Velocity distribution");
 
 	// Plot cross section
 	filename.str("");
 	filename.clear();
 
 	filename << settings.targetNames[target_number] << "_crosssection";
-	plotter->plot1DHistogram(energy_bins, crosssection_histogram, filename.str());
+	plotter->plot1DHistogram(energy_bins, crosssection_histogram, filename.str(), "Energy / eV", "Cross section / fm^{2}");
 
 	// Plot incident beam
 	filename.str("");
 	filename.clear();
 
 	filename << settings.targetNames[target_number] << "_incident_beam";
-	plotter->plot1DHistogram(energy_bins, incident_beam_histogram, filename.str());
+	plotter->plot1DHistogram(energy_bins, incident_beam_histogram, filename.str(), "Energy / eV", "Beam intensity / a.u.");
 
 	// Plot mass attenuation
 	filename.str("");
 	filename.clear();
 
 	filename << settings.targetNames[target_number] << "_mass_attenuation";
-	plotter->plot1DHistogram(energy_bins, mass_attenuation_histogram, filename.str());
+	plotter->plot1DHistogram(energy_bins, mass_attenuation_histogram, filename.str(), "Energy / eV", "Mass attenuation / fm^{2} / atom");
 
 	// Plot photon flux density
 	filename.str("");
 	filename.clear();
 
 	filename << settings.targetNames[target_number] << "_photon_flux_density";
-	plotter->plot2DHistogram(z_bins, energy_bins, photon_flux_density_histogram, filename.str());
+	plotter->plot2DHistogram(z_bins, energy_bins, photon_flux_density_histogram, filename.str(), "z / atoms/fm^{2}", "Energy / eV", "#phi");
 	
 	// Plot resonance absorptions density
 	filename.str("");
 	filename.clear();
 
 	filename << settings.targetNames[target_number] << "_resonance_absorption_density";
-	plotter->plot2DHistogram(z_bins, energy_bins, resonance_absorption_density_histogram, filename.str());
+	plotter->plot2DHistogram(z_bins, energy_bins, resonance_absorption_density_histogram, filename.str(), "z / atoms/fm^{2}", "Energy / eV", "#alpha / fm^{2}");
 }
 
 void Target::calculateIncidentBeam(const vector<double> &energy_bins){
@@ -304,7 +313,7 @@ void Target::write(const vector<double> &energy_bins){
 	filename.clear();
 
 	filename << settings.targetNames[target_number] << "_incident_beam";
-	writer->write1DHistogram(incident_beam_histogram, filename.str(), "Beam intensity distribution");
+	writer->write1DHistogram(incident_beam_histogram, filename.str(), "Beam intensity distribution / a.u.");
 
 	// Write mass attenuation
 	filename.str("");
@@ -325,7 +334,7 @@ void Target::write(const vector<double> &energy_bins){
 	filename.clear();
 
 	filename << settings.targetNames[target_number] << "_resonance_absorption_density";
-	writer->write2DHistogram(resonance_absorption_density_histogram, filename.str(), "Alpha (z, E = const)", "Alpha (z = const, E)");
+	writer->write2DHistogram(resonance_absorption_density_histogram, filename.str(), "Alpha (z, E = const) / fm^2", "Alpha (z = const, E) / fm^2");
 }
 
 void Target::vDistInfo(){

@@ -1,8 +1,12 @@
 # Absolute zero
-absolute_zero
+zero
+# Arbitrary velocity distribution (FILE is a two-column file with columns "Velocity / c" and "Velocity distribution")
+arb, FILE
 # Maxwell-Boltzmann distribution with effective temperature
 maxwell_boltzmann, Teff
 # Same as above, but using the analytical approximation for the doppler-shifted cross section, which is valid for Gamma/Delta << 1
 maxwell_boltzmann_approximation, Teff
-# Maxwell-Boltzmann distribution, where the effective temperature is calculate from the Debye approximation
-maxwell_boltzmann_debye, TD
+# Maxwell-Boltzmann distribution, where the effective temperature is calculate from the thermodynamic temperature T via the Debye temperature TD of the material
+maxwell_boltzmann_debye, T, TD
+# Combination of the options maxwell_boltzmann_approximation and maxwell_boltzmann_debye
+maxwell_boltzmann_approximation_debye, T, TD

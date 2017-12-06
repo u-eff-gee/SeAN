@@ -4,13 +4,14 @@
 #include "TLegend.h"
 #include "TGraph.h"
 #include "TGraph2D.h"
+#include "TH2D.h"
 #include "TStyle.h"
 
 #include <sstream>
 
 using std::stringstream;
 
-void Plotter::plot1DHistogram(const vector<double> &bins, const vector<double> &histogram, const string name){
+void Plotter::plot1DHistogram(const vector<double> &bins, const vector<double> &histogram, const string name, const string xaxis_label, const string yaxis_label){
 	stringstream filename;
 	filename << PLOT_OUTPUT_DIR << name << ".pdf";
 	stringstream canvasname;
@@ -20,6 +21,8 @@ void Plotter::plot1DHistogram(const vector<double> &bins, const vector<double> &
 	
 	TGraph *graph = new TGraph((int) bins.size(), &bins[0], &histogram[0]);
 	graph->SetTitle(name.c_str());
+	graph->GetHistogram()->GetXaxis()->SetTitle(xaxis_label.c_str());
+	graph->GetHistogram()->GetYaxis()->SetTitle(yaxis_label.c_str());
 	graph->Draw();
 
 	//crossSection->plot_crosssection(energy_bins, crosssection_bins, target_name, canvas, legend, "Cross section");
@@ -29,7 +32,7 @@ void Plotter::plot1DHistogram(const vector<double> &bins, const vector<double> &
 	delete canvas;
 }
 
-void Plotter::plotMultiple1DHistograms(const vector<double> &bins, const vector< vector<double> > &histograms, const string name){
+void Plotter::plotMultiple1DHistograms(const vector<double> &bins, const vector< vector<double> > &histograms, const string name, const string xaxis_label, const string yaxis_label){
 	stringstream filename;
 	filename << PLOT_OUTPUT_DIR << name << ".pdf";
 	stringstream canvasname;
@@ -40,6 +43,9 @@ void Plotter::plotMultiple1DHistograms(const vector<double> &bins, const vector<
 		TGraph *graph = new TGraph((int) bins.size(), &bins[0], &histograms[i][0]);
 		if(i == 0){
 			graph->SetTitle(name.c_str());
+			graph->GetHistogram()->GetXaxis()->SetTitle(xaxis_label.c_str());
+			graph->GetHistogram()->GetYaxis()->SetTitle(yaxis_label.c_str());
+
 			graph->Draw();
 		} else{
 			graph->Draw("same");
@@ -50,7 +56,7 @@ void Plotter::plotMultiple1DHistograms(const vector<double> &bins, const vector<
 	delete canvas;
 }
 
-void Plotter::plotMultiple1DHistogramsAndSum(const vector<double> &bins, const vector< vector<double> > &histograms, const string name){
+void Plotter::plotMultiple1DHistogramsAndSum(const vector<double> &bins, const vector< vector<double> > &histograms, const string name, const string xaxis_label, const string yaxis_label){
 	vector<double> sum(bins.size(), 0.);
 
 	for(unsigned int i = 0; i < histograms.size(); ++i){
@@ -67,6 +73,9 @@ void Plotter::plotMultiple1DHistogramsAndSum(const vector<double> &bins, const v
 
 	TGraph *graph = new TGraph((int) bins.size(), &bins[0], &sum[0]);
 	graph->SetTitle(name.c_str());
+	graph->GetHistogram()->GetXaxis()->SetTitle(xaxis_label.c_str());
+	graph->GetHistogram()->GetYaxis()->SetTitle(yaxis_label.c_str());
+
 	graph->Draw();
 	
 	for(unsigned int i = 0; i < histograms.size(); ++i){
@@ -75,12 +84,11 @@ void Plotter::plotMultiple1DHistogramsAndSum(const vector<double> &bins, const v
 		graph->Draw("same");
 	}
 
-
 	canvas->SaveAs(filename.str().c_str());
 	delete canvas;
 }
 
-void Plotter::plot2DHistogram(const vector<double> &bins1, const vector<double> &bins2, const vector< vector<double> > &histogram, const string name){
+void Plotter::plot2DHistogram(const vector<double> &bins1, const vector<double> &bins2, const vector< vector<double> > &histogram, const string name, const string xaxis_label, const string yaxis_label, const string zaxis_label){
 
 	stringstream filename;
 	filename << PLOT_OUTPUT_DIR << name << ".pdf";
@@ -102,6 +110,9 @@ void Plotter::plot2DHistogram(const vector<double> &bins1, const vector<double> 
 	}
 
 	graph->SetTitle(name.c_str());
+	graph->GetHistogram()->GetXaxis()->SetTitle(xaxis_label.c_str());
+	graph->GetHistogram()->GetYaxis()->SetTitle(yaxis_label.c_str());
+	graph->GetHistogram()->GetZaxis()->SetTitle(zaxis_label.c_str());
 	gStyle->SetPalette(55);
 	graph->Draw("surf1");
 

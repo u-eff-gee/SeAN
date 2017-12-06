@@ -215,6 +215,22 @@ void InputReader::readFile(Settings &settings){
 					getline(stream, value, DELIMITER);
 					settings.vDistParams[ntarget].push_back(atof(value.c_str()));
 				}
+				else if(value == "maxwell_boltzmann_debye"){
+					settings.vDist.push_back(vDistModel::mbd);
+					settings.vDistFile.push_back("");
+					getline(stream, value, DELIMITER);
+					settings.vDistParams[ntarget].push_back(atof(value.c_str()));
+					getline(stream, value, DELIMITER);
+					settings.vDistParams[ntarget].push_back(atof(value.c_str()));
+				}
+				else if(value == "maxwell_boltzmann_approximation_debye"){
+					settings.vDist.push_back(vDistModel::mbad);
+					settings.vDistFile.push_back("");
+					getline(stream, value, DELIMITER);
+					settings.vDistParams[ntarget].push_back(atof(value.c_str()));
+					getline(stream, value, DELIMITER);
+					settings.vDistParams[ntarget].push_back(atof(value.c_str()));
+				}
 
 				else{
 					cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
