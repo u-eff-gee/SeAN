@@ -24,7 +24,11 @@ void Settings::print(){
 void Settings::printOptions(){
 	cout << HORIZONTAL_LINE << endl;
 	cout << ">>> SeAN INPUT" << endl;
-	cout << "FILE:\t" << inputfile << endl;
+	if(inputfile != ""){
+		cout << "FILE:\t" << inputfile << endl;
+	} else{
+		cout << "FILE:\tnot set" << endl;
+	}
 	cout << "COMMAND LINE OPTIONS: " << endl;
 	cout << "\tEXACT:\t" << exact << endl;
 	cout << "\tPLOT :\t" << plot << endl;
@@ -51,17 +55,21 @@ void Settings::printExperiment(){
 	// Reset precision
 	cout << defaultfloat << setprecision((int) default_precision);
 
-	switch(incidentBeam){
-		case incidentBeamModel::constant:
-			cout << "constant, " << incidentBeamParams[0] << endl;
-			break;
-		case incidentBeamModel::gauss:
-			cout << "gauss, MU = " << incidentBeamParams[0] << " eV, SIGMA = " << incidentBeamParams[1] << " eV, NORM = " << incidentBeamParams[2] << endl;
-			break;
-		case incidentBeamModel::arb:
-			cout << "arb, " << incidentBeamFile << endl;
-			break;
-		default: break;
+	if(incidentBeamParams.size()){
+		switch(incidentBeam){
+			case incidentBeamModel::constant:
+				cout << "constant, " << incidentBeamParams[0] << endl;
+				break;
+			case incidentBeamModel::gauss:
+				cout << "gauss, MU = " << incidentBeamParams[0] << " eV, SIGMA = " << incidentBeamParams[1] << " eV, NORM = " << incidentBeamParams[2] << endl;
+				break;
+			case incidentBeamModel::arb:
+				cout << "arb, " << incidentBeamFile << endl;
+				break;
+			default: break;
+		}
+	} else{
+		cout << "not set" << endl;
 	}
 }
 

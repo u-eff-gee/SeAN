@@ -17,6 +17,11 @@ const double PI = 3.141592653589793;
 // Settings for the SeAN input file
 const string COMMENT = "#";
 const char DELIMITER = ',';
+const char LOOP_DELIMITER = ';';
+const char LOOP_START = '[';
+const char LOOP_STOP = ']';
+const char SIM_LOOP_START = '{';
+const char SIM_LOOP_STOP = '}';
 const unsigned int N_TARGET_SETTINGS = 11;
 const unsigned int N_EXPERIMENT_SETTINGS = 4; 
 

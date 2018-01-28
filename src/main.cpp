@@ -38,7 +38,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
         	if(state->arg_num == 0) {
             		argp_usage(state);
         	}
-        	if(!settings->inputfile) {
+        	if(settings->inputfile == "") {
             		argp_failure(state, 1, 0, "INPUTFILE not specified.");
         	}
         	break;
@@ -51,36 +51,39 @@ static struct argp argp = { options, parse_opt, args_doc, doc, 0, 0, 0 };
 
 int main(int argc, char* argv[]){
 
-	struct Settings settings;
-	argp_parse(&argp, argc, argv, 0, 0, &settings);
+	vector <Settings> settings;
+	settings.push_back(Settings());
+	argp_parse(&argp, argc, argv, 0, 0, &settings[0]);
 
 	// Start the clock
 	high_resolution_clock::time_point start = high_resolution_clock::now();
 
 
-	if(settings.sudowrite)
-		settings.write = true;
+	if(settings[0].sudowrite)
+		settings[0].write = true;
 
 	InputReader input;
 	input.readFile(settings);
-	settings.print();
-
-	Experiment experiment(settings);
-	experiment.initialize();
-	experiment.crossSections();
-	experiment.transmission();
-	if(settings.plot){
-		experiment.plot();
-	}
-	if(settings.write){
-		experiment.write();
-	}
-	experiment.resonant_scattering();
-	experiment.print_results();
 	
-	// Stop the clock
-	high_resolution_clock::time_point stop = high_resolution_clock::now();
-	duration<double> delta_t = duration_cast< duration<double>>(stop - start);
+	for(auto s: settings)
+		s.print();
 
-	cout << "> main.cpp: Execution took " << delta_t.count() << " seconds" << endl;
+//	Experiment experiment(settings);
+//	experiment.initialize();
+//	experiment.crossSections();
+//	experiment.transmission();
+//	if(settings.plot){
+//		experiment.plot();
+//	}
+//	if(settings.write){
+//		experiment.write();
+//	}
+//	experiment.resonant_scattering();
+//	experiment.print_results();
+//	
+//	// Stop the clock
+//	high_resolution_clock::time_point stop = high_resolution_clock::now();
+//	duration<double> delta_t = duration_cast< duration<double>>(stop - start);
+//
+//	cout << "> main.cpp: Execution took " << delta_t.count() << " seconds" << endl;
 }

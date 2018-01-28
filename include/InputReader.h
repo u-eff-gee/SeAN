@@ -6,6 +6,7 @@
 #include <string>
 
 using std::string;
+using std::istringstream;
 
 class InputReader{
 public:
@@ -13,7 +14,11 @@ public:
 	~InputReader(){};
 
 	// Read the SeAN input file
-	void readFile(Settings &settings);
+	void readFile(vector<Settings> &settings);
+	// Reader functions for parameters
+	int readDoubles(vector<double> &values, const string &value_string);
+	void readEminEmax(istringstream &stream, vector<Settings> &settings);
+
 	// Read a nuclear mass from the AME table
 	double readAME(string isotope);
 	// Read an energy-dependent mass-attenuation coefficient from a file with the NIST format

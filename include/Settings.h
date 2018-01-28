@@ -27,22 +27,23 @@ enum class incidentBeamModel{constant, gauss, arb};
 
 // Stores all the input information for SeAN
 struct Settings{
+	
 	// Command-line options
-        char *inputfile;
+        string inputfile = "";
 	bool exact = false;
 	bool plot = false;
 	bool write = false;
 	bool sudowrite = false;
 
 	// Settings for Experiment
-	double emin;
-	double emax;
-	unsigned int nbins_e;
-	unsigned int nbins_z;
+	double emin = 0.;
+	double emax = 0.;
+	unsigned int nbins_e = 0;
+	unsigned int nbins_z = 0;
 
-	incidentBeamModel incidentBeam;
+	incidentBeamModel incidentBeam = incidentBeamModel::constant;
 	vector<double> incidentBeamParams;
-	string incidentBeamFile;
+	string incidentBeamFile = "";
 
 	// Settings for Targets
 	vector<string> targetNames;
