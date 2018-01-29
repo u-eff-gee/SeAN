@@ -48,139 +48,108 @@ void InputReader::readFile(vector<Settings> &settings){
 	bool incident_beam_found = false;
 
 	// Read incident beam
-//	while(!incident_beam_found){
-//
-//		getline(ifile, line);
-//
-//		if(line.substr(0,1) == COMMENT)
-//			continue;
-//
-//		istringstream stream(line);
-//		getline(stream, value, DELIMITER);
-//		if(value == "const"){
-//			settings.incidentBeam= incidentBeamModel::constant;
-//			getline(stream, value, DELIMITER);
-//			settings.incidentBeamParams.push_back(atof(value.c_str()));
-//			incident_beam_found = true;
-//		}
-//
-//		else if(value == "gauss"){
-//			settings.incidentBeam= incidentBeamModel::gauss;
-//			getline(stream, value, DELIMITER);
-//			settings.incidentBeamParams.push_back(atof(value.c_str()));
-//			getline(stream, value, DELIMITER);
-//			settings.incidentBeamParams.push_back(atof(value.c_str()));
-//			getline(stream, value, DELIMITER);
-//			settings.incidentBeamParams.push_back(atof(value.c_str()));
-//			incident_beam_found = true;
-//		} 
-//
-//		else if(value == "arb"){
-//			settings.incidentBeam= incidentBeamModel::arb;
-//			getline(stream, value, DELIMITER);
-//			settings.incidentBeamFile = regex_replace(value, regex("\\s+"), "");				
-//			incident_beam_found = true;
-//		}
-//		
-//		else{
-//			cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
-//			cout << " readFile(): Unknown option '" << value << "' for incident beam." << endl;
-//			abort();
-//		}
-//
-//	}
-//
-//	bool nbins_e_found = false;
-//
-//	// Read NBINS_ENERGY
-//	while(!nbins_e_found){
-//
-//		getline(ifile, line);
-//
-//		if(line.substr(0,1) == COMMENT)
-//			continue;
-//
-//		istringstream stream(line);
-//		getline(stream, value, DELIMITER);
-//		settings.nbins_e = (unsigned int) atoi(value.c_str());
-//
-//		nbins_e_found = true;
-//	}
-//
-//	bool nbins_z_found = false;
-//
-//	// Read NBINS_Z
-//	while(!nbins_z_found){
-//
-//		getline(ifile, line);
-//
-//		if(line.substr(0,1) == COMMENT)
-//			continue;
-//
-//		istringstream stream(line);
-//		getline(stream, value, DELIMITER);
-//		settings.nbins_z = (unsigned int) atoi(value.c_str());
-//
-//		nbins_z_found = true;
-//	}
-//
-//	// Read information about targets
-//        while(getline(ifile, line)){
-//		if(line.substr(0,1) == COMMENT)
-//			continue;
-//
-//		istringstream stream(line);
-//
-//		switch(nline % N_TARGET_SETTINGS){
-//			// Read target name
-//			case 0:
-//				settings.targetNames.push_back(stream.str());
-//				++nline;
-//				break;
-//			
-//			// Read resonance energies
-//			case 1:
-//				settings.energy.push_back(vector<double>());
-//				while(getline(stream, value, DELIMITER)){
-//					settings.energy[ntarget].push_back(atof(value.c_str()));
-//				}
-//				++nline;
-//				break;
-//			// Read Gamma0
-//			case 2:
-//				settings.gamma0.push_back(vector<double>());
-//				while(getline(stream, value, DELIMITER)){
-//					settings.gamma0[ntarget].push_back(atof(value.c_str()));
-//				}
-//				++nline;
-//				break;
-//
-//			// Read Gamma
-//			case 3:
-//				settings.gamma.push_back(vector<double>());
-//				while(getline(stream, value, DELIMITER)){
-//					settings.gamma[ntarget].push_back(atof(value.c_str()));
-//				}
-//				++nline;
-//				break;
-//
-//			// Read Ji
-//			case 4:
-//				while(getline(stream, value, DELIMITER)){
-//					settings.ji.push_back(atof(value.c_str()));
-//				}
-//				++nline;
-//				break;
-//
-//			// Read Jj
-//			case 5:
-//				settings.jj.push_back(vector<double>());
-//				while(getline(stream, value, DELIMITER)){
-//					settings.jj[ntarget].push_back(atof(value.c_str()));
-//				}
-//				++nline;
-//				break;
-//
+	while(!incident_beam_found){
+
+		getline(ifile, line);
+
+		if(line.substr(0,1) == COMMENT)
+			continue;
+
+		istringstream stream(line);
+		readIncidentBeam(stream, settings);
+
+		incident_beam_found = true;
+	}
+
+	bool nbins_e_found = false;
+
+	// Read NBINS_E
+	while(!nbins_e_found){
+
+		getline(ifile, line);
+
+		if(line.substr(0,1) == COMMENT)
+			continue;
+
+		istringstream stream(line);
+		readNBins_E(stream, settings);
+
+		nbins_e_found = true;
+	}
+
+	bool nbins_z_found = false;
+
+	// Read NBINS_Z
+	while(!nbins_z_found){
+
+		getline(ifile, line);
+
+		if(line.substr(0,1) == COMMENT)
+			continue;
+
+		istringstream stream(line);
+		readNBins_Z(stream, settings);
+
+		nbins_z_found = true;
+	}
+
+	// Read information about targets
+        while(getline(ifile, line)){
+		if(line.substr(0,1) == COMMENT)
+			continue;
+
+		istringstream stream(line);
+
+		switch(nline % N_TARGET_SETTINGS){
+			// Read target name
+			case 0:
+				for(unsigned i = 0; i < settings.size(); ++i){
+					settings[i].targetNames.push_back(stream.str());
+				}
+				++nline;
+				break;
+			
+			// Read resonance energies
+			case 1:
+				for(unsigned i = 0; i < settings.size(); ++i){
+					settings[i].energy.push_back(vector<double>());
+				}
+				readEnergy(stream, settings, ntarget);
+				++nline;
+				break;
+			// Read Gamma0
+			case 2:
+				for(unsigned i = 0; i < settings.size(); ++i){
+					settings[i].gamma0.push_back(vector<double>());
+				}
+				readGamma0(stream, settings, ntarget);
+				++nline;
+				break;
+
+			// Read Gamma
+			case 3:
+				for(unsigned i = 0; i < settings.size(); ++i){
+					settings[i].gamma.push_back(vector<double>());
+				}
+				readGamma(stream, settings, ntarget);
+				++nline;
+				break;
+
+			// Read J0
+			case 4:
+				readJ0(stream, settings, ntarget);
+				++nline;
+				break;
+				
+			// Read Jj
+			case 5:
+				for(unsigned i = 0; i < settings.size(); ++i){
+					settings[i].jj.push_back(vector<double>());
+				}
+				readJ(stream, settings, ntarget);
+				++nline;
+				break;
+				
 //			// Read velocity distribution
 //			case 6:
 //				settings.vDistParams.push_back(vector<double>());
@@ -287,8 +256,8 @@ void InputReader::readFile(vector<Settings> &settings){
 //				++nline;
 //				++ntarget;
 //				break;
-//		}
-//        }
+		}
+        }
 
 	ifile.close();
 }
@@ -322,13 +291,14 @@ int InputReader::readDoubles(vector<double> &values, const string &value_string)
 		for(int i = 0; i < n; ++i){
 			values.push_back(start + i*inc);
 		}
+
 		return 1;
 	}
 
 	else if(sim_loop_start != string::npos){
 
 		del1 = value_string.find(LOOP_DELIMITER);
-		start = atof(value_string.substr(loop_start + 1, del1 - loop_start).c_str());
+		start = atof(value_string.substr(sim_loop_start + 1, del1 - loop_start).c_str());
 
 		del2 = value_string.substr(del1 + 1, length - del1).find(LOOP_DELIMITER);
 		stop = atof(value_string.substr(del1 + 1, del2).c_str());
@@ -338,8 +308,6 @@ int InputReader::readDoubles(vector<double> &values, const string &value_string)
 		n = atoi(value_string.substr(del1 + 1, del2).c_str());
 
 		inc = (stop - start)/(n - 1);
-
-		cout << start << ", " << stop << ", " << n << endl;
 
 		for(int i = 0; i < n; ++i){
 			values.push_back(start + i*inc);
@@ -351,11 +319,68 @@ int InputReader::readDoubles(vector<double> &values, const string &value_string)
 	}
 }
 
+int InputReader::readInts(vector<int> &values, const string &value_string){
+	long unsigned int loop_start = value_string.find(LOOP_START);	
+	long unsigned int sim_loop_start = value_string.find(SIM_LOOP_START);	
+
+	int start = 0;
+       	int stop = 0;
+	int inc = 0;
+	int n = 1;
+	long unsigned int del1 = 0;
+	long unsigned int del2 = 0;
+	long unsigned int length = value_string.length();
+
+	if(loop_start != string::npos){
+
+		del1 = value_string.find(LOOP_DELIMITER);
+		start = atoi(value_string.substr(loop_start + 1, del1 - loop_start).c_str());
+		
+		del2 = value_string.substr(del1 + 1, length - del1).find(LOOP_DELIMITER);
+		stop = atoi(value_string.substr(del1 + 1, del2).c_str());
+
+		del1 = del1 + del2 + 1;
+		del2 = value_string.substr(del1,  length - del1).find(LOOP_STOP);
+		n = atoi(value_string.substr(del1 + 1, del2).c_str());
+
+		inc = (stop - start)/(n - 1);
+
+		for(int i = 0; i < n; ++i){
+			values.push_back(start + i*inc);
+		}
+
+		return 1;
+	}
+
+	else if(sim_loop_start != string::npos){
+
+		del1 = value_string.find(LOOP_DELIMITER);
+		start = atoi(value_string.substr(sim_loop_start + 1, del1 - loop_start).c_str());
+
+		del2 = value_string.substr(del1 + 1, length - del1).find(LOOP_DELIMITER);
+		stop = atoi(value_string.substr(del1 + 1, del2).c_str());
+
+		del1 = del1 + del2 + 1;
+		del2 = value_string.substr(del1,  length - del1).find(SIM_LOOP_STOP);
+		n = atoi(value_string.substr(del1 + 1, del2).c_str());
+
+		inc = (stop - start)/(n - 1);
+
+		for(int i = 0; i < n; ++i){
+			values.push_back(start + i*inc);
+		}
+		return 2;
+	} else{
+		values.push_back(atoi(value_string.c_str()));
+		return 0;
+	}
+}
+
 void InputReader::readEminEmax(istringstream &stream, vector<Settings> &settings){
 	vector<double> values;
 	string value_string = "";
 	int flag = 0;
-	long unsigned int n_settings = 0;
+	long unsigned int n_settings = settings.size();
 	long unsigned int n_values = 0;
 
 	// Read emin
@@ -363,12 +388,15 @@ void InputReader::readEminEmax(istringstream &stream, vector<Settings> &settings
 	flag = readDoubles(values, value_string);
 
 	if(flag == 0){
-		for(unsigned int i = 0; i < values.size(); ++i){
-			settings[i].emin = values[i];
+		n_settings = settings.size();
+
+		for(unsigned int i = 0; i < n_settings; ++i){
+			settings[i].emin = values[0];
 		}
 	}
 	if(flag == 1){
 		n_settings = settings.size();
+
 		for(unsigned int i = 0; i < values.size(); ++i){
 			if(i > 0){
 				for(unsigned int j = 0; j < n_settings; ++j){
@@ -381,8 +409,8 @@ void InputReader::readEminEmax(istringstream &stream, vector<Settings> &settings
 		}
 	}
 	if(flag == 2){
-		n_settings = settings.size();
 		n_values = values.size();
+		n_settings = settings.size();
 
 		if(n_settings == 1){
 			for(unsigned int i = 0; i < n_values - 1; ++i){
@@ -402,7 +430,8 @@ void InputReader::readEminEmax(istringstream &stream, vector<Settings> &settings
 	flag = readDoubles(values, value_string);
 
 	if(flag == 0){
-		for(unsigned int i = 0; i < settings.size(); ++i){
+		n_settings = settings.size();
+		for(unsigned int i = 0; i < n_settings; ++i){
 			settings[i].emax = values[0];
 		}
 	}
@@ -420,7 +449,6 @@ void InputReader::readEminEmax(istringstream &stream, vector<Settings> &settings
 		}
 	}
 	if(flag == 2){
-		n_settings = settings.size();
 		n_values = values.size();
 
 		if(n_settings == 1){
@@ -432,6 +460,438 @@ void InputReader::readEminEmax(istringstream &stream, vector<Settings> &settings
 		for(unsigned int i = 0; i < n_values; ++i){
 			settings[i].emax = values[i];
 		}
+	}
+}
+
+void InputReader::readIncidentBeam(istringstream &stream, vector<Settings> &settings){
+
+	vector<double> values;
+	string value_string = "";
+	int flag = 0;
+	long unsigned int n_settings = settings.size();
+	long unsigned int n_values = 0;
+
+	// Read incident beam model
+	getline(stream, value_string, DELIMITER);
+
+	if(value_string=="const"){
+		for(unsigned int i = 0; i < n_settings; ++i){
+			settings[i].incidentBeam = incidentBeamModel::constant;
+		}
+	}
+	else if(value_string=="gauss"){
+		for(unsigned int i = 0; i < n_settings; ++i){
+			settings[i].incidentBeam = incidentBeamModel::gauss;
+		}
+	}
+	else if(value_string=="arb"){
+		for(unsigned int i = 0; i < n_settings; ++i){
+			settings[i].incidentBeam = incidentBeamModel::arb;
+		}
+	} else{
+		cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
+		cout << " readFile(): Unknown option '" << value_string << "' for incident beam." << endl;
+		abort();
+	}
+
+	// Read parameters
+
+	while(getline(stream, value_string, DELIMITER)){
+		flag = readDoubles(values, value_string);
+
+		if(flag == 0){
+			n_settings = settings.size();
+			for(unsigned int i = 0; i < n_settings; ++i){
+				settings[i].incidentBeamParams.push_back(values[0]);
+			}
+		}
+		if(flag == 1){
+			n_settings = settings.size();
+			for(unsigned int i = 0; i < values.size(); ++i){
+				if(i > 0){
+					for(unsigned int j = 0; j < n_settings; ++j){
+						settings.push_back(settings[j]);
+					}
+				}
+			}
+			for(unsigned int i = 0; i < values.size(); ++i){
+				for(unsigned int j = 0; j < n_settings; ++j){
+					settings[i*n_settings + j].incidentBeamParams.push_back(values[i]);
+				}
+			}
+		}
+		if(flag == 2){
+			n_values = values.size();
+
+			if(n_settings == 1){
+				for(unsigned int i = 0; i < n_values - 1; ++i){
+					settings.push_back(settings[0]);
+				}
+			}
+
+			for(unsigned int i = 0; i < n_values; ++i){
+				settings[i].incidentBeamParams.push_back(values[i]);
+			}
+		}
+
+		values.clear();
+	}
+}
+
+void InputReader::readNBins_E(istringstream &stream, vector<Settings> &settings){
+	vector<int> values;
+	string value_string = "";
+	int flag = 0;
+	long unsigned int n_settings = settings.size();
+	long unsigned int n_values = 0;
+
+	// Read nbins_e
+	getline(stream, value_string, DELIMITER);
+	flag = readInts(values, value_string);
+
+	if(flag == 0){
+		n_settings = settings.size();
+
+		for(unsigned int i = 0; i < n_settings; ++i){
+			settings[i].nbins_e = (unsigned int) values[0];
+		}
+	}
+	if(flag == 1){
+		n_settings = settings.size();
+
+		for(unsigned int i = 0; i < values.size(); ++i){
+			if(i > 0){
+				for(unsigned int j = 0; j < n_settings; ++j){
+					settings.push_back(settings[j]);
+				}
+			}
+			for(unsigned int j = 0; j < n_settings; ++j){
+				settings[i*n_settings + j].nbins_e = (unsigned int) values[i];
+			}
+		}
+	}
+	if(flag == 2){
+		n_values = values.size();
+		n_settings = settings.size();
+
+		if(n_settings == 1){
+			for(unsigned int i = 0; i < n_values - 1; ++i){
+				settings.push_back(settings[0]);
+			}
+		}
+
+		for(unsigned int i = 0; i < n_values; ++i){
+			settings[i].nbins_e = (unsigned int) values[i];
+		}
+	}
+}
+
+void InputReader::readNBins_Z(istringstream &stream, vector<Settings> &settings){
+	vector<int> values;
+	string value_string = "";
+	int flag = 0;
+	long unsigned int n_settings = settings.size();
+	long unsigned int n_values = 0;
+
+	// Read nbins_z
+	getline(stream, value_string, DELIMITER);
+	flag = readInts(values, value_string);
+
+	if(flag == 0){
+		n_settings = settings.size();
+
+		for(unsigned int i = 0; i < n_settings; ++i){
+			settings[i].nbins_z = (unsigned int) values[0];
+		}
+	}
+	if(flag == 1){
+		n_settings = settings.size();
+
+		for(unsigned int i = 0; i < values.size(); ++i){
+			if(i > 0){
+				for(unsigned int j = 0; j < n_settings; ++j){
+					settings.push_back(settings[j]);
+				}
+			}
+			for(unsigned int j = 0; j < n_settings; ++j){
+				settings[i*n_settings + j].nbins_z = (unsigned int) values[i];
+			}
+		}
+	}
+	if(flag == 2){
+		n_values = values.size();
+		n_settings = settings.size();
+
+		if(n_settings == 1){
+			for(unsigned int i = 0; i < n_values - 1; ++i){
+				settings.push_back(settings[0]);
+			}
+		}
+
+		for(unsigned int i = 0; i < n_values; ++i){
+			settings[i].nbins_z = (unsigned int) values[i];
+		}
+	}
+}
+
+void InputReader::readEnergy(istringstream &stream, vector<Settings> &settings, unsigned int ntarget){
+
+	vector<double> values;
+	string value_string = "";
+	int flag = 0;
+	long unsigned int n_settings = settings.size();
+	long unsigned int n_values = 0;
+
+	// Read energies
+
+	while(getline(stream, value_string, DELIMITER)){
+		flag = readDoubles(values, value_string);
+
+		if(flag == 0){
+			n_settings = settings.size();
+			for(unsigned int i = 0; i < n_settings; ++i){
+				settings[i].energy[ntarget].push_back(values[0]);
+			}
+		}
+		if(flag == 1){
+			n_settings = settings.size();
+			for(unsigned int i = 0; i < values.size(); ++i){
+				if(i > 0){
+					for(unsigned int j = 0; j < n_settings; ++j){
+						settings.push_back(settings[j]);
+					}
+				}
+			}
+			for(unsigned int i = 0; i < values.size(); ++i){
+				for(unsigned int j = 0; j < n_settings; ++j){
+					settings[i*n_settings + j].energy[ntarget].push_back(values[i]);
+				}
+			}
+		}
+		if(flag == 2){
+			n_values = values.size();
+
+			if(n_settings == 1){
+				for(unsigned int i = 0; i < n_values - 1; ++i){
+					settings.push_back(settings[0]);
+				}
+			}
+
+			for(unsigned int i = 0; i < n_values; ++i){
+				settings[i].energy[ntarget].push_back(values[i]);
+			}
+		}
+
+		values.clear();
+	}
+}
+
+void InputReader::readGamma0(istringstream &stream, vector<Settings> &settings, unsigned int ntarget){
+
+	vector<double> values;
+	string value_string = "";
+	int flag = 0;
+	long unsigned int n_settings = settings.size();
+	long unsigned int n_values = 0;
+
+	// Read values for gamma0
+
+	while(getline(stream, value_string, DELIMITER)){
+		flag = readDoubles(values, value_string);
+
+		if(flag == 0){
+			n_settings = settings.size();
+			for(unsigned int i = 0; i < n_settings; ++i){
+				settings[i].gamma0[ntarget].push_back(values[0]);
+			}
+		}
+		if(flag == 1){
+			n_settings = settings.size();
+			for(unsigned int i = 0; i < values.size(); ++i){
+				if(i > 0){
+					for(unsigned int j = 0; j < n_settings; ++j){
+						settings.push_back(settings[j]);
+					}
+				}
+			}
+			for(unsigned int i = 0; i < values.size(); ++i){
+				for(unsigned int j = 0; j < n_settings; ++j){
+					settings[i*n_settings + j].gamma0[ntarget].push_back(values[i]);
+				}
+			}
+		}
+		if(flag == 2){
+			n_values = values.size();
+
+			if(n_settings == 1){
+				for(unsigned int i = 0; i < n_values - 1; ++i){
+					settings.push_back(settings[0]);
+				}
+			}
+
+			for(unsigned int i = 0; i < n_values; ++i){
+				settings[i].gamma0[ntarget].push_back(values[i]);
+			}
+		}
+
+		values.clear();
+	}
+}
+
+void InputReader::readGamma(istringstream &stream, vector<Settings> &settings, unsigned int ntarget){
+
+	vector<double> values;
+	string value_string = "";
+	int flag = 0;
+	long unsigned int n_settings = settings.size();
+	long unsigned int n_values = 0;
+
+	// Read values for gamma
+
+	while(getline(stream, value_string, DELIMITER)){
+		flag = readDoubles(values, value_string);
+
+		if(flag == 0){
+			n_settings = settings.size();
+			for(unsigned int i = 0; i < n_settings; ++i){
+				settings[i].gamma[ntarget].push_back(values[0]);
+			}
+		}
+		if(flag == 1){
+			n_settings = settings.size();
+			for(unsigned int i = 0; i < values.size(); ++i){
+				if(i > 0){
+					for(unsigned int j = 0; j < n_settings; ++j){
+						settings.push_back(settings[j]);
+					}
+				}
+			}
+			for(unsigned int i = 0; i < values.size(); ++i){
+				for(unsigned int j = 0; j < n_settings; ++j){
+					settings[i*n_settings + j].gamma[ntarget].push_back(values[i]);
+				}
+			}
+		}
+		if(flag == 2){
+			n_values = values.size();
+
+			if(n_settings == 1){
+				for(unsigned int i = 0; i < n_values - 1; ++i){
+					settings.push_back(settings[0]);
+				}
+			}
+
+			for(unsigned int i = 0; i < n_values; ++i){
+				settings[i].gamma[ntarget].push_back(values[i]);
+			}
+		}
+
+		values.clear();
+	}
+}
+
+
+void InputReader::readJ0(istringstream &stream, vector<Settings> &settings, unsigned int ntarget){
+
+	vector<double> values;
+	string value_string = "";
+	int flag = 0;
+	long unsigned int n_settings = settings.size();
+	long unsigned int n_values = 0;
+
+	// Read values for j0 
+
+	while(getline(stream, value_string, DELIMITER)){
+		flag = readDoubles(values, value_string);
+
+		if(flag == 0){
+			n_settings = settings.size();
+			for(unsigned int i = 0; i < n_settings; ++i){
+				settings[i].ji.push_back(values[0]);
+			}
+		}
+		if(flag == 1){
+			n_settings = settings.size();
+			for(unsigned int i = 0; i < values.size(); ++i){
+				if(i > 0){
+					for(unsigned int j = 0; j < n_settings; ++j){
+						settings.push_back(settings[j]);
+					}
+				}
+			}
+			for(unsigned int i = 0; i < values.size(); ++i){
+				for(unsigned int j = 0; j < n_settings; ++j){
+					settings[i*n_settings + j].ji.push_back(values[i]);
+				}
+			}
+		}
+		if(flag == 2){
+			n_values = values.size();
+
+			if(n_settings == 1){
+				for(unsigned int i = 0; i < n_values - 1; ++i){
+					settings.push_back(settings[0]);
+				}
+			}
+
+			for(unsigned int i = 0; i < n_values; ++i){
+				settings[i].ji.push_back(values[i]);
+			}
+		}
+
+		values.clear();
+	}
+}
+
+void InputReader::readJ(istringstream &stream, vector<Settings> &settings, unsigned int ntarget){
+
+	vector<double> values;
+	string value_string = "";
+	int flag = 0;
+	long unsigned int n_settings = settings.size();
+	long unsigned int n_values = 0;
+
+	// Read values for jj
+
+	while(getline(stream, value_string, DELIMITER)){
+		flag = readDoubles(values, value_string);
+
+		if(flag == 0){
+			n_settings = settings.size();
+			for(unsigned int i = 0; i < n_settings; ++i){
+				settings[i].jj[ntarget].push_back(values[0]);
+			}
+		}
+		if(flag == 1){
+			n_settings = settings.size();
+			for(unsigned int i = 0; i < values.size(); ++i){
+				if(i > 0){
+					for(unsigned int j = 0; j < n_settings; ++j){
+						settings.push_back(settings[j]);
+					}
+				}
+			}
+			for(unsigned int i = 0; i < values.size(); ++i){
+				for(unsigned int j = 0; j < n_settings; ++j){
+					settings[i*n_settings + j].jj[ntarget].push_back(values[i]);
+				}
+			}
+		}
+		if(flag == 2){
+			n_values = values.size();
+
+			if(n_settings == 1){
+				for(unsigned int i = 0; i < n_values - 1; ++i){
+					settings.push_back(settings[0]);
+				}
+			}
+
+			for(unsigned int i = 0; i < n_values; ++i){
+				settings[i].jj[ntarget].push_back(values[i]);
+			}
+		}
+
+		values.clear();
 	}
 }
 

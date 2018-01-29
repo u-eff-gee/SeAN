@@ -48,10 +48,8 @@ void Settings::printExperiment(){
 	// Since eV is the standard energy unit of SeAN, but the absolute energy of resonances is in the order of several MeV, increase the precision for the output of double numbers and reset it later
 	cout << setprecision(7) << "EMIN\t\t:\t" << scientific << emin << " eV" << endl;
 	cout << setprecision(7) << "EMAX\t\t:\t" << scientific << emax << " eV" << endl;
-	cout << "NBINS_ENERGY\t:\t" << nbins_e << endl;
-	cout << "NBINS_Z\t\t:\t" << nbins_z << endl;
 	cout << "PRIMARY BEAM\t:\t";
-
+	
 	// Reset precision
 	cout << defaultfloat << setprecision((int) default_precision);
 
@@ -71,6 +69,10 @@ void Settings::printExperiment(){
 	} else{
 		cout << "not set" << endl;
 	}
+
+	cout << "NBINS_ENERGY\t:\t" << nbins_e << endl;
+	cout << "NBINS_Z\t\t:\t" << nbins_z << endl;
+
 }
 
 void Settings::printTarget(unsigned int i){
@@ -80,54 +82,92 @@ void Settings::printTarget(unsigned int i){
 	cout << ">>> TARGET #" << (i + 1) << " : " << targetNames[i]  << endl;
 	cout << "RESONANCES:\tENERGY\tGAMMA0\tGAMMA\tJ0\tJ" << endl;
 
-	long unsigned int nresonances = energy[i].size();
-	for(long unsigned int j = 0; j < nresonances; ++j){
-		cout << "\t\t" << scientific << setprecision(7) << energy[i][j] << defaultfloat << "\t" << gamma0[i][j] << "\t" << gamma[i][j] << "\t" << ji[i] << "\t" << jj[i][j] << endl;
+	if(energy.size() == 0 || gamma0.size() == 0 || gamma.size() == 0 || jj.size() == 0){
+		cout << "\tno resonances given or incomplete input" << endl;
+	} else{
+
+		long unsigned int nresonances = energy[i].size();
+
+		if(energy[i].size() == nresonances && gamma0[i].size() == nresonances && gamma[i].size() && jj[i].size() == nresonances){
+
+			for(long unsigned int j = 0; j < nresonances; ++j){
+				cout << "\t\t" << scientific << setprecision(7) << energy[i][j] << defaultfloat << "\t" << gamma0[i][j] << "\t" << gamma[i][j] << "\t" << ji[i] << "\t" << jj[i][j] << endl;
+			}
+			
+			// Reset precision
+			cout << defaultfloat << setprecision((int) default_precision);
+		} else{
+			cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
+			cout << " printTarget(): Number of parameters ENERGY, GAMMA0, GAMMA, J0 and J does not match." << endl;
+			abort();
+		}
 	}
-	
-	// Reset precision
-	cout << defaultfloat << setprecision((int) default_precision);
 
 	cout << "VELOCITY DISTRIBUTION:\t";
-	switch(vDist[i]){
-		case vDistModel::zero:
-			cout << "zero" << endl;
-			break;
-		case vDistModel::arb:
-			cout << "arb, " << vDistFile[i] << endl;
-			break;
-		case vDistModel::mb:
-			cout << "Maxwell-Boltzmann, T_eff = " << vDistParams[i][0] << " K" << endl;
-			break;
-		case vDistModel::mba:
-			cout << "Maxwell-Boltzmann (using approximation), T_eff = " << vDistParams[i][0] << " K " << endl;
-			break;
-		case vDistModel::mbd:
-			cout << "Maxwell-Boltzmann (using Debye approximation), T = " << vDistParams[i][0] << " K, T_D = " << vDistParams[i][1] << " K " << endl;
-			break;
-		case vDistModel::mbad:
-			cout << "Maxwell-Boltzmann (using Debye and integral approximation), T = " << vDistParams[i][0] << " K, T_D = " << vDistParams[i][1] << " K " << endl;
-			break;
-		default: break;
+
+	if(vDist.size() == 0){
+		cout << "not set" << endl;
+	} else{
+		switch(vDist[i]){
+			case vDistModel::zero:
+				cout << "zero" << endl;
+				break;
+			case vDistModel::arb:
+				cout << "arb, " << vDistFile[i] << endl;
+				break;
+			case vDistModel::mb:
+				cout << "Maxwell-Boltzmann, T_eff = " << vDistParams[i][0] << " K" << endl;
+				break;
+			case vDistModel::mba:
+				cout << "Maxwell-Boltzmann (using approximation), T_eff = " << vDistParams[i][0] << " K " << endl;
+				break;
+			case vDistModel::mbd:
+				cout << "Maxwell-Boltzmann (using Debye approximation), T = " << vDistParams[i][0] << " K, T_D = " << vDistParams[i][1] << " K " << endl;
+				break;
+			case vDistModel::mbad:
+				cout << "Maxwell-Boltzmann (using Debye and integral approximation), T = " << vDistParams[i][0] << " K, T_D = " << vDistParams[i][1] << " K " << endl;
+				break;
+			default: break;
+		}
 	}
-
-	cout << "ATOMIC MASS:\t\t" << mass[i] << " u" << endl;
-
+	
+	cout << "ATOMIC MASS:\t\t";
+	if(mass.size() == 0){
+		cout << "not set" << endl;
+	} else{
+		cout << mass[i] << " u" << endl;
+	}
+	
 	cout << "MASS ATTENUATION:\t";
-	switch(mAtt[i]){
-		case mAttModel::constant:
-			cout << "constant, " << mAttParams[i][0] << endl;
-			break;
-		case mAttModel::nist:
-			cout << "nist, " << mAttFile[i] << endl;
-			break;
-		case mAttModel::arb:
-			cout << "arb" << mAttFile[i] << endl;
-			break;
-		default: break;
+
+	if(mAttParams.size() == 0 || mAttFile.size() == 0){
+		cout << "not set" << endl;
+	} else{
+		switch(mAtt[i]){
+			case mAttModel::constant:
+				cout << "constant, " << mAttParams[i][0] << endl;
+				break;
+			case mAttModel::nist:
+				cout << "nist, " << mAttFile[i] << endl;
+				break;
+			case mAttModel::arb:
+				cout << "arb" << mAttFile[i] << endl;
+				break;
+			default: break;
+		}
+	}
+	
+	cout << "TARGET THICKNESS:\t";
+	if(thickness.size() == 0){
+		cout << "not set" << endl;
+	} else{
+	 	cout << thickness[i] << " atoms/fm^2" << endl;
 	}
 
-	cout << "TARGET THICKNESS:\t" << thickness[i] << " atoms/fm^2" << endl;
-
-	cout << "VELOCITY:\t\t" << velocity[i] << " m/s" << endl;
+	cout << "VELOCITY:\t\t";
+	if(velocity.size() == 0){
+		cout << "not set" << endl;
+	} else{
+		cout << velocity[i] << " m/s" << endl;
+	}
 }

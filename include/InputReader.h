@@ -16,8 +16,24 @@ public:
 	// Read the SeAN input file
 	void readFile(vector<Settings> &settings);
 	// Reader functions for parameters
+		// General reader function for double values
 	int readDoubles(vector<double> &values, const string &value_string);
+		// General reader function for int values
+	int readInts(vector<int> &values, const string &value_string);
+
 	void readEminEmax(istringstream &stream, vector<Settings> &settings);
+	void readIncidentBeam(istringstream &stream, vector<Settings> &settings);
+	void readNBins_E(istringstream &stream, vector<Settings> &settings);
+	void readNBins_Z(istringstream &stream, vector<Settings> &settings);
+	void readEnergy(istringstream &stream, vector<Settings> &settings, const unsigned int ntarget);
+
+	void readGamma0(istringstream &stream, vector<Settings> &settings, const unsigned int ntarget);
+
+	void readGamma(istringstream &stream, vector<Settings> &settings, const unsigned int ntarget);
+
+	void readJ0(istringstream &stream, vector<Settings> &settings, const unsigned int ntarget);
+
+	void readJ(istringstream &stream, vector<Settings> &settings, const unsigned int ntarget);
 
 	// Read a nuclear mass from the AME table
 	double readAME(string isotope);
