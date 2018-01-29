@@ -64,26 +64,29 @@ int main(int argc, char* argv[]){
 
 	InputReader input;
 	input.readFile(settings);
-	
-	for(auto s: settings)
-		s.print();
 
-//	Experiment experiment(settings);
-//	experiment.initialize();
-//	experiment.crossSections();
-//	experiment.transmission();
-//	if(settings.plot){
-//		experiment.plot();
-//	}
-//	if(settings.write){
-//		experiment.write();
-//	}
-//	experiment.resonant_scattering();
-//	experiment.print_results();
-//	
-//	// Stop the clock
-//	high_resolution_clock::time_point stop = high_resolution_clock::now();
-//	duration<double> delta_t = duration_cast< duration<double>>(stop - start);
-//
-//	cout << "> main.cpp: Execution took " << delta_t.count() << " seconds" << endl;
+	Experiment *experiment;
+	
+	for(unsigned int i = 0; i < settings.size(); ++i){
+
+		experiment = new Experiment(settings[i]);
+		experiment->initialize();
+		experiment->crossSections();
+		experiment->transmission();
+		if(settings[i].plot){
+			experiment->plot();
+		}
+		if(settings[i].write){
+			experiment->write();
+		}
+		experiment->resonant_scattering();
+		experiment->print_results();
+
+	}
+	
+	// Stop the clock
+	high_resolution_clock::time_point stop = high_resolution_clock::now();
+	duration<double> delta_t = duration_cast< duration<double>>(stop - start);
+
+	cout << "> main.cpp: Execution took " << delta_t.count() << " seconds" << endl;
 }

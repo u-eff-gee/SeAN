@@ -140,7 +140,7 @@ void Settings::printTarget(unsigned int i){
 	
 	cout << "MASS ATTENUATION:\t";
 
-	if(mAttParams.size() == 0 || mAttFile.size() == 0){
+	if(mAttParams.size() == 0 && mAttFile.size() == 0){
 		cout << "not set" << endl;
 	} else{
 		switch(mAtt[i]){

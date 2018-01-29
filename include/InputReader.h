@@ -35,6 +35,16 @@ public:
 
 	void readJ(istringstream &stream, vector<Settings> &settings, const unsigned int ntarget);
 
+	void readVelocityDistribution(istringstream &stream, vector<Settings> &settings, const unsigned int ntarget);
+
+	void readMass(istringstream &stream, vector<Settings> &settings);
+
+	void readMassAttenuation(istringstream &stream, vector<Settings> &settings, const unsigned int ntarget);
+
+	void readTargetThickness(istringstream &stream, vector<Settings> &settings);
+		
+	void readVelocity(istringstream &stream, vector<Settings> &settings);
+
 	// Read a nuclear mass from the AME table
 	double readAME(string isotope);
 	// Read an energy-dependent mass-attenuation coefficient from a file with the NIST format

@@ -150,112 +150,42 @@ void InputReader::readFile(vector<Settings> &settings){
 				++nline;
 				break;
 				
-//			// Read velocity distribution
-//			case 6:
-//				settings.vDistParams.push_back(vector<double>());
-//				getline(stream, value, DELIMITER);
-//				if(value == "zero"){
-//					settings.vDist.push_back(vDistModel::zero);
-//					settings.vDistFile.push_back("");
-//					getline(stream, value, DELIMITER);
-//					settings.vDistParams[ntarget].push_back(0.);
-//				}
-//				else if(value == "arb"){
-//					settings.vDist.push_back(vDistModel::arb);
-//					getline(stream, value, DELIMITER);
-//					settings.vDistFile.push_back(regex_replace(value, regex("\\s+"), ""));
-//				}
-//				else if(value == "maxwell_boltzmann"){
-//					settings.vDist.push_back(vDistModel::mb);
-//					settings.vDistFile.push_back("");
-//					getline(stream, value, DELIMITER);
-//					settings.vDistParams[ntarget].push_back(atof(value.c_str()));
-//				}
-//				else if(value == "maxwell_boltzmann_approximation"){
-//					settings.vDist.push_back(vDistModel::mba);
-//					settings.vDistFile.push_back("");
-//					getline(stream, value, DELIMITER);
-//					settings.vDistParams[ntarget].push_back(atof(value.c_str()));
-//				}
-//				else if(value == "maxwell_boltzmann_debye"){
-//					settings.vDist.push_back(vDistModel::mbd);
-//					settings.vDistFile.push_back("");
-//					getline(stream, value, DELIMITER);
-//					settings.vDistParams[ntarget].push_back(atof(value.c_str()));
-//					getline(stream, value, DELIMITER);
-//					settings.vDistParams[ntarget].push_back(atof(value.c_str()));
-//				}
-//				else if(value == "maxwell_boltzmann_approximation_debye"){
-//					settings.vDist.push_back(vDistModel::mbad);
-//					settings.vDistFile.push_back("");
-//					getline(stream, value, DELIMITER);
-//					settings.vDistParams[ntarget].push_back(atof(value.c_str()));
-//					getline(stream, value, DELIMITER);
-//					settings.vDistParams[ntarget].push_back(atof(value.c_str()));
-//				}
-//
-//				else{
-//					cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
-//					cout << " readFile(): Unknown option '" << value << "' for velocity distribution." << endl;
-//					abort();
-//				}
-//				++nline;
-//				break;
-//
-//			// Read atomic mass
-//			case 7:
-//				if(regex_search(line, regex("[a-zA-Z]"))){
-//					settings.mass.push_back(readAME(line));
-//				} else{
-//					settings.mass.push_back(atof(line.c_str()));
-//				}
-//				++nline;
-//				break;
-//
-//			// Read mass attenuation
-//			case 8:
-//				settings.mAttParams.push_back(vector<double>());
-//				getline(stream, value, DELIMITER);
-//				if(value == "const"){
-//					settings.mAtt.push_back(mAttModel::constant);
-//					getline(stream, value, DELIMITER);
-//					settings.mAttParams[ntarget].push_back(atof(value.c_str()));
-//					settings.mAttFile.push_back("");
-//				}
-//				else if(value == "nist"){
-//					settings.mAtt.push_back(mAttModel::nist);
-//					getline(stream, value, DELIMITER);
-//					settings.mAttParams[ntarget].push_back(0.);
-//					settings.mAttFile.push_back(regex_replace(value, regex("\\s+"), ""));
-//				}
-//				else if(value == "arb"){
-//					settings.mAtt.push_back(mAttModel::arb);
-//					getline(stream, value, DELIMITER);
-//					settings.mAttParams[ntarget].push_back(0.);
-//					settings.mAttFile.push_back(regex_replace(value, regex("\\s+"), ""));
-//				}
-//				else{
-//					cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
-//					cout << " readFile(): Unknown option '" << value << "' for mass attenuation." << endl;
-//					abort();
-//				}
-//				++nline;
-//				break;
-//
-//			// Read target thickness
-//			case 9:
-//				getline(stream, value, DELIMITER);
-//				settings.thickness.push_back(atof(value.c_str()));
-//				++nline;
-//				break;
-//
-//			// Read target velocity
-//			case 10:
-//				getline(stream, value, DELIMITER);
-//				settings.velocity.push_back(atof(value.c_str()));
-//				++nline;
-//				++ntarget;
-//				break;
+			// Read velocity distribution
+			case 6:
+				for(unsigned i = 0; i < settings.size(); ++i){
+					settings[i].vDistParams.push_back(vector<double>());
+				}
+				readVelocityDistribution(stream, settings, ntarget);
+				++nline;
+				break;
+
+			// Read atomic mass
+			case 7:
+				readMass(stream, settings);
+				++nline;
+				break;
+
+			// Read mass attenuation
+			case 8:
+				for(unsigned i = 0; i < settings.size(); ++i){
+					settings[i].mAttParams.push_back(vector<double>());
+				}
+				readMassAttenuation(stream, settings, ntarget);
+				++nline;
+				break;
+
+			// Read target thickness
+			case 9:
+				readTargetThickness(stream, settings);
+				++nline;
+				break;
+				
+			// Read target velocity
+			case 10:
+				readVelocity(stream, settings);
+				++nline;
+				++ntarget;
+				break;
 		}
         }
 
@@ -892,6 +822,347 @@ void InputReader::readJ(istringstream &stream, vector<Settings> &settings, unsig
 		}
 
 		values.clear();
+	}
+}
+
+void InputReader::readVelocityDistribution(istringstream &stream, vector<Settings> &settings, const unsigned int ntarget){
+
+	vector<double> values;
+	string value_string = "";
+	int flag = 0;
+	long unsigned int n_settings = settings.size();
+	long unsigned int n_values = 0;
+	bool file = false;
+
+	// Read velocity distribution model
+	getline(stream, value_string, DELIMITER);
+
+	if(value_string=="zero"){
+		for(unsigned int i = 0; i < n_settings; ++i){
+			settings[i].vDist.push_back(vDistModel::zero);
+		}
+	} else if(value_string=="arb"){
+		for(unsigned int i = 0; i < n_settings; ++i){
+			settings[i].vDist.push_back(vDistModel::arb);
+		}
+
+		file = true;
+
+	} else if(value_string=="maxwell_boltzmann"){
+		for(unsigned int i = 0; i < n_settings; ++i){
+			settings[i].vDist.push_back(vDistModel::mb);
+		}
+	} else if(value_string=="maxwell_boltzmann_approximation"){
+		for(unsigned int i = 0; i < n_settings; ++i){
+			settings[i].vDist.push_back(vDistModel::mba);
+		}
+	} else if(value_string=="maxwell_boltzmann_approximation"){
+		for(unsigned int i = 0; i < n_settings; ++i){
+			settings[i].vDist.push_back(vDistModel::mba);
+		}
+	} else if(value_string=="maxwell_boltzmann_debye"){
+		for(unsigned int i = 0; i < n_settings; ++i){
+			settings[i].vDist.push_back(vDistModel::mbd);
+		}
+	} else if(value_string=="maxwell_boltzmann_approximation_debye"){
+		for(unsigned int i = 0; i < n_settings; ++i){
+			settings[i].vDist.push_back(vDistModel::mbad);
+		}
+	} else{
+		cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
+		cout << " readFile(): Unknown option '" << value_string << "' for velocity distribution." << endl;
+		abort();
+	}
+
+	// Read parameters
+	
+	if(file){
+		getline(stream, value_string, DELIMITER);
+			
+		for(unsigned int i = 0; i < n_settings; ++i){
+			settings[i].vDistFile.push_back(regex_replace(value_string, regex("\\s+"), ""));
+		}
+	} else{
+
+		while(getline(stream, value_string, DELIMITER)){
+			flag = readDoubles(values, value_string);
+
+			if(flag == 0){
+				n_settings = settings.size();
+				for(unsigned int i = 0; i < n_settings; ++i){
+					settings[i].vDistParams[ntarget].push_back(values[0]);
+				}
+			}
+			if(flag == 1){
+				n_settings = settings.size();
+				for(unsigned int i = 0; i < values.size(); ++i){
+					if(i > 0){
+						for(unsigned int j = 0; j < n_settings; ++j){
+							settings.push_back(settings[j]);
+						}
+					}
+				}
+				for(unsigned int i = 0; i < values.size(); ++i){
+					for(unsigned int j = 0; j < n_settings; ++j){
+						settings[i*n_settings + j].vDistParams[ntarget].push_back(values[i]);
+					}
+				}
+			}
+			if(flag == 2){
+				n_values = values.size();
+
+				if(n_settings == 1){
+					for(unsigned int i = 0; i < n_values - 1; ++i){
+						settings.push_back(settings[0]);
+					}
+				}
+
+				for(unsigned int i = 0; i < n_values; ++i){
+					settings[i].vDistParams[ntarget].push_back(values[i]);
+				}
+			}
+
+			values.clear();
+		}
+	}
+}
+
+void InputReader::readMass(istringstream &stream, vector<Settings> &settings){
+	vector<double> values;
+	string value_string = "";
+	int flag = 0;
+	long unsigned int n_settings = settings.size();
+	long unsigned int n_values = 0;
+
+	// Read values for the mass
+	getline(stream, value_string, DELIMITER);
+
+	if(regex_search(value_string, regex("[a-zA-Z]"))){
+		values.push_back(readAME(regex_replace(value_string, regex("\\s+"), "")));
+		for(unsigned int i = 0; i < n_settings; ++i){
+			settings[i].mass.push_back(values[0]);
+		}
+	} else{
+		flag = readDoubles(values, value_string);
+
+		if(flag == 0){
+			n_settings = settings.size();
+			for(unsigned int i = 0; i < n_settings; ++i){
+				settings[i].mass.push_back(values[0]);
+			}
+		}
+		if(flag == 1){
+			n_settings = settings.size();
+			for(unsigned int i = 0; i < values.size(); ++i){
+				if(i > 0){
+					for(unsigned int j = 0; j < n_settings; ++j){
+						settings.push_back(settings[j]);
+					}
+				}
+			}
+			for(unsigned int i = 0; i < values.size(); ++i){
+				for(unsigned int j = 0; j < n_settings; ++j){
+					settings[i*n_settings + j].mass.push_back(values[i]);
+				}
+			}
+		}
+		if(flag == 2){
+			n_values = values.size();
+
+			if(n_settings == 1){
+				for(unsigned int i = 0; i < n_values - 1; ++i){
+					settings.push_back(settings[0]);
+				}
+			}
+
+			for(unsigned int i = 0; i < n_values; ++i){
+				settings[i].mass.push_back(values[i]);
+			}
+		}
+	}
+	
+	values.clear();
+}
+
+void InputReader::readMassAttenuation(istringstream &stream, vector<Settings> &settings, const unsigned int ntarget){
+
+	vector<double> values;
+	string value_string = "";
+	int flag = 0;
+	long unsigned int n_settings = settings.size();
+	long unsigned int n_values = 0;
+	bool file = false;
+
+	// Read velocity distribution model
+	getline(stream, value_string, DELIMITER);
+
+	if(value_string=="const"){
+		for(unsigned int i = 0; i < n_settings; ++i){
+			settings[i].mAtt.push_back(mAttModel::constant);
+		}
+	} else if(value_string=="nist"){
+		for(unsigned int i = 0; i < n_settings; ++i){
+			settings[i].mAtt.push_back(mAttModel::nist);
+		}
+
+		file = true;
+
+	} else if(value_string=="arb"){
+		for(unsigned int i = 0; i < n_settings; ++i){
+			settings[i].mAtt.push_back(mAttModel::arb);
+		}
+
+		file = true;
+	} else{
+		cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
+		cout << " readFile(): Unknown option '" << value_string << "' for mass attenuation." << endl;
+		abort();
+	}
+
+	// Read parameters
+	
+	if(file){
+		getline(stream, value_string, DELIMITER);
+			
+		for(unsigned int i = 0; i < n_settings; ++i){
+			settings[i].mAttFile.push_back(regex_replace(value_string, regex("\\s+"), ""));
+		}
+	} else{
+
+		while(getline(stream, value_string, DELIMITER)){
+			flag = readDoubles(values, value_string);
+
+			if(flag == 0){
+				n_settings = settings.size();
+				for(unsigned int i = 0; i < n_settings; ++i){
+					settings[i].mAttParams[ntarget].push_back(values[0]);
+				}
+			}
+			if(flag == 1){
+				n_settings = settings.size();
+				for(unsigned int i = 0; i < values.size(); ++i){
+					if(i > 0){
+						for(unsigned int j = 0; j < n_settings; ++j){
+							settings.push_back(settings[j]);
+						}
+					}
+				}
+				for(unsigned int i = 0; i < values.size(); ++i){
+					for(unsigned int j = 0; j < n_settings; ++j){
+						settings[i*n_settings + j].mAttParams[ntarget].push_back(values[i]);
+					}
+				}
+			}
+			if(flag == 2){
+				n_values = values.size();
+
+				if(n_settings == 1){
+					for(unsigned int i = 0; i < n_values - 1; ++i){
+						settings.push_back(settings[0]);
+					}
+				}
+
+				for(unsigned int i = 0; i < n_values; ++i){
+					settings[i].mAttParams[ntarget].push_back(values[i]);
+				}
+			}
+
+			values.clear();
+		}
+	}
+}
+
+void InputReader::readTargetThickness(istringstream &stream, vector<Settings> &settings){
+	vector<double> values;
+	string value_string = "";
+	int flag = 0;
+	long unsigned int n_settings = settings.size();
+	long unsigned int n_values = 0;
+
+	// Read values for the target thickness
+	getline(stream, value_string, DELIMITER);
+	flag = readDoubles(values, value_string);
+
+	if(flag == 0){
+		n_settings = settings.size();
+		for(unsigned int i = 0; i < n_settings; ++i){
+			settings[i].thickness.push_back(values[0]);
+		}
+	}
+	if(flag == 1){
+		n_settings = settings.size();
+		for(unsigned int i = 0; i < values.size(); ++i){
+			if(i > 0){
+				for(unsigned int j = 0; j < n_settings; ++j){
+					settings.push_back(settings[j]);
+				}
+			}
+		}
+		for(unsigned int i = 0; i < values.size(); ++i){
+			for(unsigned int j = 0; j < n_settings; ++j){
+				settings[i*n_settings + j].thickness.push_back(values[i]);
+			}
+		}
+	}
+	if(flag == 2){
+		n_values = values.size();
+
+		if(n_settings == 1){
+			for(unsigned int i = 0; i < n_values - 1; ++i){
+				settings.push_back(settings[0]);
+			}
+		}
+
+		for(unsigned int i = 0; i < n_values; ++i){
+			settings[i].thickness.push_back(values[i]);
+		}
+	}
+}
+
+void InputReader::readVelocity(istringstream &stream, vector<Settings> &settings){
+	vector<double> values;
+	string value_string = "";
+	int flag = 0;
+	long unsigned int n_settings = settings.size();
+	long unsigned int n_values = 0;
+
+	// Read values for the target velocity
+	getline(stream, value_string, DELIMITER);
+	flag = readDoubles(values, value_string);
+
+	if(flag == 0){
+		n_settings = settings.size();
+		for(unsigned int i = 0; i < n_settings; ++i){
+			settings[i].velocity.push_back(values[0]);
+		}
+	}
+	if(flag == 1){
+		n_settings = settings.size();
+		for(unsigned int i = 0; i < values.size(); ++i){
+			if(i > 0){
+				for(unsigned int j = 0; j < n_settings; ++j){
+					settings.push_back(settings[j]);
+				}
+			}
+		}
+		for(unsigned int i = 0; i < values.size(); ++i){
+			for(unsigned int j = 0; j < n_settings; ++j){
+				settings[i*n_settings + j].velocity.push_back(values[i]);
+			}
+		}
+	}
+	if(flag == 2){
+		n_values = values.size();
+
+		if(n_settings == 1){
+			for(unsigned int i = 0; i < n_values - 1; ++i){
+				settings.push_back(settings[0]);
+			}
+		}
+
+		for(unsigned int i = 0; i < n_values; ++i){
+			settings[i].velocity.push_back(values[i]);
+		}
 	}
 }
 
