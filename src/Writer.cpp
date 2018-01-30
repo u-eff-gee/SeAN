@@ -17,7 +17,7 @@ using std::setprecision;
 void Writer::write1DHistogram(const vector<double> &histogram, const string name, const string column_name){
 
 	stringstream filename;
-	filename << "output/" << name << ".txt";
+	filename << OUTPUT_DIR << name << ".txt";
 
 	ofstream ofile(filename.str());
 
@@ -38,7 +38,7 @@ void Writer::write1DHistogram(const vector<double> &histogram, const string name
 void Writer::write2DHistogram(const vector<vector<double> > &histogram, const string name, const string line_name, const string column_name){
 
 	stringstream filename;
-	filename << "output/" << name << ".txt";
+	filename << OUTPUT_DIR << name << ".txt";
 
 	ofstream ofile(filename.str());
 

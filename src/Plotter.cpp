@@ -1,4 +1,5 @@
 #include "Plotter.h"
+#include "Config.h"
 
 #include "TCanvas.h"
 #include "TLegend.h"
@@ -13,11 +14,10 @@ using std::stringstream;
 
 void Plotter::plot1DHistogram(const vector<double> &bins, const vector<double> &histogram, const string name, const string xaxis_label, const string yaxis_label){
 	stringstream filename;
-	filename << PLOT_OUTPUT_DIR << name << ".pdf";
+	filename << OUTPUT_DIR << name << ".pdf";
 	stringstream canvasname;
 	canvasname << name << "_canvas";
 	TCanvas *canvas = new TCanvas(canvasname.str().c_str(), name.c_str(), 0, 0, 800, 500);
-	//TLegend *legend = new TLegend(CS_PLOT_LEGEND_X1, CS_PLOT_LEGEND_Y1, CS_PLOT_LEGEND_X2, CS_PLOT_LEGEND_Y2);
 	
 	TGraph *graph = new TGraph((int) bins.size(), &bins[0], &histogram[0]);
 	graph->SetTitle(name.c_str());
@@ -25,16 +25,13 @@ void Plotter::plot1DHistogram(const vector<double> &bins, const vector<double> &
 	graph->GetHistogram()->GetYaxis()->SetTitle(yaxis_label.c_str());
 	graph->Draw();
 
-	//crossSection->plot_crosssection(energy_bins, crosssection_bins, target_name, canvas, legend, "Cross section");
-
-	// legend->Draw();
 	canvas->SaveAs(filename.str().c_str());
 	delete canvas;
 }
 
 void Plotter::plotMultiple1DHistograms(const vector<double> &bins, const vector< vector<double> > &histograms, const string name, const string xaxis_label, const string yaxis_label){
 	stringstream filename;
-	filename << PLOT_OUTPUT_DIR << name << ".pdf";
+	filename << OUTPUT_DIR << name << ".pdf";
 	stringstream canvasname;
 	canvasname << name << "_canvas";
 	TCanvas *canvas = new TCanvas(canvasname.str().c_str(), name.c_str(), 0, 0, 800, 500);
@@ -66,7 +63,7 @@ void Plotter::plotMultiple1DHistogramsAndSum(const vector<double> &bins, const v
 	}	
 
 	stringstream filename;
-	filename << PLOT_OUTPUT_DIR << name << ".pdf";
+	filename << OUTPUT_DIR << name << ".pdf";
 	stringstream canvasname;
 	canvasname << name << "_canvas";
 	TCanvas *canvas = new TCanvas(canvasname.str().c_str(), name.c_str(), 0, 0, 800, 500);
@@ -91,7 +88,7 @@ void Plotter::plotMultiple1DHistogramsAndSum(const vector<double> &bins, const v
 void Plotter::plot2DHistogram(const vector<double> &bins1, const vector<double> &bins2, const vector< vector<double> > &histogram, const string name, const string xaxis_label, const string yaxis_label, const string zaxis_label){
 
 	stringstream filename;
-	filename << PLOT_OUTPUT_DIR << name << ".pdf";
+	filename << OUTPUT_DIR << name << ".pdf";
 	stringstream canvasname;
 	canvasname << name << "_canvas";
 

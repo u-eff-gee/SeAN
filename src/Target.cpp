@@ -259,7 +259,7 @@ void Target::calculateMassAttenuation(const vector<double> &energy_bins){
 			absorption->arbitrary_mass_attenuation(energy_bins, mass_attenuation_file, mass_attenuation_histogram);
 			break;
 		case mAttModel::nist:
-			filename << MU_DIR << settings.mAttFile[target_number];
+			filename << settings.mAttFile[target_number];
 			inputReader->readNIST(mass_attenuation_file, filename.str()); 
 			absorption->nist_mass_attenuation(energy_bins, mass_attenuation_file, mass_attenuation_histogram, target_number);
 			break;

@@ -11,7 +11,7 @@ const double HBARC2 = 3.89379366e16; // in eV^2fm^2
 const double SPEEDOFLIGHT = 299792458.; // in m/s
 const double kB = 8.6173303e-5; // in eV/K
 const double AtomicMassUnit = 931.494095e6; // in eV/c^2
-const double AtomicMassUnitG = 1.660539040e-27; // in kg
+const double AtomicMassUnitKG = 1.660539040e-27; // in kg
 const double PI = 3.141592653589793;
 
 // Settings for the SeAN input file
@@ -23,9 +23,10 @@ const char LOOP_STOP = ']';
 const char SIM_LOOP_START = '{';
 const char SIM_LOOP_STOP = '}';
 const unsigned int N_TARGET_SETTINGS = 11;
-const unsigned int N_EXPERIMENT_SETTINGS = 4; 
 
 // Settings for the directories
+
+const string OUTPUT_DIR = "output/";
 const string VELOCITY_DISTRIBUTION_DIR = "velocity_distribution/";
 const string MU_DIR = "mass_attenuation/";
 const string BEAM_DIR = "beam/";

@@ -13,9 +13,6 @@ DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))
 
 _OBJ = Experiment.o main.o CrossSection.o Target.o Absorption.o Settings.o InputReader.o Plotter.o Writer.o Integrator.o
 OBJ = $(patsubst %,$(OBJDIR)/%,$(_OBJ))
-#
-#$(OBJDIR)/%.o: $(SRCDIR)/%.cpp $(DEPS)
-#	$(CC) -c -o $@ $< $(CFLAGS) $(ROOTFLAGS)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS) $(ROOTFLAGS) 

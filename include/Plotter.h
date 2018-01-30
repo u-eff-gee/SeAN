@@ -8,8 +8,6 @@ using std::string;
 using std::vector;
 
 class Plotter{
-private:
-	string PLOT_OUTPUT_DIR = "output/";
 
 public:
 	Plotter(){};

@@ -11,10 +11,6 @@ using std::vector;
 
 class Writer{
 
-private:
-	string TXT_OUTPUT_DIR = "output/";
-	const string COMMENT = "#";
-
 public:
 	Writer(){};
 	~Writer(){};

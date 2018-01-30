@@ -66,7 +66,7 @@ void Absorption::arbitrary_mass_attenuation(const vector<double> &energy_bins, c
 void Absorption::nist_mass_attenuation(const vector<double> &energy_bins, const vector< vector<double> > mass_attenuation_file, vector<double> &mass_attenuation_histogram, const unsigned int target_number){
 
 	// Conversion from cm2/g to fm2/atom
-	double mu_conversion_factor = settings.mass[target_number]*AtomicMassUnitG*1.0e26;
+	double mu_conversion_factor = settings.mass[target_number]*AtomicMassUnitKG*1.0e26;
 	// Conversion from eV to MeV
 	double energy_conversion_factor = 1.e-6;
 

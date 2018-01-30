@@ -1208,6 +1208,8 @@ double InputReader::readAME(string isotope){
 
 void InputReader::readNIST(vector< vector<double> > &mass_attenuation_file, const string mass_attenuation_filename){
 
+	stringstream filename;
+	filename << MU_DIR << AME_FILE_NAME;
 	ifstream ifile(mass_attenuation_filename);
 
         if(!ifile.is_open()){
