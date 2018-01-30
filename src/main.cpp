@@ -2,6 +2,7 @@
 #include <argp.h>
 #include <ctime>
 #include <chrono>
+#include <sstream>
 
 #include "Experiment.h"
 #include "Config.h"
@@ -11,6 +12,7 @@
 using std::cout;
 using std::endl;
 using std::cin;
+using std::stringstream;
 using namespace std::chrono;
 
 //const char *sean_program_version = "SeAN 0.0.0";
@@ -20,9 +22,11 @@ static char doc[] = "SeAN, Self-Absorption Numerical";
 static char args_doc[] = "INPUTFILE";
 
 static struct argp_option options[] = {
-  { 0, 'e', 0, 0, "Do not use convolution approximation (increased computing time)" },
-  { 0, 'p', 0, 0, "Create plots of all calculated quantities" },
-  { 0, 'w', 0, 0, "Create text output files for all calculated quantities" },
+  { "exact", 'e', 0, 0, "Do not use convolution approximation (increased computing time)" },
+  { "plot", 'p', 0, 0, "Create plots of all calculated quantities" },
+  { "write", 'w', 0, 0, "Create text output files for all calculated quantities" },
+  { "verbosity", 'v', "VERBOSITY", 0, "Set command line verbosity (0 = print nothing, 1 = print results, 2 [default] = print input and results)" },
+  { "output", 'o', "OUTPUTFILENAME", 0, "Write input and results to file" },
   { 0 }
 };
 
@@ -34,6 +38,10 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
 	case 'e': settings->exact = true; break;
     	case 'p': settings->plot = true; break;
     	case 'w': settings->write = true; break;
+	case 'v': settings->verbosity = atoi(arg); break;
+	case 'o': settings->output = true;
+		  settings->outputfile = arg;
+			break;
     	case ARGP_KEY_END:
         	if(state->arg_num == 0) {
             		argp_usage(state);
@@ -58,35 +66,48 @@ int main(int argc, char* argv[]){
 	// Start the clock
 	high_resolution_clock::time_point start = high_resolution_clock::now();
 
-
-	if(settings[0].sudowrite)
-		settings[0].write = true;
-
 	InputReader input;
 	input.readFile(settings);
 
 	Experiment *experiment;
-	
-	for(unsigned int i = 0; i < settings.size(); ++i){
 
+	unsigned int n_settings = settings.size();
+
+	for(unsigned int i = 0; i < n_settings; ++i){
+
+		if(settings[0].verbosity > 1){
+			settings[i].print();
+		}
 		experiment = new Experiment(settings[i]);
 		experiment->initialize();
 		experiment->crossSections();
 		experiment->transmission();
-		if(settings[i].plot){
+		if(settings[0].plot){
 			experiment->plot();
 		}
-		if(settings[i].write){
+		if(settings[0].write){
 			experiment->write();
 		}
 		experiment->resonant_scattering();
-		experiment->print_results();
+		if(settings[0].verbosity > 0){
+			experiment->print_results();
+		}
 
+		if(settings[0].output){
+			settings[i].write_output(i);
+			experiment->write_results(settings[0].outputfile, i);
+		}
+	}
+	
+	if(settings[0].verbosity > 0 && settings[0].output){
+		cout << "> Created output file 'output/" << settings[0].outputfile << "'" << endl;
 	}
 	
 	// Stop the clock
 	high_resolution_clock::time_point stop = high_resolution_clock::now();
 	duration<double> delta_t = duration_cast< duration<double>>(stop - start);
 
-	cout << "> main.cpp: Execution took " << delta_t.count() << " seconds" << endl;
+	if(settings[0].verbosity > 0){
+		cout << "> main.cpp: Execution took " << delta_t.count() << " seconds" << endl;
+	}
 }

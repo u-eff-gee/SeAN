@@ -30,10 +30,12 @@ struct Settings{
 	
 	// Command-line options
         string inputfile = "";
+	string outputfile = "";
+	int verbosity = 2;
+	bool output = false;
 	bool exact = false;
 	bool plot = false;
 	bool write = false;
-	bool sudowrite = false;
 
 	// Settings for Experiment
 	double emin = 0.;
@@ -67,11 +69,16 @@ struct Settings{
 	vector<double> velocity;
 
 	// Methods to print settings
-	const char* HORIZONTAL_LINE = "##############################################################";
 	void print();
 	void printOptions();
 	void printExperiment();
 	void printTarget(unsigned int i);
+
+	// Method to write settings to file
+	void write_output(unsigned int n_setting) const;
+	void writeOptions(unsigned int n_setting) const;
+	void writeExperiment() const;
+	void writeTarget(unsigned int i) const;
 };
 
 #endif

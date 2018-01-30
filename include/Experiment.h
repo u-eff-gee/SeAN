@@ -30,6 +30,7 @@ public:
 	void plot();
 	void print_results();
 	void write();
+	void write_results(string outputfile, unsigned int n_setting) const;
 
 private:
 	void createEnergyBins(double emin, double emax);

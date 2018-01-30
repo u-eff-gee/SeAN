@@ -2,15 +2,19 @@
 #include <fstream>
 #include <string>
 #include <regex>
+#include <sstream>
 
 #include "Experiment.h"
+#include "Config.h"
 
 using std::cout;
 using std::endl;
 using std::ifstream;
+using std::ofstream;
 using std::string;
 using std::regex;
 using std::regex_replace;
+using std::stringstream;
 
 Experiment::Experiment(Settings &s){
 	settings = s;
@@ -80,7 +84,7 @@ void Experiment::print_results(){
 	unsigned int ntargets = (unsigned int) settings.targetNames.size();	
 
 	cout << ">>> SeAN RESULTS" << endl;
-	cout << settings.HORIZONTAL_LINE << endl;
+	cout << HORIZONTAL_LINE << endl;
 	cout << "TARGET NAME\tRESONANT SCATTERING" << endl;
 
 	for(unsigned int i = 0; i < ntargets; ++i){
@@ -103,5 +107,30 @@ void Experiment::write(){
 
 	for(unsigned int i = 0; i < ntargets; ++i){
 		targets[i]->write(energy_bins);
+	}
+}
+
+void Experiment::write_results(string outputfile, unsigned int n_setting) const{
+
+	stringstream filename;
+	filename << "output/" << outputfile;
+
+	ofstream ofile;
+	ofile.open(filename.str(), std::ios_base::out | std::ios_base::app);
+
+        if(!ofile.is_open()){
+                cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
+		cout << " write_results(): File '" << outputfile << "' could not be opened." << endl;
+		abort();
+	}
+	
+	unsigned int ntargets = (unsigned int) settings.targetNames.size();	
+
+	ofile << ">>> SeAN RESULTS #" << n_setting << endl;
+	ofile << HORIZONTAL_LINE << endl;
+	ofile << "TARGET NAME\tRESONANT SCATTERING" << endl;
+
+	for(unsigned int i = 0; i < ntargets; ++i){
+		targets[i]->write_results(outputfile);
 	}
 }

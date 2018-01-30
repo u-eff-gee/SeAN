@@ -337,6 +337,23 @@ void Target::write(const vector<double> &energy_bins){
 	writer->write2DHistogram(resonance_absorption_density_histogram, filename.str(), "Alpha (z, E = const) / fm^2", "Alpha (z = const, E) / fm^2");
 }
 
+void Target::write_results(string outputfile) const{
+
+	stringstream filename;
+	filename << "output/" << outputfile;
+
+	ofstream ofile;
+	ofile.open(filename.str(), std::ios_base::out | std::ios_base::app);
+
+        if(!ofile.is_open()){
+                cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
+		cout << " write_results(): File '" << outputfile << "' could not be opened." << endl;
+		abort();
+	}
+
+	ofile << "Target #" << target_number << "\t" << n_resonantly_scattered << endl;
+}
+
 void Target::vDistInfo(){
 	
 //	 Determine the integral of the velocity distribution and the centroid of the distribution.

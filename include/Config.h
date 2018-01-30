@@ -32,4 +32,7 @@ const string BEAM_DIR = "beam/";
 const string MASS_DIR = "atomic_mass/";
 const string AME_FILE_NAME = "mass16.txt";
 
+// Settings for SeAN output files
+const string HORIZONTAL_LINE = "##############################################################";
+
 #endif

@@ -25,7 +25,7 @@ void InputReader::readFile(vector<Settings> &settings){
 		cout << " readFile(): File '" << settings[0].inputfile << "' not found." << endl;
 		abort();
 	}
-        cout << "> Reading input file '" << settings[0].inputfile << "'" << endl;
+        //cout << "> Reading input file '" << settings[0].inputfile << "'" << endl;
 
         string line;
 	unsigned int ntarget = 0;
@@ -1189,7 +1189,7 @@ double InputReader::readAME(string isotope){
 		cout << " readAME(): File '" << filename.str() << "' not found." << endl;
 		abort();
 	}
-        cout << "> Reading input file '" << filename.str() << "'" << endl;
+        //cout << "> Reading input file '" << filename.str() << "'" << endl;
 
         string line;
 	unsigned int nline = 0;
@@ -1215,7 +1215,7 @@ void InputReader::readNIST(vector< vector<double> > &mass_attenuation_file, cons
 		cout << " readNIST(): File '" << mass_attenuation_filename << "' not found." << endl;
 		abort();
 	}
-        cout << "> Reading input file '" << mass_attenuation_filename << "'" << endl;
+        //cout << "> Reading input file '" << mass_attenuation_filename << "'" << endl;
 
 	string line;
 
@@ -1244,7 +1244,7 @@ void InputReader::read2ColumnFile(vector< vector<double> > &data, string filenam
 		cout << " read2ColumnFile(): File '" << filename << "' not found." << endl;
 		abort();
 	}
-        cout << "> Reading input file '" << filename << "'" << endl;
+        //cout << "> Reading input file '" << filename << "'" << endl;
 
 	data.push_back(vector<double>());
 	data.push_back(vector<double>());

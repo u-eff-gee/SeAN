@@ -1,3 +1,6 @@
+# This file
+.gitignore
+
 # Scripts
 edit.sh
 
@@ -14,6 +17,7 @@ sean
 output/*.pdf
 output/*.txt
 !output/output.txt
+output/*.out
 
 # valgrind output
 *.out.*

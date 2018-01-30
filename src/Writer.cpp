@@ -4,12 +4,15 @@
 #include <sstream>
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 
 using std::stringstream;
 using std::ofstream;
 using std::cout;
 using std::endl;
 using std::scientific;
+using std::defaultfloat;
+using std::setprecision;
 
 void Writer::write1DHistogram(const vector<double> &histogram, const string name, const string column_name){
 

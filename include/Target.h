@@ -98,6 +98,9 @@ public:
 	// Functions to write histograms to file
 	void write(const vector<double> &energy_bins);
 
+	// Functions to write output
+	void write_results(string outputfile) const;
+
 	// Function to return the photon flux density. The incident beam on the subsequent target will be read off from this.
 	
 	vector< vector<double> >& getPhotonFluxDensity(){ return photon_flux_density_histogram; };
