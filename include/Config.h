@@ -11,7 +11,7 @@ const double HBARC2 = 3.89379366e16; // in eV^2fm^2
 const double SPEEDOFLIGHT = 299792458.; // in m/s
 const double kB = 8.6173303e-5; // in eV/K
 const double AtomicMassUnit = 931.494095e6; // in eV/c^2
-const double AtomicMassUnitKG = 1.660539040e-27; // in kg
+const double AtomicMassUnitG = 1.660539040e-24; // in g
 const double PI = 3.141592653589793;
 
 // Settings for the SeAN input file
