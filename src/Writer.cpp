@@ -53,9 +53,12 @@ void Writer::write2DHistogram(const vector<vector<double> > &histogram, const st
 	ofile << COMMENT << " Lines   : " << line_name << endl;
 	ofile << COMMENT << " Columns : " << column_name << endl;
 
-	for(unsigned int i = 0; i < histogram.size(); ++i){
-		for(unsigned int j = 0; j < histogram.size(); ++j){
-			ofile << scientific << histogram[i][j] << ", ";
+	long unsigned int ncolumns = histogram.size();
+	long unsigned int nlines = histogram[0].size();
+
+	for(unsigned int i = 0; i < ncolumns; ++i){
+		for(unsigned int j = 0; j < nlines; ++j){
+			ofile << scientific << histogram[i][j] << "\t";
 		}
 		ofile << endl;
 	}

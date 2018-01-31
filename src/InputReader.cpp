@@ -1209,12 +1209,13 @@ double InputReader::readAME(string isotope){
 void InputReader::readNIST(vector< vector<double> > &mass_attenuation_file, const string mass_attenuation_filename){
 
 	stringstream filename;
-	filename << MU_DIR << AME_FILE_NAME;
-	ifstream ifile(mass_attenuation_filename);
+	filename << MU_DIR << mass_attenuation_filename;
+	cout << filename.str() << endl;
+	ifstream ifile(filename.str());
 
         if(!ifile.is_open()){
 		cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
-		cout << " readNIST(): File '" << mass_attenuation_filename << "' not found." << endl;
+		cout << " readNIST(): File '" << filename.str() << "' not found." << endl;
 		abort();
 	}
         //cout << "> Reading input file '" << mass_attenuation_filename << "'" << endl;
