@@ -20,14 +20,12 @@
 
 \section{Introduction}
 This document describes the theoretical background of nuclear self-absorption experiments relevant for the usage of SeAN. 
-A comprehensive basic introduction can be found in the PhD thesis of C. Romig (Ref. \cite{Rom15}).
-The notation in all SeAN - related documents is also based on this reference.
+%A comprehensive introduction to the experimental technique can be found in the PhD thesis of C. Romig (Ref. \cite{Rom15}).
+%The notation in all experiment - related documents is also based on this reference.
 
-One of the first introductions into the formalism was given by F.R. Metzger in 1959 \cite{Met59}.
+%One of the first introductions into the formalism was given by F.R. Metzger in 1959 \cite{Met59}.
 
 \newpage
-
-\section{Theory}
 
 \section{Photoabsorption cross section}
 Photoabsorption in this context means the absorption of a photon by an atomic nucleus, causing an excitation of the nucleus. A special focus in the derivation of the absorption cross section will be on the inclusion of effects of the presence of the nucleus inside some system of atoms. The energy scales of nuclear excitations and excitations of, for example, a crystal lattice, differ by about a factor of $10^6$. Nevertheless, as will become clear in the following, the binding in a system of atoms can have an impact on a measurement of nuclear observables.
@@ -96,26 +94,22 @@ Using the factorized matrix elements, Eq. \ref{absorption_general} becomes:
 
 \begin{equation}
 \label{absorption_general_factorized}
-	W = \left| M^{\mathrm{nucl}}_{C \to B} \right|^2 \cdot \left| M^{\mathrm{nucl}}_{A \to C} \right|^2 \left| \sum_{n_s} \frac{ \langle \beta_s | \exp{\left( - i \mathbf{k} \cdot \mathbf{x} / \hbar \right)} | n_s \rangle \langle n_s | \exp{\left( i \mathbf{p} \cdot \mathbf{x} / \hbar \right)} | \alpha_s \rangle  }{E_0 - E + E(n_s) - E(\alpha_s) + i/2 \Gamma(n_s)} \right| ^2
+	W (A, \alpha_s, B, \beta_s)= \left| M^{\mathrm{nucl}}_{C \to B} \right|^2 \cdot \left| M^{\mathrm{nucl}}_{A \to C} \right|^2 \cdot 
 \end{equation}
+
+\begin{equation*}
+\left| \sum_{n_s} \frac{ \langle \beta_s | \exp{\left( - i \mathbf{k} \cdot \mathbf{x} / \hbar \right)} | n_s \rangle \langle n_s | \exp{\left( i \mathbf{p} \cdot \mathbf{x} / \hbar \right)} | \alpha_s \rangle  }{E_0 - E + E(n_s) - E(\alpha_s) + i/2 \Gamma(n_s)} \right| ^2
+\end{equation*}
 
 Here, the nuclear matrix elements have already been factored out of the sum.
 
-In fact, for the discussion of photo\textit{absorption}, the final state of the system and the nucleus are irrelevant. Therefore, consider only the probability for absorption by summing over all final states
+In fact, for the discussion of photo\textit{absorption}, the final state of the system and the nucleus are irrelevant. Therefore, consider only the probability for absorption by summing over all final states:
 
 \begin{equation}
 \label{absorption_general_no_final}
 W(A, \alpha_s) = \sum_{\beta_s} W(A, \alpha_s, B, \beta_s)
 \end{equation}
 
-using the completeness relation
-
-\begin{equation}
-	\label{completeness_relation_system}
-	\sum_{\beta_s} | \beta_s \rangle \langle \beta_s | = \mathbb{1}
-\end{equation}
-
-for the system states.
 
 Furthermore, in constrast to the nucleus, the system is often not in a definite state $\alpha_s$ at the time of the capture, but rather distributed among the set $\{ \alpha_s \}$, with the probability $g(\alpha_s)$ of finding the system in the definite state $\alpha_s$:
 
@@ -128,23 +122,75 @@ To account for this, introduce a weighted sum over $\alpha_s$ in Eq. \ref{absorp
 
 \begin{equation}
 \label{absorption_general_alpha_s_distribution}
-W(A, \{\alpha_s\}) = \sum_{\alpha_s} g(\alpha_s) W(A, \alpha_s)
+W = \sum_{\alpha_s} g(\alpha_s) W(A, \alpha_s)
 \end{equation}
 
-Executing all the sums and calculating the absolute value in Eq. \ref{absorption_general_factorized} explicity, the result is:
+\begin{equation}
+\label{absorption_simplification_1}
+	W \propto \sum_{\alpha_s} g(\alpha_s) \sum_{\beta_s} \left| \sum_{n_s} \frac{ \langle \beta_s | \exp{\left( - i \mathbf{k} \cdot \mathbf{x} / \hbar \right)} | n_s \rangle \langle n_s | \exp{\left( i \mathbf{p} \cdot \mathbf{x} / \hbar \right)} | \alpha_s \rangle  }{E_0 - E + E(n_s) - E(\alpha_s) + i/2 \Gamma(n_s)} \right| ^2
+\end{equation}
+
+In Eq. \ref{absorption_simplification_1}, the nuclear matrix elements have been left out for sake of readability. 
+The following simplifications do not depend on them. 
+First, calculate the absolute value explicitly to be able to exchange the order of the summations:
+
+\begin{equation}
+\label{absorption_simplification_2}
+	W \propto \sum_{\alpha_s} g(\alpha_s) \sum_{\beta_s} \sum_{n_s} \frac{ \langle \beta_s | \exp{\left( - i \mathbf{k} \cdot \mathbf{x} / \hbar \right)} | n_s \rangle \langle n_s | \exp{\left( i \mathbf{p} \cdot \mathbf{x} / \hbar \right)} | \alpha_s \rangle  }{E_0 - E + E(n_s) - E(\alpha_s) + i/2 \Gamma(n_s)} 
+\end{equation}	
+\begin{equation*}
+\sum_{m_s} \frac{ \langle m_s | \exp{\left( i \mathbf{k} \cdot \mathbf{x} / \hbar \right)} | \beta_s \rangle \langle \alpha_s | \exp{\left(  - i \mathbf{p} \cdot \mathbf{x} / \hbar \right)} | n_s \rangle  }{E_0 - E + E(n_s) - E(\alpha_s) - i/2 \Gamma(n_s)}
+\end{equation*}
+
+Since all sums run over the whole space, they can be interchanged. 
+The same holds for the matrix elements which are simply numbers:
+
+\begin{equation}
+\label{absorption_simplification_3}
+	W \propto \sum_{\alpha_s} g(\alpha_s) \sum_{n_s} \sum_{m_s} \frac{  \langle n_s | \exp{\left( i \mathbf{p} \cdot \mathbf{x} / \hbar \right)} | \alpha_s \rangle \langle \alpha_s | \exp{\left(  - i \mathbf{p} \cdot \mathbf{x} / \hbar \right)} | n_s \rangle  }{E_0 - E + E(n_s) - E(\alpha_s) + i/2 \Gamma(n_s)} 
+\end{equation}	
+\begin{equation*}
+	\frac{ \langle m_s | \exp{\left( i \mathbf{k} \cdot \mathbf{x} / \hbar \right)} \sum_{\beta_s} \left( | \beta_s \rangle \langle \beta_s | \right) \exp{\left( - i \mathbf{k} \cdot \mathbf{x} / \hbar \right)} | n_s \rangle }{E_0 - E + E(n_s) - E(\alpha_s) - i/2 \Gamma(n_s)}
+\end{equation*}
+
+Using the completeness relation
+
+\begin{equation}
+	\label{completeness_relation_system}
+	\sum_{\beta_s} | \beta_s \rangle \langle \beta_s | = \mathbb{1}
+\end{equation}
+
+for the states $\beta_s$ the numerator in the second line of Eq. \ref{absorption_simplification_3} can be turned into a delta function in $m_s$ and $n_s$:
+
+\begin{equation}
+	\label{absorption_simplification_4}
+	\underbrace{\langle m_s | \underbrace{\exp{\left( i \mathbf{k} \cdot \mathbf{x} / \hbar \right)} \underbrace{\sum_{\beta_s} \left( | \beta_s \rangle \langle \beta_s | \right)}_{ = \mathbb{1}} \exp{\left( - i \mathbf{k} \cdot \mathbf{x} / \hbar \right)} }_{ = \mathbb{1}} | n_s \rangle }_{ = \delta_{m_s, n_s}}
+\end{equation}
+
+As expected when the final states are of no interest, the momentum $\mathbf{k}$ of the emitted particle drops out as well. 
+Now, the absolute values in the numerator and the denominator can be calculated separately and the final probability for absorption is:
 
 \begin{equation}
 \label{absorption_general_summed}
-	W = \left| M^{\mathrm{nucl}}_{C \to B} \right|^2 \cdot \left| M^{\mathrm{nucl}}_{A \to C} \right|^2 \sum_{\alpha_s} g(\alpha_s) \sum_{n_s} \frac{ \left| \langle n_s | \exp{\left( i \mathbf{p} \cdot \mathbf{x} / \hbar \right)} | \alpha_s \rangle \right|^2  }{\left[ E - E_0 - \left( E(n_s) - E(\alpha_s) \right) \right] + 1/4 \left( \Gamma(n_s) \right)^2 }
+	W = \left| M^{\mathrm{nucl}}_{C \to B} \right|^2 \cdot \left| M^{\mathrm{nucl}}_{A \to C} \right|^2 \sum_{\alpha_s} g(\alpha_s) \sum_{n_s} \frac{ \left| \langle n_s | \exp{\left( i \mathbf{p} \cdot \mathbf{x} / \hbar \right)} | \alpha_s \rangle \right|^2  }{\left[ E - E_0 - \left( E(n_s) - E(\alpha_s) \right) \right]^2 + 1/4 \left( \Gamma(n_s) \right)^2 }
 \end{equation}
 
-Coming from the general Eq. \ref{absorption_general}, Eq. \ref{absorption_general_summed} contains some adaptations for the photoabsorption experiments which are considered here.
+Coming from the more general Eq. \ref{absorption_general}, Eq. \ref{absorption_general_summed} has now been adapted for the photoabsorption experiments which are considered here.
+Note that $W$ is a \textit{probability} for the absorption and emission process. To adapt to the case of photoabsorption and emission, the matrix elements have to be replaced by \cite{Bet37}
 
-Usually, the nuclear matrix elements $M^{\mathrm{nucl}}$ are the quantities to be measured, so they will be left as "black boxes" in the following. Of course, a good estimate of the size of the nuclear matrix element is crucial for the planning of an experiment.
+\begin{equation}
+	\label{probability_to_cross_section}
+	\left| M^{\mathrm{nucl}}_{C \to B} \right|^2 \cdot \left| M^{\mathrm{nucl}}_{A \to C} \right|^2 = \pi \left( \frac{\hbar c}{E_j - E_i} \right)^2 \frac{2 J_j + 1}{2 J_i + 1} \Gamma_i \Gamma_j
+\end{equation}
+
+In Eq. \ref{probability_to_cross_section}, $i$ denotes the initial state of the nucleus (mostly the ground state) and j the excited state at an energy $E_j$. The nuclear states have a corresponding angular momentum quantum number $J$ and a partial transition width $\Gamma$ which is a function of the transition matrix element.
+
+Usually, the nuclear matrix elements $M^{\mathrm{nucl}}$ are the quantities to be measured, so they will be left as "black boxes" in the following. 
+Of course, a good estimate of the magnitude of the nuclear matrix element is crucial for the planning of an experiment.
 
 In the following, different methods of including the influence of the system on the resonant absorption will be described. First, however, it is instructive to discuss the case of capture on a free atom.
 
-\subsection{Free atom}
+\section{Free atom}
 The wave function of a free atom can be modeled as a plane wave:
 
 \begin{equation}
@@ -160,10 +206,25 @@ This problem is usually overcome by treating the problem in a finite box with si
 	\langle x | \alpha_s \rangle = \frac{1}{L^{ 3/2}} \exp{ \left( i \mathbf{k}_{\alpha_s} \cdot \mathbf{x} / \hbar \right) }
 \end{equation}
 
-This imposes a restriction on the possible values for $\mathbf{k}_{alpha_s}$. 
-At the end of a calculation in the finite space, taking the limit $L \to \infty$ should be possible if the calculated observable is independent of the size of the space. When doing the transition to the full space, the sums over $\alpha_s$ and $n_s$ will turn to integrals, because both variables can take on any value.
+This imposes a restriction on the possible values for the momentum $\mathbf{k}_{\alpha_s}$:
 
-Using plane waves, the matrix element in the numerator in Eq. \ref{absorption_general_summed} becomes:
+\begin{equation}
+	\label{k_quantization}
+	k_{\alpha_s} = \frac{\hbar \pi}{L} \left( n_x \mathbf{e}_x + n_y \mathbf{e}_y + n_z \mathbf{e}_z \right)
+\end{equation}
+
+\begin{equation*}
+	n_i \in \mathbb{Z}
+\end{equation*}
+
+%At the end of a calculation in the finite space, taking the limit $L \to \infty$ should be possible if the calculated observable is independent of the size of the space. 
+Using plane waves, considering that $\mathbf{p}$ is not an operator but a constant vector, and inserting unity operators in real space
+
+\begin{equation}
+	\int_{-L/2}^{L/2} \mathrm{d}^3 x' \left| x' \rangle \langle x' \right| = \mathbb{1}
+\end{equation}
+
+the matrix element in the numerator in Eq. \ref{absorption_general_summed} becomes:
 
 \begin{equation}
 	\label{plane_wave_delta}
@@ -173,17 +234,27 @@ Using plane waves, the matrix element in the numerator in Eq. \ref{absorption_ge
 	= \langle n_s | \exp{\left( i \mathbf{p} \cdot \mathbf{x} / \hbar \right)} | \alpha_s \rangle \langle \alpha_s | \exp{\left( -i \mathbf{p} \cdot \mathbf{x} / \hbar \right)} | n_s \rangle
 \end{equation*}
 \begin{equation*}
-	= N(L)^2 \int \mathrm{d}^3 x \exp{ \left( i \left[ \left( \mathbf{k}_{\alpha_s} + \mathbf{p} \right) - \mathbf{k}_{n_s} \right] \mathbf{x} \right) } \int \mathrm{d}^3 x \exp{ \left( - i \left[ \mathbf{k}_{n_s} - \left( \mathbf{k}_{\alpha_s} + \mathbf{p} \right) \right] \mathbf{x} \right) }
+	= \int_{-L/2}^{L/2} \frac{\mathrm{d}^3 x}{L^3} \exp{ \left( i \left[ \left( \mathbf{k}_{\alpha_s} + \mathbf{p} \right) - \mathbf{k}_{n_s} \right] \mathbf{x} \right) } \int_{-L/2}^{L/2}\frac{\mathrm{d}^3 x'}{L^3} \exp{ \left( - i \left[ \mathbf{k}_{n_s} - \left( \mathbf{k}_{\alpha_s} + \mathbf{p} \right) \right] \mathbf{x}' \right) }
 \end{equation*}
 \begin{equation*}
 	= \delta \left( \left[ \mathbf{k}_{\alpha_s} + \mathbf{p} \right] - \mathbf{k}_{n_s} \right)^2
 \end{equation*}
 
-In the last step, a definition of the Dirac $\delta$-function has been used. 
-The symbol $N(L)$ denotes a normalization constant that appears in a finite volume and disappears when going to the continuum. 
-It was only included as a reminder.
+In the last step, a definition of the Dirac $\delta$-function has been used:
+
+\begin{equation}
+	\int_{-L/2}^{L_2} \exp{ \left( i a x \right) } = 
+	\begin{cases}
+	L^3, a = 0,\\
+	0 \text{, else (residual theorem)}
+	\end{cases}
+\end{equation}
+
+Since all the dimension $L$ of the space vanishes in the final result, it is justified to take the limit to infinity.
+
 What the $\delta$-function does is obvious: it ensures the conservation of momentum when a photon with a momentum $\mathbf{p}$ is absorbed. 
 Therefore, the capture on a free atom can be treated as an inelastic process between two particles. 
+
 For the photon and the nucleus $^A_ZX$, which has an excited state $^A_ZX^*$ at an energy $E_0$, the 4-momenta before the capture are:
 
 \begin{equation}
@@ -192,7 +263,7 @@ For the photon and the nucleus $^A_ZX$, which has an excited state $^A_ZX^*$ at 
 \end{equation}
 \begin{equation}
 \label{four_momentum_nucleus}
-	p^\mu_{\mathrm{X}} = \left( \sqrt{ Au c^2 + k^2 c^2}, \mathbf{k} \right)
+	p^\mu_{\mathrm{X}} = \left( E_{\alpha_s} = \sqrt{ \left(Au c^2\right)^2 + k_{\alpha_s}^2 c^2}, \mathbf{k}_{\alpha_s} \right)
 \end{equation}
 
 In Eq. \ref{four_momentum_nucleus}, the atomic mass unit $u$ has been used.
@@ -200,24 +271,24 @@ After the capture, the 4-momentum of the excited nucleus is:
 
 \begin{equation}
 	\label{four_momentum_excited_nucleus}
-	p^\mu_{\mathrm{X^*}} = \left( \sqrt{ \left( Au c^2 + E_0 \right)^2 + k'^2 c^2}, \mathbf{k'} \right)
+	p^\mu_{\mathrm{X^*}} = \left( E_{n_s} = \sqrt{ \left( Au c^2 + E_0 \right)^2 + k_{n_s}^2 c^2}, \mathbf{k}_{n_s} \right)
 \end{equation}
 
 Using the conservation of momentum and solving the conservation of energy
 
 \begin{equation}
 	\label{conservation_of_energy}
-	p^0_\mathrm{ph} + p^0_\mathrm{X} = p c + \sqrt{ Au c^2 + k^2 c^2} = \sqrt{ \left( Au c^2 + E_0 \right)^2 + (\mathbf{k} + \mathbf{p})^2 c^2} = p^0_\mathrm{X^*}
+	p^0_\mathrm{ph} + p^0_\mathrm{X} = p c + \sqrt{ Au c^2 + k_{\alpha_s}^2 c^2} = \sqrt{ \left( Au c^2 + E_0 \right)^2 + (\mathbf{k}_{\alpha_s} + \mathbf{p})^2 c^2} = p^0_\mathrm{X^*}
 \end{equation}
 
 for the energy of the photon $E_\mathrm{ph} = pc$, one gets:
 
 \begin{equation}
 	\label{recoil_energy}
-	E_\mathrm{ph} = \frac{E_0 \cdot Auc^2 + E_0^2/2}{\sqrt{\left( Auc^2\right)^2 + k^2 c^2} - kc}
+	E_\mathrm{ph} = \frac{E_0 \cdot Auc^2 + E_0^2/2}{\sqrt{\left( Auc^2\right)^2 + k_{\alpha_s}^2 c^2} - k_{\alpha_s}c}
 \end{equation}
 
-The equation is easier to interpret when the nucleus can be considered to be at rest ($k = 0$) before the capture. 
+The equation is easier to interpret when the nucleus can be considered to be at rest ($k_{\alpha_s} = 0$) before the capture. 
 Then, Eq. \ref{recoil_energy} becomes:
 
 \begin{equation}
@@ -227,17 +298,74 @@ Then, Eq. \ref{recoil_energy} becomes:
 
 Eq. \ref{recoil_energy_at_rest} states that the photon needs to have not only enough energy to excite the state $j$, but the recoil energy that is transferred to the nucleus also needs to be considered.
 
-Putting the considerations that were made up to now together, Eq. \ref{absorption_general_summed} becomes:
+Putting the considerations that were made up to now together, Eq. \ref{absorption_general_summed} becomes
 
 \begin{equation}
 \label{absorption_general_plane_wave}
-	W = \left| M^{\mathrm{nucl}}_{C \to B} \right|^2 \cdot \left| M^{\mathrm{nucl}}_{A \to C} \right|^2 \int \mathrm{d}^3 k_{\alpha_s}  g(\alpha_s) \int \mathrm{d}^3 k_{n_s} 
+	W = \left| M^{\mathrm{nucl}}_{C \to B} \right|^2 \cdot \left| M^{\mathrm{nucl}}_{A \to C} \right|^2 \int \mathrm{d}^3 k_{\alpha_s}  \frac{g(\alpha_s)}{ \left[ E' (E, \mathbf{k}_{\alpha_s})- E_0 - \frac{E_0^2}{2 Auc^2} \right]^2 + \Gamma^2 / 4}
 \end{equation}
-%\begin{equation*}
-	%\frac{ \delta \left( left[ \mathbf{k}_{\alpha_s} + \mathbf{p} \right] - \mathbf{k}_{n_s} \right) }{\left[ E - E_0 - \left(E(n_s) - E(\alpha_s) \right) \right] + 1/4 \left( \Gamma(n_s) \right)^2 }
-%\end{equation*}
 
-\subsection{Doppler shift}
+in the reference frame where the nucleus is at rest. 
+The transition to the rest frame requires that the energy of the photon $E$ is Doppler-shifted.
+This is why in Eq. \ref{absorption_general_plane_wave}, $E'$ depends on $E$ and the initial momentum of the nucleus in the laboratory frame.
+
+%\begin{equation}
+%\label{absorption_general_plane_wave}
+%	W = \left| M^{\mathrm{nucl}}_{C \to B} \right|^2 \cdot \left| M^{\mathrm{nucl}}_{A \to C} \right|^2 \int \mathrm{d}^3 k_{\alpha_s}  \frac{g(\alpha_s)}{ \left[ E - E_0 (\mathbf{k}_{\alpha_s}) - \frac{E_0^2}{2 Auc^2} \right]^2 + \Gamma^2 / 4}
+%\end{equation}
+%
+%in the reference frame where the nucleus is at rest. 
+%The transition to the rest frame requires that the transition energy $E_0$ is Doppler-shifted.
+%This is why in Eq. \ref{absorption_general_plane_wave}, $E_0$ depends on $\mathbf{k}_{\alpha_s}$, the momentum of the nucleus in the laboratory frame.
+
+Instead of the momentum $\mathbf{k}$, we will now use the velocity $v$, and get a more common expression for the relativistic Doppler shift:
+
+%\begin{equation}
+%	\label{doppler_shifted_transition_energy}
+%	E_0 (\mathbf{v}_{\alpha_s}) = \frac{\sqrt{1 - \left( \frac{v_{\alpha_s, \parallel}}{c} \right)^2}}{1 + \frac{v_{\alpha_s, \parallel}}{c}} \cdot E_0
+%\end{equation}
+
+\begin{equation}
+	\label{doppler_shifted_transition_energy}
+	E' (E, \mathbf{v}_{\alpha_s}) = \frac{1 + \frac{v_{\alpha_s, \parallel}}{c}}{\sqrt{1 - \left( \frac{v_{\alpha_s, \parallel}}{c} \right)^2}} \cdot E \approx \left( 1 + \frac{v_{\alpha_s, \parallel}}{c} \right) \cdot E
+\end{equation}
+
+The index $\parallel$ of the velocity means that only the projection of the velocity of the nucleus on the momentum axis of the photon is responsible for the Doppler shift:
+
+\begin{equation}
+	\label{v_parallel}
+	v_{\alpha_s, \parallel} = \mathbf{v}_{\alpha_s} \cdot \frac{\mathbf{p}}{\left| \mathbf{p} \right|}
+\end{equation}
+
+The approximation in Eq. \ref{doppler_shifted_transition_energy} holds in the non-relativistc limit of low velocities, which is well justified for free atoms at "normal" temperatures.
+
+In Eq. \ref{absorption_general_plane_wave}, the average over a distribution of momentum states can be replaced by an integration over all possible velocities:
+
+\begin{equation}
+\label{absorption_plane_wave_v}
+	W = \left| M^{\mathrm{nucl}}_{C \to B} \right|^2 \cdot \left| M^{\mathrm{nucl}}_{A \to C} \right|^2 \int \mathrm{d} v_{\alpha_s, \parallel}  \frac{g(v_{\alpha_s, \parallel})}{ \left[ E' (E, v_{\alpha_s, \parallel})- E_0 - \frac{E_0^2}{2 Auc^2} \right]^2 + \Gamma^2 / 4}
+\end{equation}
+
+The distribution of velocities of free atoms in thermal equilibrium at a temperature T is a Maxwell-Boltzmann distribution:
+
+\begin{equation}
+	\label{maxwell_boltzmann_distribution}
+	g(v_\parallel) \mathrm{d} v_\parallel = \sqrt{\frac{A u}{2 \pi k_B T}} \exp{\left( - \frac{A u v_\parallel^2}{2 k_B T} \right)} \mathrm{d} v_\parallel
+\end{equation}
+
+\section{Approximations for atoms in solids}
+
+\subsection{Effective temperature}
+
+%\subsubsection{Debye approximation}
+
+%\subsubsection{Effective temperature from phonon densities}
+
+%\subsection{Harmonic crystal}
+
+%\subsection{Arbitrary system of atoms}
+
+\section{Computational considerations}
 
 \begin{equation}
 \label{breit_wigner}
@@ -296,7 +424,6 @@ w\left(v_\parallel \right) = \sqrt{\frac{M}{2 \pi k_B T}} \cdot \mathrm{exp} \le
 \sigma_{0 \to i} (E, E_i^{lab}) = \frac{\pi}{2} \cdot \left( \frac{\hbar c}{E_i^{nucl}} \right)^2 \cdot \frac{2 J_i + 1}{2 J_0 + 1} \cdot \frac{\Gamma_0 \Gamma}{\left( E - E_i^{nucl} \right)^2 + \frac{\Gamma^2}{4}} 
 \end{equation}
 \begin{equation}
-\label{convolution_f_1}
 = \frac{1}{\left( E_i^{lab} \right)^2} \cdot f\left( E - E^{lab}_i \right)
 \end{equation}
 
@@ -327,5 +454,5 @@ w\left(v_\parallel \right) = \sqrt{\frac{M}{2 \pi k_B T}} \cdot \mathrm{exp} \le
 \newpage
 
 \bibliography{references}{}
-\bibliographystyle{plain}
+\bibliographystyle{unsrt}
 \end{document}
