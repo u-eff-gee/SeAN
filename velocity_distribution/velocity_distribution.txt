@@ -1,7 +1,7 @@
 # Absolute zero
 zero
 # Arbitrary velocity distribution (FILE is a two-column file with columns "Velocity / c" and "Velocity distribution")
-arb, FILE
+arb_vdist, FILE
 # Maxwell-Boltzmann distribution with effective temperature
 maxwell_boltzmann, Teff
 # Same as above, but using the analytical approximation for the doppler-shifted cross section, which is valid for Gamma/Delta << 1

@@ -7,12 +7,13 @@
 using std::string;
 using std::vector;
 
-// Enum for different velocity distribution models
-// arb: arbitrary, point-wise defined distribution
+// Enum for different doppler-broadening models
+// arb_vdist: arbitrary, point-wise defined velocity distribution
+// arb_cs: arbitrary, point-wise defined velocity distribution
 // zero: T = 0 -> no Doppler broadening of the cross section
 // mb: Maxwell-Boltzmann distribution with effective temperature
 // mba: Maxwell-Boltzmann distribution with effective temperature + use the approximation that Gamma is much smaller than the Doppler width
-enum class vDistModel{arb, zero, mb, mba, mbd, mbad};
+enum class dopplerModel{arb_vdist, arb_cs, zero, mb, mba, mbd, mbad};
 
 // Enum for different mass attenuation models
 // arb: arbitrary, point-wise defined mass attenuation
@@ -55,8 +56,9 @@ struct Settings{
 	vector<double> ji;
 	vector<vector<double> > jj;
 
-	vector<vDistModel> vDist;
-	vector< vector<double> > vDistParams;
+	vector<dopplerModel> dopplerBroadening;
+	vector< vector<double> > dopplerParams;
+	vector<string> dopplerFile;
 	vector<string> vDistFile;
 
 	vector<double> mass;

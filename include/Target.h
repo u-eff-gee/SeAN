@@ -34,6 +34,7 @@ private:
 	vector<unsigned int> vdist_centroid;
 
 	// Cross section transformed by velocity distribution
+	vector< vector<double> > cross_section_file;
 	vector<double> crosssection_histogram;
 
 	// Incident beam

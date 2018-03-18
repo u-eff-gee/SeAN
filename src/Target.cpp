@@ -90,20 +90,25 @@ void Target::initialize(const vector<double> &energy_bins){
 
 void Target::calculateCrossSection(const vector<double> &energy_bins){
 
-	// Need to treat the two special cases
+	// Need to treat the three special cases
 	// 1. Velocity distribution at T = 0 K
 	// 2. Maxwell-Boltzmann with approximation
+	// 3. Arbitrary doppler-shifted cross section or velocity distribution
 	// separately, because it is possible to calculate the doppler-shifted cross section without the expensive double integral 
-	if(settings.vDist[target_number] == vDistModel::zero){
+	if(settings.dopplerBroadening[target_number] == dopplerModel::zero){
 		crossSection->no_dopplershift(crosssection_at_rest_histogram, crosssection_histogram);
 	}
 
-	else if(settings.vDist[target_number] == vDistModel::mba){
+	else if(settings.dopplerBroadening[target_number] == dopplerModel::mba){
 		crossSection->maxwell_boltzmann_approximation(energy_bins, crosssection_histogram, energy_boosted, target_number);
 	}
 
-	else if(settings.vDist[target_number] == vDistModel::mbad){
+	else if(settings.dopplerBroadening[target_number] == dopplerModel::mbad){
 		crossSection->maxwell_boltzmann_approximation_debye(energy_bins, crosssection_histogram, energy_boosted, target_number);
+	}
+
+	else if(settings.dopplerBroadening[target_number] == dopplerModel::arb_cs){
+		crossSection->arbitrary_cross_section(energy_bins, crosssection_histogram, cross_section_file);
 	}
 
 	else if(settings.exact){
@@ -130,28 +135,37 @@ void Target::calculateCrossSectionAtRest(const vector<double> &energy_bins){
 
 void Target::calculateVelocityDistribution(const vector<double> &energy_bins){
 
-	crossSection->calculateVelocityBins(energy_bins, velocity_distribution_bins, energy_boosted, target_number);
+	if(settings.dopplerBroadening[target_number] != dopplerModel::arb_cs){
+		crossSection->calculateVelocityBins(energy_bins, velocity_distribution_bins, energy_boosted, target_number);
+	}
 
-	switch(settings.vDist[target_number]){
-		case vDistModel::zero:
+	stringstream filename;
+
+	switch(settings.dopplerBroadening[target_number]){
+		case dopplerModel::zero:
 			crossSection->absolute_zero(velocity_distribution_bins, velocity_distribution_histogram, target_number);
 			break;
 
-		case vDistModel::mb:
-		case vDistModel::mba:
-		case vDistModel::mbad:
+		case dopplerModel::mb:
+		case dopplerModel::mba:
+		case dopplerModel::mbad:
 			crossSection->maxwell_boltzmann(velocity_distribution_bins, velocity_distribution_histogram, target_number);
 			break;
 
-		case vDistModel::mbd:
+		case dopplerModel::mbd:
 			crossSection->maxwell_boltzmann_debye(velocity_distribution_bins, velocity_distribution_histogram, target_number);
 			break;
 
-		case vDistModel::arb:
-			stringstream filename;
+		case dopplerModel::arb_vdist:
 			filename << VELOCITY_DISTRIBUTION_DIR << settings.vDistFile[target_number];
 			inputReader->read2ColumnFile(velocity_distribution_file, filename.str());
 			crossSection->arbitrary_velocity_distribution(velocity_distribution_bins, velocity_distribution_histogram, velocity_distribution_file, energy_boosted, target_number);
+			break;
+
+		case dopplerModel::arb_cs:
+			filename << CROSS_SECTION_DIR << settings.dopplerFile[target_number];
+			inputReader->read2ColumnFile(cross_section_file, filename.str());
+			crossSection->arbitrary_cross_section(energy_bins, crosssection_histogram, cross_section_file);
 			break;
 	}
 
