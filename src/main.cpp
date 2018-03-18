@@ -83,10 +83,10 @@ int main(int argc, char* argv[]){
 		experiment->crossSections();
 		experiment->transmission();
 		if(settings[0].plot){
-			experiment->plot();
+			experiment->plot(i);
 		}
 		if(settings[0].write){
-			experiment->write();
+			experiment->write(i);
 		}
 		experiment->resonant_scattering();
 		if(settings[0].verbosity > 0){

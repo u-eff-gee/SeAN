@@ -27,9 +27,9 @@ public:
 	void resonant_scattering();
 
 	// Functions for output
-	void plot();
+	void plot(unsigned int n_setting) const;
 	void print_results();
-	void write();
+	void write(unsigned int n_setting) const;
 	void write_results(string outputfile, unsigned int n_setting) const;
 
 private:

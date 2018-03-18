@@ -158,11 +158,11 @@ void Target::calculateVelocityDistribution(const vector<double> &energy_bins){
 	vDistInfo();
 }
 
-void Target::plot(const vector<double> &energy_bins){
+void Target::plot(const vector<double> &energy_bins, const unsigned int n_setting){
 
 	stringstream filename;
 	
-	filename << settings.targetNames[target_number] << "_crosssection_at_rest";
+	filename << settings.targetNames[target_number] << "_crosssection_at_rest_" << n_setting;
 
 	plotter->plotMultiple1DHistogramsAndSum(energy_bins, crosssection_at_rest_histogram, filename.str(), "Energy / eV", "Cross section / fm^{2}");
 
@@ -171,7 +171,7 @@ void Target::plot(const vector<double> &energy_bins){
 	filename.str("");
 	filename.clear();
 
-	filename << settings.targetNames[target_number] << "_velocity_distribution";
+	filename << settings.targetNames[target_number] << "_velocity_distribution_" << n_setting;
 
 	plotter->plot1DHistogram(velocity_distribution_bins[0], velocity_distribution_histogram[0], filename.str(), "Velocity / c", "Velocity distribution");
 
@@ -179,35 +179,35 @@ void Target::plot(const vector<double> &energy_bins){
 	filename.str("");
 	filename.clear();
 
-	filename << settings.targetNames[target_number] << "_crosssection";
+	filename << settings.targetNames[target_number] << "_crosssection_" << n_setting;
 	plotter->plot1DHistogram(energy_bins, crosssection_histogram, filename.str(), "Energy / eV", "Cross section / fm^{2}");
 
 	// Plot incident beam
 	filename.str("");
 	filename.clear();
 
-	filename << settings.targetNames[target_number] << "_incident_beam";
+	filename << settings.targetNames[target_number] << "_incident_beam_" << n_setting;
 	plotter->plot1DHistogram(energy_bins, incident_beam_histogram, filename.str(), "Energy / eV", "Beam intensity / a.u.");
 
 	// Plot mass attenuation
 	filename.str("");
 	filename.clear();
 
-	filename << settings.targetNames[target_number] << "_mass_attenuation";
+	filename << settings.targetNames[target_number] << "_mass_attenuation_" << n_setting;
 	plotter->plot1DHistogram(energy_bins, mass_attenuation_histogram, filename.str(), "Energy / eV", "Mass attenuation / fm^{2} / atom");
 
 	// Plot photon flux density
 	filename.str("");
 	filename.clear();
 
-	filename << settings.targetNames[target_number] << "_photon_flux_density";
+	filename << settings.targetNames[target_number] << "_photon_flux_density_" << n_setting;
 	plotter->plot2DHistogram(z_bins, energy_bins, photon_flux_density_histogram, filename.str(), "z / atoms/fm^{2}", "Energy / eV", "#phi");
 	
 	// Plot resonance absorptions density
 	filename.str("");
 	filename.clear();
 
-	filename << settings.targetNames[target_number] << "_resonance_absorption_density";
+	filename << settings.targetNames[target_number] << "_resonance_absorption_density_" << n_setting;
 	plotter->plot2DHistogram(z_bins, energy_bins, resonance_absorption_density_histogram, filename.str(), "z / atoms/fm^{2}", "Energy / eV", "#alpha / fm^{2}");
 }
 
@@ -273,12 +273,12 @@ void Target::calculateTransmission(const vector<double> energy_bins){
 	absorption->resonance_absorption_density(crosssection_histogram, photon_flux_density_histogram, resonance_absorption_density_histogram);
 }
 
-void Target::write(const vector<double> &energy_bins){
+void Target::write(const vector<double> &energy_bins, const unsigned int n_setting) {
 	
 	stringstream filename;
 
 	// Write energy bins
-	filename << settings.targetNames[target_number] << "_energy_bins";
+	filename << settings.targetNames[target_number] << "_energy_bins_" << n_setting;
 	writer->write1DHistogram(energy_bins, filename.str(), "Energy / eV");
 	
 	// Write cross section at rest
@@ -287,10 +287,18 @@ void Target::write(const vector<double> &energy_bins){
 		filename.str("");
 		filename.clear();
 
-		filename << settings.targetNames[target_number] << "_crosssection_at_rest_" << i;
+		filename << settings.targetNames[target_number] << "_crosssection_at_rest_"  << n_setting << "_" << i;
 
 		writer->write1DHistogram(crosssection_at_rest_histogram[i], filename.str(), "Cross section / fm^2");
 	}
+
+	// Write cross section
+	filename.str("");
+	filename.clear();
+
+	filename << settings.targetNames[target_number] << "_crosssection_" << n_setting;
+
+	writer->write1DHistogram(crosssection_histogram, filename.str(), "Cross section / fm^2");
 
 	// Write velocity distribution 
 	// In fact, each resonance has its own binning, but write only the velocity distribution for the first one
@@ -298,13 +306,13 @@ void Target::write(const vector<double> &energy_bins){
 	filename.str("");
 	filename.clear();
 
-	filename << settings.targetNames[target_number] << "_velocity_bins";
+	filename << settings.targetNames[target_number] << "_velocity_bins_" << n_setting;
 	writer->write1DHistogram(velocity_distribution_bins[0], filename.str(), "Velocity / c");
 
 	filename.str("");
 	filename.clear();
 
-	filename << settings.targetNames[target_number] << "_velocity_histogram";
+	filename << settings.targetNames[target_number] << "_velocity_histogram_" << n_setting;
 	writer->write1DHistogram(velocity_distribution_histogram[0], filename.str(), "Velocity distribution");
 
 	// Write incident beam
@@ -312,28 +320,28 @@ void Target::write(const vector<double> &energy_bins){
 	filename.str("");
 	filename.clear();
 
-	filename << settings.targetNames[target_number] << "_incident_beam";
+	filename << settings.targetNames[target_number] << "_incident_beam_" << n_setting;
 	writer->write1DHistogram(incident_beam_histogram, filename.str(), "Beam intensity distribution / a.u.");
 
 	// Write mass attenuation
 	filename.str("");
 	filename.clear();
 
-	filename << settings.targetNames[target_number] << "_mass_attenuation";
+	filename << settings.targetNames[target_number] << "_mass_attenuation_" << n_setting;
 	writer->write1DHistogram(mass_attenuation_histogram, filename.str(), "Mass attenuation / fm^2 / atom");
 	
 	// Write photon flux density
 	filename.str("");
 	filename.clear();
 
-	filename << settings.targetNames[target_number] << "_photon_flux_density";
+	filename << settings.targetNames[target_number] << "_photon_flux_density_" << n_setting;
 	writer->write2DHistogram(photon_flux_density_histogram, filename.str(), "Phi (z, E = const)", "Phi (z = const, E)");
 	
 	// Write resonance absorption density
 	filename.str("");
 	filename.clear();
 
-	filename << settings.targetNames[target_number] << "_resonance_absorption_density";
+	filename << settings.targetNames[target_number] << "_resonance_absorption_density_" << n_setting;
 	writer->write2DHistogram(resonance_absorption_density_histogram, filename.str(), "Alpha (z, E = const) / fm^2", "Alpha (z = const, E) / fm^2");
 }
 
