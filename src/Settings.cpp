@@ -119,29 +119,32 @@ void Settings::printTarget(unsigned int i){
 		}
 	}
 
-	cout << "VELOCITY DISTRIBUTION:\t";
+	cout << "DOPPLER_BROADENING:\t";
 
-	if(vDist.size() == 0){
+	if(dopplerBroadening.size() == 0){
 		cout << "not set" << endl;
 	} else{
-		switch(vDist[i]){
-			case vDistModel::zero:
+		switch(dopplerBroadening[i]){
+			case dopplerModel::zero:
 				cout << "zero" << endl;
 				break;
-			case vDistModel::arb:
-				cout << "arb, " << vDistFile[i] << endl;
+			case dopplerModel::arb_vdist:
+				cout << "arb_vdist, " << vDistFile[i] << endl;
 				break;
-			case vDistModel::mb:
-				cout << "Maxwell-Boltzmann, T_eff = " << vDistParams[i][0] << " K" << endl;
+			case dopplerModel::arb_cs:
+				cout << "arb_cs, " << dopplerFile[i] << endl;
 				break;
-			case vDistModel::mba:
-				cout << "Maxwell-Boltzmann (using approximation), T_eff = " << vDistParams[i][0] << " K " << endl;
+			case dopplerModel::mb:
+				cout << "Maxwell-Boltzmann, T_eff = " << dopplerParams[i][0] << " K" << endl;
 				break;
-			case vDistModel::mbd:
-				cout << "Maxwell-Boltzmann (using Debye approximation), T = " << vDistParams[i][0] << " K, T_D = " << vDistParams[i][1] << " K " << endl;
+			case dopplerModel::mba:
+				cout << "Maxwell-Boltzmann (using approximation), T_eff = " << dopplerParams[i][0] << " K " << endl;
 				break;
-			case vDistModel::mbad:
-				cout << "Maxwell-Boltzmann (using Debye and integral approximation), T = " << vDistParams[i][0] << " K, T_D = " << vDistParams[i][1] << " K " << endl;
+			case dopplerModel::mbd:
+				cout << "Maxwell-Boltzmann (using Debye approximation), T = " << dopplerParams[i][0] << " K, T_D = " << dopplerParams[i][1] << " K " << endl;
+				break;
+			case dopplerModel::mbad:
+				cout << "Maxwell-Boltzmann (using Debye and integral approximation), T = " << dopplerParams[i][0] << " K, T_D = " << dopplerParams[i][1] << " K " << endl;
 				break;
 			default: break;
 		}
@@ -344,29 +347,32 @@ void Settings::writeTarget(unsigned int i) const{
 		}
 	}
 
-	ofile << "VELOCITY DISTRIBUTION:\t";
+	ofile << "DOPPLER BROADENING:\t";
 
-	if(vDist.size() == 0){
+	if(dopplerBroadening.size() == 0){
 		ofile << "not set" << endl;
 	} else{
-		switch(vDist[i]){
-			case vDistModel::zero:
+		switch(dopplerBroadening[i]){
+			case dopplerModel::zero:
 				ofile << "zero" << endl;
 				break;
-			case vDistModel::arb:
-				ofile << "arb, " << vDistFile[i] << endl;
+			case dopplerModel::arb_vdist:
+				ofile << "arb_vdist, " << dopplerFile[i] << endl;
 				break;
-			case vDistModel::mb:
-				ofile << "Maxwell-Boltzmann, T_eff = " << vDistParams[i][0] << " K" << endl;
+			case dopplerModel::arb_cs:
+				ofile << "arb_cs, " << dopplerFile[i] << endl;
 				break;
-			case vDistModel::mba:
-				ofile << "Maxwell-Boltzmann (using approximation), T_eff = " << vDistParams[i][0] << " K " << endl;
+			case dopplerModel::mb:
+				ofile << "Maxwell-Boltzmann, T_eff = " << dopplerParams[i][0] << " K" << endl;
 				break;
-			case vDistModel::mbd:
-				ofile << "Maxwell-Boltzmann (using Debye approximation), T = " << vDistParams[i][0] << " K, T_D = " << vDistParams[i][1] << " K " << endl;
+			case dopplerModel::mba:
+				ofile << "Maxwell-Boltzmann (using approximation), T_eff = " << dopplerParams[i][0] << " K " << endl;
 				break;
-			case vDistModel::mbad:
-				ofile << "Maxwell-Boltzmann (using Debye and integral approximation), T = " << vDistParams[i][0] << " K, T_D = " << vDistParams[i][1] << " K " << endl;
+			case dopplerModel::mbd:
+				ofile << "Maxwell-Boltzmann (using Debye approximation), T = " << dopplerParams[i][0] << " K, T_D = " << dopplerParams[i][1] << " K " << endl;
+				break;
+			case dopplerModel::mbad:
+				ofile << "Maxwell-Boltzmann (using Debye and integral approximation), T = " << dopplerParams[i][0] << " K, T_D = " << dopplerParams[i][1] << " K " << endl;
 				break;
 			default: break;
 		}

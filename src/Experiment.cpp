@@ -92,21 +92,21 @@ void Experiment::print_results(){
 	}
 }
 
-void Experiment::plot(){
+void Experiment::plot(unsigned int n_setting) const {
 
 	unsigned int ntargets = (unsigned int) settings.targetNames.size();	
 
 	for(unsigned int i = 0; i < ntargets; ++i){
-		targets[i]->plot(energy_bins);
+		targets[i]->plot(energy_bins, n_setting);
 	}
 }
 
-void Experiment::write(){
+void Experiment::write(unsigned int n_setting) const {
 
 	unsigned int ntargets = (unsigned int) settings.targetNames.size();	
 
 	for(unsigned int i = 0; i < ntargets; ++i){
-		targets[i]->write(energy_bins);
+		targets[i]->write(energy_bins, n_setting);
 	}
 }
 

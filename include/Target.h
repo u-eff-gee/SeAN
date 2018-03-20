@@ -34,6 +34,7 @@ private:
 	vector<unsigned int> vdist_centroid;
 
 	// Cross section transformed by velocity distribution
+	vector< vector<double> > cross_section_file;
 	vector<double> crosssection_histogram;
 
 	// Incident beam
@@ -84,7 +85,7 @@ public:
 	void print_results();
 
 	// Function to plot histograms
-	void plot(const vector<double> &energy_bins);
+	void plot(const vector<double> &energy_bins, const unsigned int n_setting);
 
 	// Functions to calculate histograms
 
@@ -96,7 +97,7 @@ public:
 	void calculateAbsorption(vector<double> &energy_bins);
 
 	// Functions to write histograms to file
-	void write(const vector<double> &energy_bins);
+	void write(const vector<double> &energy_bins, const unsigned int n_setting);
 
 	// Functions to write output
 	void write_results(string outputfile) const;

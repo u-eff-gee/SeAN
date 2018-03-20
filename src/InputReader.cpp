@@ -153,7 +153,7 @@ void InputReader::readFile(vector<Settings> &settings){
 			// Read velocity distribution
 			case 6:
 				for(unsigned i = 0; i < settings.size(); ++i){
-					settings[i].vDistParams.push_back(vector<double>());
+					settings[i].dopplerParams.push_back(vector<double>());
 				}
 				readVelocityDistribution(stream, settings, ntarget);
 				++nline;
@@ -832,55 +832,69 @@ void InputReader::readVelocityDistribution(istringstream &stream, vector<Setting
 	int flag = 0;
 	long unsigned int n_settings = settings.size();
 	long unsigned int n_values = 0;
-	bool file = false;
+	bool has_vDist_file = false;
+	bool has_cs_file = false;
 
 	// Read velocity distribution model
 	getline(stream, value_string, DELIMITER);
 
 	if(value_string=="zero"){
 		for(unsigned int i = 0; i < n_settings; ++i){
-			settings[i].vDist.push_back(vDistModel::zero);
+			settings[i].dopplerBroadening.push_back(dopplerModel::zero);
 		}
-	} else if(value_string=="arb"){
+	} else if(value_string=="arb_velocity_distribution"){
 		for(unsigned int i = 0; i < n_settings; ++i){
-			settings[i].vDist.push_back(vDistModel::arb);
+			settings[i].dopplerBroadening.push_back(dopplerModel::arb_vdist);
 		}
 
-		file = true;
+		has_vDist_file = true;
+
+	} else if(value_string=="arb_cross_section"){
+		for(unsigned int i = 0; i < n_settings; ++i){
+			settings[i].dopplerBroadening.push_back(dopplerModel::arb_cs);
+		}
+
+		has_cs_file = true;
 
 	} else if(value_string=="maxwell_boltzmann"){
 		for(unsigned int i = 0; i < n_settings; ++i){
-			settings[i].vDist.push_back(vDistModel::mb);
+			settings[i].dopplerBroadening.push_back(dopplerModel::mb);
 		}
 	} else if(value_string=="maxwell_boltzmann_approximation"){
 		for(unsigned int i = 0; i < n_settings; ++i){
-			settings[i].vDist.push_back(vDistModel::mba);
+			settings[i].dopplerBroadening.push_back(dopplerModel::mba);
 		}
 	} else if(value_string=="maxwell_boltzmann_approximation"){
 		for(unsigned int i = 0; i < n_settings; ++i){
-			settings[i].vDist.push_back(vDistModel::mba);
+			settings[i].dopplerBroadening.push_back(dopplerModel::mba);
 		}
 	} else if(value_string=="maxwell_boltzmann_debye"){
 		for(unsigned int i = 0; i < n_settings; ++i){
-			settings[i].vDist.push_back(vDistModel::mbd);
+			settings[i].dopplerBroadening.push_back(dopplerModel::mbd);
 		}
 	} else if(value_string=="maxwell_boltzmann_approximation_debye"){
 		for(unsigned int i = 0; i < n_settings; ++i){
-			settings[i].vDist.push_back(vDistModel::mbad);
+			settings[i].dopplerBroadening.push_back(dopplerModel::mbad);
 		}
 	} else{
 		cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
-		cout << " readFile(): Unknown option '" << value_string << "' for velocity distribution." << endl;
+		cout << " readFile(): Unknown option '" << value_string << "' for doppler broadening." << endl;
 		abort();
 	}
 
 	// Read parameters
 	
-	if(file){
+	if(has_vDist_file){
 		getline(stream, value_string, DELIMITER);
 			
 		for(unsigned int i = 0; i < n_settings; ++i){
 			settings[i].vDistFile.push_back(regex_replace(value_string, regex("\\s+"), ""));
+		}
+	} else if(has_cs_file){
+		getline(stream, value_string, DELIMITER);
+			
+		for(unsigned int i = 0; i < n_settings; ++i){
+			settings[i].dopplerFile.push_back(regex_replace(value_string, regex("\\s+"), ""));
 		}
 	} else{
 
@@ -890,7 +904,7 @@ void InputReader::readVelocityDistribution(istringstream &stream, vector<Setting
 			if(flag == 0){
 				n_settings = settings.size();
 				for(unsigned int i = 0; i < n_settings; ++i){
-					settings[i].vDistParams[ntarget].push_back(values[0]);
+					settings[i].dopplerParams[ntarget].push_back(values[0]);
 				}
 			}
 			if(flag == 1){
@@ -904,7 +918,7 @@ void InputReader::readVelocityDistribution(istringstream &stream, vector<Setting
 				}
 				for(unsigned int i = 0; i < values.size(); ++i){
 					for(unsigned int j = 0; j < n_settings; ++j){
-						settings[i*n_settings + j].vDistParams[ntarget].push_back(values[i]);
+						settings[i*n_settings + j].dopplerParams[ntarget].push_back(values[i]);
 					}
 				}
 			}
@@ -918,7 +932,7 @@ void InputReader::readVelocityDistribution(istringstream &stream, vector<Setting
 				}
 
 				for(unsigned int i = 0; i < n_values; ++i){
-					settings[i].vDistParams[ntarget].push_back(values[i]);
+					settings[i].dopplerParams[ntarget].push_back(values[i]);
 				}
 			}
 

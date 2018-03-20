@@ -65,6 +65,8 @@ public:
 	// Special cases
 	void no_dopplershift(const vector< vector<double> > &crosssection_at_rest_histogram, vector<double> &crosssection_histogram);
 
+	void arbitrary_cross_section(const vector<double> &energy_bins, vector<double> &crosssection_histogram, const vector< vector<double> > &cross_section_file);
+
 private:
 	double eGamma(double energy, double velocity){
 		return (1. + velocity)/(sqrt(1. - velocity*velocity))*energy;

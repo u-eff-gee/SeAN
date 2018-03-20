@@ -1,0 +1,2 @@
+# Arbitrary doppler-broadened cross section (FILE is a two-column file with columns "Energy / eV" and "Cross section / fm^2")
+arb_cross_section, FILE

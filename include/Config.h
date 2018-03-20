@@ -28,6 +28,7 @@ const unsigned int N_TARGET_SETTINGS = 11;
 
 const string OUTPUT_DIR = "output/";
 const string VELOCITY_DISTRIBUTION_DIR = "velocity_distribution/";
+const string CROSS_SECTION_DIR = "cross_section/";
 const string MU_DIR = "mass_attenuation/";
 const string BEAM_DIR = "beam/";
 const string MASS_DIR = "atomic_mass/";

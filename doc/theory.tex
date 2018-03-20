@@ -114,7 +114,7 @@ In fact, for the discussion of photo\textit{absorption}, the final state of the 
 
 \begin{equation}
 \label{absorption_general_no_final}
-W(A, \alpha_s) = \sum_{\beta_s} W(A, \alpha_s, B, \beta_s)
+	W(A, \alpha_s) = \sum_{B} \sum_{\beta_s} W(A, \alpha_s, B, \beta_s)
 \end{equation}
 
 
@@ -129,21 +129,23 @@ To account for this, introduce a weighted sum over $\alpha_s$ in Eq. \ref{absorp
 
 \begin{equation}
 \label{absorption_general_alpha_s_distribution}
-W = \sum_{\alpha_s} g(\alpha_s) W(A, \alpha_s)
+	W(E) = \sum_{\alpha_s} g(\alpha_s) W(A, \alpha_s)
 \end{equation}
+
+In Eq. \ref{absorption_general_alpha_s_distribution}, the arguments of the function $W$ have been changed from $\left( A, \alpha_s \right)$ to $\left( E \right)$ as in Ref. \cite{Lam39}, because in the following parts, the main focus will be on the energy dependence of $W$.
+Due to the summation over $B$, the matrix element $\left| M^{\mathrm{nucl}}_{C \to B} \right|^2$ disappears, and the probability of absorption looks like:
 
 \begin{equation}
 \label{absorption_simplification_1}
-	W \propto \sum_{\alpha_s} g(\alpha_s) \sum_{\beta_s} \left| \sum_{n_s} \frac{ \langle \beta_s | \exp{\left( - i \mathbf{k} \cdot \mathbf{x} / \hbar \right)} | n_s \rangle \langle n_s | \exp{\left( i \mathbf{p} \cdot \mathbf{x} / \hbar \right)} | \alpha_s \rangle  }{E_0 - E + E(n_s) - E(\alpha_s) + i/2 \Gamma(n_s)} \right| ^2
+	W(E) =  \left| M^\mathrm{nucl}_{A \to C} \right|^2 \sum_{\alpha_s} g(\alpha_s) \sum_{\beta_s} \left| \sum_{n_s} \frac{ \langle \beta_s | \exp{\left( - i \mathbf{k} \cdot \mathbf{x} / \hbar \right)} | n_s \rangle \langle n_s | \exp{\left( i \mathbf{p} \cdot \mathbf{x} / \hbar \right)} | \alpha_s \rangle  }{E_0 - E + E(n_s) - E(\alpha_s) + i/2 \Gamma(n_s)} \right| ^2
 \end{equation}
 
-In Eq. \ref{absorption_simplification_1}, the nuclear matrix elements have been left out for sake of readability. 
-The following simplifications do not depend on them. 
+In the following, the expression will be simplified. The remaining nuclear matrix element has no influence on these calculations and will be left out for sake of readability.
 First, calculate the absolute value explicitly to be able to exchange the order of the summations:
 
 \begin{equation}
 \label{absorption_simplification_2}
-	W \propto \sum_{\alpha_s} g(\alpha_s) \sum_{\beta_s} \sum_{n_s} \frac{ \langle \beta_s | \exp{\left( - i \mathbf{k} \cdot \mathbf{x} / \hbar \right)} | n_s \rangle \langle n_s | \exp{\left( i \mathbf{p} \cdot \mathbf{x} / \hbar \right)} | \alpha_s \rangle  }{E_0 - E + E(n_s) - E(\alpha_s) + i/2 \Gamma(n_s)} 
+	W (E) \propto \sum_{\alpha_s} g(\alpha_s) \sum_{\beta_s} \sum_{n_s} \frac{ \langle \beta_s | \exp{\left( - i \mathbf{k} \cdot \mathbf{x} / \hbar \right)} | n_s \rangle \langle n_s | \exp{\left( i \mathbf{p} \cdot \mathbf{x} / \hbar \right)} | \alpha_s \rangle  }{E_0 - E + E(n_s) - E(\alpha_s) + i/2 \Gamma(n_s)} 
 \end{equation}	
 \begin{equation*}
 \sum_{m_s} \frac{ \langle m_s | \exp{\left( i \mathbf{k} \cdot \mathbf{x} / \hbar \right)} | \beta_s \rangle \langle \alpha_s | \exp{\left(  - i \mathbf{p} \cdot \mathbf{x} / \hbar \right)} | n_s \rangle  }{E_0 - E + E(n_s) - E(\alpha_s) - i/2 \Gamma(n_s)}
@@ -154,7 +156,7 @@ The same holds for the matrix elements which are simply numbers:
 
 \begin{equation}
 \label{absorption_simplification_3}
-	W \propto \sum_{\alpha_s} g(\alpha_s) \sum_{n_s} \sum_{m_s} \frac{  \langle n_s | \exp{\left( i \mathbf{p} \cdot \mathbf{x} / \hbar \right)} | \alpha_s \rangle \langle \alpha_s | \exp{\left(  - i \mathbf{p} \cdot \mathbf{x} / \hbar \right)} | n_s \rangle  }{E_0 - E + E(n_s) - E(\alpha_s) + i/2 \Gamma(n_s)} 
+	W (E) \propto \sum_{\alpha_s} g(\alpha_s) \sum_{n_s} \sum_{m_s} \frac{  \langle n_s | \exp{\left( i \mathbf{p} \cdot \mathbf{x} / \hbar \right)} | \alpha_s \rangle \langle \alpha_s | \exp{\left(  - i \mathbf{p} \cdot \mathbf{x} / \hbar \right)} | n_s \rangle  }{E_0 - E + E(n_s) - E(\alpha_s) + i/2 \Gamma(n_s)} 
 \end{equation}	
 \begin{equation*}
 	\frac{ \langle m_s | \exp{\left( i \mathbf{k} \cdot \mathbf{x} / \hbar \right)} \sum_{\beta_s} \left( | \beta_s \rangle \langle \beta_s | \right) \exp{\left( - i \mathbf{k} \cdot \mathbf{x} / \hbar \right)} | n_s \rangle }{E_0 - E + E(n_s) - E(\alpha_s) - i/2 \Gamma(n_s)}
@@ -179,10 +181,20 @@ Now, the absolute values in the numerator and the denominator can be calculated 
 
 \begin{equation}
 \label{absorption_general_summed}
-	W = \left| M^{\mathrm{nucl}}_{C \to B} \right|^2 \cdot \left| M^{\mathrm{nucl}}_{A \to C} \right|^2 \sum_{\alpha_s} g(\alpha_s) \sum_{n_s} \frac{ \left| \langle n_s | \exp{\left( i \mathbf{p} \cdot \mathbf{x} / \hbar \right)} | \alpha_s \rangle \right|^2  }{\left[ E - E_0 - \left( E(n_s) - E(\alpha_s) \right) \right]^2 + 1/4 \left( \Gamma(n_s) \right)^2 }
+	W(E) = \left| M^{\mathrm{nucl}}_{A \to C} \right|^2 \sum_{\alpha_s} g(\alpha_s) \sum_{n_s} \frac{ \left| \langle n_s | \exp{\left( i \mathbf{p} \cdot \mathbf{x} / \hbar \right)} | \alpha_s \rangle \right|^2  }{\left[ E - E_0 - \left( E(n_s) - E(\alpha_s) \right) \right]^2 + 1/4 \left( \Gamma(n_s) \right)^2 }
 \end{equation}
 
-Coming from the more general Eq. \ref{absorption_general}, Eq. \ref{absorption_general_summed} has now been adapted for the photoabsorption experiments which are considered here.
+Coming from the more general Eq. \ref{absorption_general} which includes definite states of the nucleus and the system, Eq. \ref{absorption_general_summed} has now been adapted.
+A further simplification can be made if the absorption of the photon happens on a single isolated state $C$.
+In this case, the remaining nuclear transition probability will simply be a factor of 1:
+
+\begin{equation}
+	\label{isolated_state}
+\left| M^{\mathrm{nucl}}_{A \to C} \right|^2 \to 1
+\end{equation}
+
+The validity of Eq. \ref{isolated_state} will always be assumed in this text if not specified otherwise, since it only becomes important in cases of extremely large level densities in a nucleus. Below the neutron separation threshold, excited states can most often be assumed to be isolated in a very good approximation.
+
 Note that $W$ is a \textit{probability} for the absorption and emission process. To adapt to the case of photoabsorption and emission, the matrix elements have to be replaced by \cite{Bet37}
 
 \begin{equation}
@@ -402,7 +414,7 @@ E_\gamma^{lab}(v_\parallel) = \frac{\sqrt{1 - \left( \frac{v_\parallel}{c} \righ
 \end{equation}
 
 \begin{equation}
-\label{maxwell_boltzmann_distribution}
+\label{maxwell_boltzmann_distribution_2}
 w\left(v_\parallel \right) = \sqrt{\frac{M}{2 \pi k_B T}} \cdot \mathrm{exp} \left( -\frac{M v_\parallel^2}{2 k_B T} \right) 
 \end{equation}
 
