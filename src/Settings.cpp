@@ -22,8 +22,6 @@ void Settings::print(){
 	unsigned int ntargets = (unsigned int) targetNames.size();
 	for(unsigned int i = 0; i < ntargets; ++i)
 		printTarget(i);
-
-	cout << HORIZONTAL_LINE << endl;
 }
 
 void Settings::printOptions(){
@@ -213,8 +211,6 @@ void Settings::write_output(unsigned int n_setting) const {
 	unsigned int ntargets = (unsigned int) targetNames.size();
 	for(unsigned int i = 0; i < ntargets; ++i)
 		writeTarget(i);
-
-	ofile << HORIZONTAL_LINE << endl;
 
 	ofile.close();
 }

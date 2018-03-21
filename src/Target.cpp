@@ -115,7 +115,7 @@ void Target::calculateCrossSection(const vector<double> &energy_bins){
 		crossSection->arbitrary_cross_section(energy_bins, crosssection_histogram, cross_section_file);
 	}
 	else if(settings.dopplerBroadening[target_number] == dopplerModel::phdos){
-		phononDensity->calculateCrossSection(energy_bins, crosssection_histogram, omega_s_file, e_s_file, p_file, target_number);
+		phononDensity->calculateCrossSection(energy_bins, energy_boosted, crosssection_histogram, omega_s_file, e_s_file, p_file, target_number);
 	}
 
 	else if(settings.exact){

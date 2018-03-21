@@ -37,3 +37,6 @@ doc/*.log
 doc/*.out
 doc/*.pdf
 doc/*.toc
+
+# phdos directory
+phdos/*

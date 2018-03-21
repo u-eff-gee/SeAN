@@ -83,8 +83,8 @@ void Experiment::print_results(){
 
 	unsigned int ntargets = (unsigned int) settings.targetNames.size();	
 
-	cout << ">>> SeAN RESULTS" << endl;
 	cout << HORIZONTAL_LINE << endl;
+	cout << ">>> SeAN RESULTS" << endl;
 	cout << "TARGET NAME\tRESONANT SCATTERING" << endl;
 
 	for(unsigned int i = 0; i < ntargets; ++i){
