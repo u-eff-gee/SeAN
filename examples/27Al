@@ -19,7 +19,8 @@ const, 1.0
 # 5) Angular momenta of the excited states (comma separated values)
 1.5
 # 6) Model for doppler-broadened of cross section
-arb_cross_section, flat.txt
+phdos, omega_s.txt, e_s.txt, p.txt, 293., 6.02214086e23
+#arb_cross_section, flat.txt
 # 7) Nuclear mass in atomic mass units
 27Al
 # 8) Mass attenuation coefficient

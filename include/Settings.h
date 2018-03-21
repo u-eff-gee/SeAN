@@ -13,7 +13,8 @@ using std::vector;
 // zero: T = 0 -> no Doppler broadening of the cross section
 // mb: Maxwell-Boltzmann distribution with effective temperature
 // mba: Maxwell-Boltzmann distribution with effective temperature + use the approximation that Gamma is much smaller than the Doppler width
-enum class dopplerModel{arb_vdist, arb_cs, zero, mb, mba, mbd, mbad};
+// phdos: Calculate the cross section from the eigenmodes (phonons) of the material
+enum class dopplerModel{arb_vdist, arb_cs, zero, mb, mba, mbd, mbad, phdos};
 
 // Enum for different mass attenuation models
 // arb: arbitrary, point-wise defined mass attenuation
@@ -60,6 +61,9 @@ struct Settings{
 	vector< vector<double> > dopplerParams;
 	vector<string> dopplerFile;
 	vector<string> vDistFile;
+	vector<string> omegaFile;
+	vector<string> polarizationFile;
+	vector<string> momentumFile;
 
 	vector<double> mass;
 

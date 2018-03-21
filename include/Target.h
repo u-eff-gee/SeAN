@@ -12,6 +12,7 @@
 #include "Plotter.h"
 #include "Writer.h"
 #include "Integrator.h"
+#include "PhononDensity.h"
 
 using std::string;
 using std::vector;
@@ -37,6 +38,11 @@ private:
 	vector< vector<double> > cross_section_file;
 	vector<double> crosssection_histogram;
 
+	// Phonon density files
+	vector< vector<double> > e_s_file;
+	vector< vector<double> > p_file;
+	vector<double> omega_s_file;
+
 	// Incident beam
 	vector< vector<double> > incident_beam_file;
 	vector<double> incident_beam_histogram;
@@ -54,6 +60,7 @@ private:
 	Plotter *plotter;
 	Writer *writer;
 	Integrator *integrator;
+	PhononDensity *phononDensity;
 
 	double n_resonantly_scattered;
 	unsigned int target_number;

@@ -35,7 +35,7 @@ public:
 
 	void readJ(istringstream &stream, vector<Settings> &settings, const unsigned int ntarget);
 
-	void readVelocityDistribution(istringstream &stream, vector<Settings> &settings, const unsigned int ntarget);
+	void readDopplerBroadening(istringstream &stream, vector<Settings> &settings, const unsigned int ntarget);
 
 	void readMass(istringstream &stream, vector<Settings> &settings);
 
@@ -49,8 +49,10 @@ public:
 	double readAME(string isotope);
 	// Read an energy-dependent mass-attenuation coefficient from a file with the NIST format
 	void readNIST(vector< vector<double> > &mass_attenuation_file, const string mass_attenuation_filename);
-	// Read any file with two columns
+	// Read file with one, two or three columns
+	void read1ColumnFile(vector<double> &data, string filename);
 	void read2ColumnFile(vector< vector<double> > &data, string filename);
+	void read3ColumnFile(vector< vector<double> > &data, string filename);
 
 
 private:

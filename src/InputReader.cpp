@@ -150,12 +150,12 @@ void InputReader::readFile(vector<Settings> &settings){
 				++nline;
 				break;
 				
-			// Read velocity distribution
+			// Read doppler broadening
 			case 6:
 				for(unsigned i = 0; i < settings.size(); ++i){
 					settings[i].dopplerParams.push_back(vector<double>());
 				}
-				readVelocityDistribution(stream, settings, ntarget);
+				readDopplerBroadening(stream, settings, ntarget);
 				++nline;
 				break;
 
@@ -825,7 +825,7 @@ void InputReader::readJ(istringstream &stream, vector<Settings> &settings, unsig
 	}
 }
 
-void InputReader::readVelocityDistribution(istringstream &stream, vector<Settings> &settings, const unsigned int ntarget){
+void InputReader::readDopplerBroadening(istringstream &stream, vector<Settings> &settings, const unsigned int ntarget){
 
 	vector<double> values;
 	string value_string = "";
@@ -834,6 +834,7 @@ void InputReader::readVelocityDistribution(istringstream &stream, vector<Setting
 	long unsigned int n_values = 0;
 	bool has_vDist_file = false;
 	bool has_cs_file = false;
+	bool needs_phdos = false;
 
 	// Read velocity distribution model
 	getline(stream, value_string, DELIMITER);
@@ -876,6 +877,12 @@ void InputReader::readVelocityDistribution(istringstream &stream, vector<Setting
 		for(unsigned int i = 0; i < n_settings; ++i){
 			settings[i].dopplerBroadening.push_back(dopplerModel::mbad);
 		}
+	} else if(value_string=="phdos"){
+		for(unsigned int i = 0; i < n_settings; ++i){
+			settings[i].dopplerBroadening.push_back(dopplerModel::phdos);
+		}
+
+		needs_phdos = true;
 	} else{
 		cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
 		cout << " readFile(): Unknown option '" << value_string << "' for doppler broadening." << endl;
@@ -897,6 +904,26 @@ void InputReader::readVelocityDistribution(istringstream &stream, vector<Setting
 			settings[i].dopplerFile.push_back(regex_replace(value_string, regex("\\s+"), ""));
 		}
 	} else{
+		if(needs_phdos){
+			getline(stream, value_string, DELIMITER);
+				
+			for(unsigned int i = 0; i < n_settings; ++i){
+				settings[i].omegaFile.push_back(regex_replace(value_string, regex("\\s+"), ""));
+			}
+
+			getline(stream, value_string, DELIMITER);
+				
+			for(unsigned int i = 0; i < n_settings; ++i){
+				settings[i].polarizationFile.push_back(regex_replace(value_string, regex("\\s+"), ""));
+			}
+
+			getline(stream, value_string, DELIMITER);
+				
+			for(unsigned int i = 0; i < n_settings; ++i){
+				settings[i].momentumFile.push_back(regex_replace(value_string, regex("\\s+"), ""));
+			}
+		}
+
 
 		while(getline(stream, value_string, DELIMITER)){
 			flag = readDoubles(values, value_string);
@@ -1249,6 +1276,31 @@ void InputReader::readNIST(vector< vector<double> > &mass_attenuation_file, cons
 	}
 }
 
+void InputReader::read1ColumnFile(vector<double> &data, string filename){
+
+	string line, value;
+	ifstream ifile;
+
+	ifile.open(filename);	
+
+        if(!ifile.is_open()){
+		cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
+		cout << " read2ColumnFile(): File '" << filename << "' not found." << endl;
+		abort();
+	}
+        //cout << "> Reading input file '" << filename << "'" << endl;
+
+	while(getline(ifile, line)){
+		if(line.substr(0,1) == COMMENT)
+			continue;
+
+		istringstream stream(line);
+
+		getline(stream, value, DELIMITER);
+		data.push_back(atof(value.c_str()));
+	}
+}
+
 void InputReader::read2ColumnFile(vector< vector<double> > &data, string filename){
 
 	string line, value;
@@ -1276,5 +1328,38 @@ void InputReader::read2ColumnFile(vector< vector<double> > &data, string filenam
 		data[0].push_back(atof(value.c_str()));
 		getline(stream, value, DELIMITER); 
 		data[1].push_back(atof(value.c_str()));
+	}
+}
+
+void InputReader::read3ColumnFile(vector< vector<double> > &data, string filename){
+
+	string line, value;
+	ifstream ifile;
+
+	ifile.open(filename);	
+
+        if(!ifile.is_open()){
+		cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
+		cout << " read3ColumnFile(): File '" << filename << "' not found." << endl;
+		abort();
+	}
+        //cout << "> Reading input file '" << filename << "'" << endl;
+
+	data.push_back(vector<double>());
+	data.push_back(vector<double>());
+	data.push_back(vector<double>());
+	
+	while(getline(ifile, line)){
+		if(line.substr(0,1) == COMMENT)
+			continue;
+
+		istringstream stream(line);
+
+		getline(stream, value, DELIMITER);
+		data[0].push_back(atof(value.c_str()));
+		getline(stream, value, DELIMITER); 
+		data[1].push_back(atof(value.c_str()));
+		getline(stream, value, DELIMITER); 
+		data[2].push_back(atof(value.c_str()));
 	}
 }

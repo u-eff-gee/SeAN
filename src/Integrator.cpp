@@ -1,5 +1,19 @@
 #include "Integrator.h"
 
+double Integrator::trapezoidal_rule(const vector<double> &bins, const vector<double> &histogram){
+	// Bin size
+	double bin_size = bins[1] - bins[0];
+
+	double integral = 0.;
+
+	#pragma omp parallel for reduction (+:integral)
+	for(unsigned int i = 0; i < bins.size() - 1; ++i){
+		integral += (histogram[i] + histogram[i+1])
+	}
+
+	return 0.5*bin_area*integral;
+}
+
 double Integrator::integrate2DHistogram(const vector<double> &bins1, const vector<double> &bins2, const vector<vector<double> > &histogram){
 
 	// Area of a bin in 2D plane

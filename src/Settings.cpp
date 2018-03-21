@@ -146,6 +146,9 @@ void Settings::printTarget(unsigned int i){
 			case dopplerModel::mbad:
 				cout << "Maxwell-Boltzmann (using Debye and integral approximation), T = " << dopplerParams[i][0] << " K, T_D = " << dopplerParams[i][1] << " K " << endl;
 				break;
+			case dopplerModel::phdos:
+				cout << "phDOS, omega_s = " << omegaFile[i] << ", e_s = " << polarizationFile[i] << ", p = " << momentumFile[i] << ", T = " << dopplerParams[i][0] << " K, N = " << dopplerParams[i][1] << endl;
+				break;
 			default: break;
 		}
 	}
@@ -373,6 +376,9 @@ void Settings::writeTarget(unsigned int i) const{
 				break;
 			case dopplerModel::mbad:
 				ofile << "Maxwell-Boltzmann (using Debye and integral approximation), T = " << dopplerParams[i][0] << " K, T_D = " << dopplerParams[i][1] << " K " << endl;
+				break;
+			case dopplerModel::phdos:
+				cout << "phDOS, omega_s = " << omegaFile[i] << ", e_s = " << polarizationFile[i] << ", p = " << momentumFile[i] << ", T = " << dopplerParams[i][0] << " K, N = " << dopplerParams[i][1] << endl;
 				break;
 			default: break;
 		}

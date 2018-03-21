@@ -75,6 +75,9 @@ void Target::initialize(const vector<double> &energy_bins){
 	// Initialize writer
 	writer = new Writer();
 
+	// Initialize phonon density
+	phononDensity = new PhononDensity(settings);
+
 	// Shift resonance energies due to target velocity
 	boostEnergies();
 	// Calculate z bins
@@ -90,10 +93,11 @@ void Target::initialize(const vector<double> &energy_bins){
 
 void Target::calculateCrossSection(const vector<double> &energy_bins){
 
-	// Need to treat the three special cases
+	// Need to treat the four special cases
 	// 1. Velocity distribution at T = 0 K
 	// 2. Maxwell-Boltzmann with approximation
 	// 3. Arbitrary doppler-shifted cross section or velocity distribution
+	// 4. Phonon density distribution
 	// separately, because it is possible to calculate the doppler-shifted cross section without the expensive double integral 
 	if(settings.dopplerBroadening[target_number] == dopplerModel::zero){
 		crossSection->no_dopplershift(crosssection_at_rest_histogram, crosssection_histogram);
@@ -109,6 +113,9 @@ void Target::calculateCrossSection(const vector<double> &energy_bins){
 
 	else if(settings.dopplerBroadening[target_number] == dopplerModel::arb_cs){
 		crossSection->arbitrary_cross_section(energy_bins, crosssection_histogram, cross_section_file);
+	}
+	else if(settings.dopplerBroadening[target_number] == dopplerModel::phdos){
+		phononDensity->calculateCrossSection(energy_bins, crosssection_histogram, omega_s_file, e_s_file, p_file, target_number);
 	}
 
 	else if(settings.exact){
@@ -167,6 +174,19 @@ void Target::calculateVelocityDistribution(const vector<double> &energy_bins){
 			inputReader->read2ColumnFile(cross_section_file, filename.str());
 			crossSection->arbitrary_cross_section(energy_bins, crosssection_histogram, cross_section_file);
 			break;
+		case dopplerModel::phdos:
+			filename << PHONON_DIR << settings.omegaFile[target_number];
+			inputReader->read1ColumnFile(omega_s_file, filename.str());
+
+			filename.str("");
+			filename.clear();
+			filename << PHONON_DIR << settings.polarizationFile[target_number];
+			inputReader->read3ColumnFile(e_s_file, filename.str());
+
+			filename.str("");
+			filename.clear();
+			filename << PHONON_DIR << settings.momentumFile[target_number];
+			inputReader->read3ColumnFile(p_file, filename.str());
 	}
 
 	vDistInfo();
