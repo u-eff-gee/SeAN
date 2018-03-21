@@ -45,6 +45,7 @@ void PhononDensity::calculateCrossSection(const vector<double> &energy_bins, con
 		calculate_cosine_sum(omega_s_file, n_modes);
 
 		for(unsigned j = 0; j < settings.nbins_e; ++j){
+			#pragma omp parallel for
 			for(unsigned int k = 0; k < settings.nbins_e; ++k){
 				mu_hist[k] = cos(mu_bins[k]*(energy_bins[j] - energy_boosted[0]) - energy_bins[j]*energy_bins[j]*sine_sum[k])*exp(-mu_bins[k]*0.5*settings.gamma[target_number][0] + energy_bins[j]*energy_bins[j]*cosine_sum[k]);
 			}
@@ -97,6 +98,7 @@ void PhononDensity::calculate_q_s_squared_over_E_squared(const vector<double> &o
 
 	double c1 = 1./(2.*settings.mass[target_number]*AtomicMassUnit*n_modes);
 
+	#pragma omp parallel for
 	for(unsigned int i = 0; i < n_modes; ++i){
 		q_s_squared_over_E_squared[i] = pow(p[0]*e_s_file[0][i] + p[1]*e_s_file[1][i] + p[2]*e_s_file[2][i], 2)*c1/omega_s_file[i];
 	}
