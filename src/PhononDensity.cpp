@@ -17,7 +17,7 @@ void PhononDensity::calculateCrossSection(const vector<double> &energy_bins, con
 	if(settings.verbosity > 0){
 		cout << HORIZONTAL_LINE << endl;
 		cout << "> Calculating cross section from " << omega_s_file.size() << " phonon modes of crystal lattice."; 
-		if(p_file.size() > 1){
+		if(p_file[0].size() > 1){
 			cout << " Averaging over " << n_momentum_vectors << " momentum vectors of the photon." << endl;
 		} else{
 			cout << endl;

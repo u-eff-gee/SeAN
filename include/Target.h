@@ -77,7 +77,7 @@ public:
 	// The order of the following functions represents the order in which they are called in a normal calculation. Indented functions are called by the function above.
 	void initialize(const vector<double> &energy_bins);
 		// Function to modify resonance energies due to Doppler shift
-		void boostEnergies();
+		void boost_and_recoil();
 		void calculateCrossSectionAtRest(const vector<double> &energy_bins);
 		void calculateVelocityDistribution(const vector<double> &energy_bins);
 		void calculateMassAttenuation(const vector<double> &energy_bins);

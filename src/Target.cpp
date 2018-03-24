@@ -79,7 +79,7 @@ void Target::initialize(const vector<double> &energy_bins){
 	phononDensity = new PhononDensity(settings);
 
 	// Shift resonance energies due to target velocity
-	boostEnergies();
+	boost_and_recoil();
 	// Calculate z bins
 	calculateZBins();
 	// Calculate cross section
@@ -131,13 +131,20 @@ void Target::calculateCrossSection(const vector<double> &energy_bins){
 	}
 }
 
-void Target::boostEnergies(){
+void Target::boost_and_recoil(){
+	double recoil = 0.;
+
 	double beta = settings.velocity[target_number]/SPEEDOFLIGHT;
 	
 	unsigned int nenergies = (unsigned int) settings.energy[target_number].size();
 
-	for(unsigned int i = 0; i < nenergies; ++i)
-		energy_boosted.push_back((1. + beta)/sqrt(1. - beta*beta)*settings.energy[target_number][i]);
+	for(unsigned int i = 0; i < nenergies; ++i){
+		if(settings.recoil){
+			recoil = settings.energy[target_number][i]*settings.energy[target_number][i]/(2.*settings.mass[target_number]*AtomicMassUnit);
+		}
+
+		energy_boosted.push_back((1. + beta)/sqrt(1. - beta*beta)*settings.energy[target_number][i] + recoil);
+	}
 }
 
 void Target::calculateCrossSectionAtRest(const vector<double> &energy_bins){

@@ -26,6 +26,7 @@ static struct argp_option options[] = {
   { "plot", 'p', 0, 0, "Create plots of all calculated quantities" },
   { "write", 'w', 0, 0, "Create text output files for all calculated quantities" },
   { "verbosity", 'v', "VERBOSITY", 0, "Set command line verbosity (0 = print nothing, 1 = print results, 2 [default] = print input and results)" },
+  { "recoil", 'r', 0, 0, "Include nuclear recoil in the calculation of the cross section maximum."},
   { "output", 'o', "OUTPUTFILENAME", 0, "Write input and results to file" },
   { 0 }
 };
@@ -39,6 +40,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     	case 'p': settings->plot = true; break;
     	case 'w': settings->write = true; break;
 	case 'v': settings->verbosity = atoi(arg); break;
+	case 'r': settings->recoil= true; break;
 	case 'o': settings->output = true;
 		  settings->outputfile = arg;
 			break;

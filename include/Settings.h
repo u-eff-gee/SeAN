@@ -34,6 +34,7 @@ struct Settings{
         string inputfile = "";
 	string outputfile = "";
 	int verbosity = 2;
+	bool recoil = false;
 	bool output = false;
 	bool exact = false;
 	bool plot = false;
