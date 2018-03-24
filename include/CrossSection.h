@@ -11,6 +11,7 @@
 
 #include "Config.h"
 #include "Settings.h"
+#include "Integrator.h"
 
 using std::vector;
 using std::string;
@@ -22,9 +23,13 @@ private:
 	vector< vector<double> > pconv_velocity_distribution_histogram;
 
 	Settings settings;
+	Integrator* integrator;
 
 public:
-	CrossSection(Settings &s){ settings = s; };
+	CrossSection(Settings &s){ 
+		settings = s; 
+		integrator = new Integrator();
+	};
 	
 	~CrossSection(){
 		delete &pconv_crosssection_histogram;
@@ -32,7 +37,7 @@ public:
 	};
 
 	// Cross section at rest calculators
-	void breit_wigner(const vector<double> &energy_bins, vector< vector<double> > (&crosssection_at_rest_histogram), vector<double> &energy_boosted, unsigned int target_number);
+	void breit_wigner(const vector<double> &energy_bins, vector< vector<double> > (&crosssection_at_rest_histogram), const vector<double> &energy_boosted, const unsigned int target_number);
 
 	// Velocity distribution calculators
 	// Calculator for the velocity bins that correspond to the energy bins
@@ -66,6 +71,13 @@ public:
 	void no_dopplershift(const vector< vector<double> > &crosssection_at_rest_histogram, vector<double> &crosssection_histogram);
 
 	void arbitrary_cross_section(const vector<double> &energy_bins, vector<double> &crosssection_histogram, const vector< vector<double> > &cross_section_file);
+
+	// Unit tests
+	// Calculate the analytical value integrated cross section, i.e. the integral of d sigma / d E with from 0 to infinity. This is a measure of the correctness of the cross section that is calculated by SeAN
+	double integrated_crosssection_analytical(vector<double> energy_boosted, unsigned int target_number) const;
+
+	// Check whether the total integral over the cross section equals the analytical expression for a Breit-Wigner cross section folded with an arbitrary velocity distribution
+	void check_crosssection_normalization(const vector<double> &energy_bins, vector<double> &crosssection_histogram, vector<double> energy_boosted, unsigned int target_number) const;
 
 private:
 	double eGamma(double energy, double velocity){

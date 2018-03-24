@@ -125,6 +125,10 @@ void Target::calculateCrossSection(const vector<double> &energy_bins){
 		crossSection->fft_input(energy_bins, crosssection_at_rest_histogram, velocity_distribution_histogram, energy_boosted);
 		crossSection->dopplershiftFFT(energy_bins, crosssection_histogram, crosssection_at_rest_histogram, velocity_distribution_bins, velocity_distribution_histogram, vdist_norm, vdist_centroid);
 	}
+
+	if(settings.verbosity > 0){
+		crossSection->check_crosssection_normalization(energy_bins, crosssection_histogram, energy_boosted, target_number);
+	}
 }
 
 void Target::boostEnergies(){

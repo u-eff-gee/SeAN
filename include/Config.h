@@ -13,6 +13,7 @@ const double kB = 8.6173303e-5; // in eV/K
 const double AtomicMassUnit = 931.494095e6; // in eV/c^2
 const double AtomicMassUnitG = 1.660539040e-24; // in g
 const double PI = 3.141592653589793;
+const double PI2 = 9.869604401089358; 
 
 // Settings for the SeAN input file
 const string COMMENT = "#";
@@ -34,6 +35,10 @@ const string MU_DIR = "mass_attenuation/";
 const string BEAM_DIR = "beam/";
 const string MASS_DIR = "atomic_mass/";
 const string AME_FILE_NAME = "mass16.txt";
+
+// Settings for phonon calculations
+const unsigned int SAVE_PROGRESS = 1; // After SAVE_PROGRESS calculations with different momentum vectors, thecurrent cross section will be written to file
+const unsigned int MU_MAX_INTEGRAL = 3; // Set integration range for mu in terms of the 'decay constant' 2/Gamma 
 
 // Settings for SeAN output files
 const string HORIZONTAL_LINE = "##############################################################";

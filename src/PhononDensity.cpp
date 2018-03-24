@@ -3,9 +3,11 @@
 #include "omp.h"
 #include <cmath>
 #include <iostream>
+#include <sstream>
 
 using std::cout;
 using std::endl;
+using std::stringstream;
 
 void PhononDensity::calculateCrossSection(const vector<double> &energy_bins, const vector<double> &energy_boosted, vector<double> &crosssection_histogram, const vector<double> &omega_s_file, const vector< vector<double> > &e_s_file, const vector< vector<double> > &p_file, const unsigned int target_number){
 
@@ -31,13 +33,15 @@ void PhononDensity::calculateCrossSection(const vector<double> &energy_bins, con
 
 	mu_hist = vector<double>(settings.nbins_e);
 
+	stringstream save_progress_filename;
+
 	for(unsigned int i = 0; i < n_momentum_vectors; ++i){
 		p[0] = p_file[0][i];
 		p[1] = p_file[1][i];
 		p[2] = p_file[2][i];
 
 		if(settings.verbosity > 0){
-			cout << "\tMomentum vector: ( " << p[0] << ", " << p[1] << ", " << p[2] << " )" << endl;
+			cout << "\tMomentum vector #" << i << " of " << n_momentum_vectors << " : ( " << p[0] << ", " << p[1] << ", " << p[2] << " )" << endl;
 		}
 
 		calculate_q_s_squared_over_E_squared(omega_s_file, e_s_file, p, target_number, n_modes);
@@ -55,12 +59,19 @@ void PhononDensity::calculateCrossSection(const vector<double> &energy_bins, con
 		}
 
 		if(settings.verbosity > 0){
-			cout << "\t> Checking normalization:integral W(E) dE = " << integrator->trapezoidal_rule(energy_bins, crosssection_histogram) << " == " << (i+1)*(0.5*PI - atan(-2.*energy_boosted[0]/settings.gamma[target_number][0])) << " ? " << endl;
+			cout << "\t> Checking normalization : integral W(E) dE = " << integrator->trapezoidal_rule(energy_bins, crosssection_histogram) << " == " << (i+1)*(0.5*PI - atan(-2.*energy_boosted[0]/settings.gamma[target_number][0])) << " ? " << endl;
+		}
+
+		if(i % SAVE_PROGRESS == 0){
+			save_progress_filename << settings.targetNames[0] << "_crosssection_save" << i;
+			writer->write1DHistogram(crosssection_histogram, save_progress_filename.str(), "Cross section / fm^2");
+			save_progress_filename.str("");
+			save_progress_filename.clear();
 		}
 	}
 	
 
-	double cs_max = PI*0.5*HBARC2/(energy_boosted[0]*energy_boosted[0])*(2.*settings.jj[target_number][0] + 1.)/(2.*settings.ji[target_number] + 1.)*settings.gamma0[target_number][0]*momentum_vector_weight;
+	double cs_max = PI*HBARC2/(energy_boosted[0]*energy_boosted[0])*(2.*settings.jj[target_number][0] + 1.)/(2.*settings.ji[target_number] + 1.)*settings.gamma0[target_number][0]*momentum_vector_weight;
 
 	#pragma omp parallel for
 	for(unsigned int i = 0; i < settings.nbins_e; ++i){
@@ -70,10 +81,10 @@ void PhononDensity::calculateCrossSection(const vector<double> &energy_bins, con
 
 void PhononDensity::calculate_mu_bins(const unsigned int target_number){
 
-	// Calculate integration range for mu. The integrated function is proportional to exp(-mu*Gamma/2). This term will eventually dominate the behavior for large mu, so integrate over a range from 0 to 3 times the "decay constant" 2/Gamma.
+	// Calculate integration range for mu. The integrated function is proportional to exp(-mu*Gamma/2). This term will eventually dominate the behavior for large mu, so integrate over a range from 0 to MU_MAX_INTEGRAL times the "decay constant" 2/Gamma.
 	double decay_constant = 2./settings.gamma[target_number][0];
 	mu_bins = vector<double>(settings.nbins_e);
-	double bin_size_mu = (double) 3.*decay_constant/(settings.nbins_e - 1);
+	double bin_size_mu = (double) MU_MAX_INTEGRAL*decay_constant/(settings.nbins_e - 1);
 
 	#pragma omp parallel for
 	for(unsigned i = 0; i < settings.nbins_e; ++i){
@@ -97,6 +108,7 @@ void PhononDensity::calculate_q_s_squared_over_E_squared(const vector<double> &o
 	q_s_squared_over_E_squared = vector<double>(n_modes, 0.);
 
 	double c1 = 1./(2.*settings.mass[target_number]*AtomicMassUnit*n_modes);
+	//double c1 = 1./(2.*settings.mass[target_number]*AtomicMassUnit*settings.dopplerParams[target_number][1]);
 
 	#pragma omp parallel for
 	for(unsigned int i = 0; i < n_modes; ++i){

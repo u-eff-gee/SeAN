@@ -19,7 +19,7 @@ using std::endl;
 using std::upper_bound;
 using std::max_element;
 
-void CrossSection::breit_wigner(const vector<double> &energy_bins, vector<vector<double> > &crosssection_at_rest_bins, vector<double> &energy_boosted, unsigned int target_number){
+void CrossSection::breit_wigner(const vector<double> &energy_bins, vector<vector<double> > &crosssection_at_rest_bins, const vector<double> &energy_boosted, const unsigned int target_number){
 
 	for(unsigned int i = 0; i < energy_boosted.size(); ++i){
 		double cs_max = PI*0.5*HBARC2/(energy_boosted[i]*energy_boosted[i])*(2.*settings.jj[target_number][i] + 1.)/(2.*settings.ji[target_number] + 1.)*settings.gamma0[target_number][i]*settings.gamma[target_number][i];
@@ -283,4 +283,26 @@ void CrossSection::maxwell_boltzmann_approximation_debye(const vector<double> &e
 			crosssection_histogram[j] += cs_max*exp(-(energy_bins[j] - energy_boosted[i])*(energy_bins[j] - energy_boosted[i])/(doppler_width*doppler_width));
 		}
 	}
+}
+
+double CrossSection::integrated_crosssection_analytical(vector<double> energy_boosted, unsigned int target_number) const {
+	double cs_int = 0.;
+
+	for(unsigned i = 0; i < energy_boosted.size(); ++i){
+		cs_int += PI2*HBARC2/(energy_boosted[i]*energy_boosted[i])*(2.*settings.jj[target_number][i] + 1.)/(2.*settings.ji[target_number] + 1.)*settings.gamma0[target_number][i];
+	}
+
+	return cs_int;
+}
+	
+void CrossSection::check_crosssection_normalization(const vector<double> &energy_bins, vector<double> &crosssection_histogram, vector<double> energy_boosted, unsigned int target_number) const {
+
+	double cs_int_analytical = integrated_crosssection_analytical(energy_boosted, target_number);
+	double cs_int_numerical = integrator->trapezoidal_rule(energy_bins, crosssection_histogram);
+
+	cout << HORIZONTAL_LINE << endl;
+	cout << "> Checking cross section normalization for target '" << settings.targetNames[target_number] << "':" << endl;
+	cout << "\tAnalytical integral: " << cs_int_analytical << " eV fm^2" << endl;
+	cout << "\tIntegral of numerically calculated cross section: " << cs_int_numerical << " eV fm^2" << endl;
+	cout << "\tDeviation: " << (cs_int_analytical - cs_int_numerical)/cs_int_analytical*100. << " %" << endl;
 }
