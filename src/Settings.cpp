@@ -133,10 +133,10 @@ void Settings::printTarget(unsigned int i){
 				cout << "zero" << endl;
 				break;
 			case dopplerModel::arb_vdist:
-				cout << "arb_vdist, " << vDistFile[i] << endl;
+				cout << "arb_vdist, bins " << velocityBinFile[i] << ", velocity distribution = " << vDistFile[i] << endl;
 				break;
 			case dopplerModel::arb_cs:
-				cout << "arb_cs, " << dopplerFile[i] << endl;
+				cout << "arb_cs, bins = " << energyBinFile[i] << ", cross section = " << crosssectionFile[i] << endl;
 				break;
 			case dopplerModel::mb:
 				cout << "Maxwell-Boltzmann, T_eff = " << dopplerParams[i][0] << " K" << endl;
@@ -368,10 +368,10 @@ void Settings::writeTarget(unsigned int i) const{
 				ofile << "zero" << endl;
 				break;
 			case dopplerModel::arb_vdist:
-				ofile << "arb_vdist, " << dopplerFile[i] << endl;
+				ofile << "arb_vdist, bins " << velocityBinFile[i] << ", velocity distribution = " << vDistFile[i] << endl;
 				break;
 			case dopplerModel::arb_cs:
-				ofile << "arb_cs, " << dopplerFile[i] << endl;
+				ofile << "arb_cs, bins = " << energyBinFile[i] << ", cross section = " << crosssectionFile[i] << endl;
 				break;
 			case dopplerModel::mb:
 				ofile << "Maxwell-Boltzmann, T_eff = " << dopplerParams[i][0] << " K" << endl;

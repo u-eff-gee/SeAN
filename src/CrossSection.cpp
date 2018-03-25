@@ -108,10 +108,10 @@ void CrossSection::maxwell_boltzmann_debye(const vector< vector<double> > &veloc
 	}
 }
 
-void CrossSection::arbitrary_velocity_distribution(const vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, const vector< vector<double> > &velocity_distribution_file, const vector<double> &energy_boosted, const unsigned int target_number){
+void CrossSection::arbitrary_velocity_distribution(const vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, const vector<double> &velocity_bins_file, const vector<double> &velocity_distribution_file, const vector<double> &energy_boosted, const unsigned int target_number){
 	// Interpolate data from file	
-	ROOT::Math::Interpolator inter((unsigned int) velocity_distribution_file[0].size(), ROOT::Math::Interpolation::kCSPLINE);
-	inter.SetData((unsigned int) velocity_distribution_file[0].size(), &velocity_distribution_file[0][0], &velocity_distribution_file[1][0]);
+	ROOT::Math::Interpolator inter((unsigned int) velocity_bins_file.size(), ROOT::Math::Interpolation::kCSPLINE);
+	inter.SetData((unsigned int) velocity_bins_file.size(), &velocity_bins_file[0], &velocity_distribution_file[0]);
 
 	// Evaluate at the given velocity bins
 	for(unsigned int i = 0; i < velocity_distribution_bins.size(); ++i){
@@ -121,10 +121,11 @@ void CrossSection::arbitrary_velocity_distribution(const vector< vector<double> 
 	}
 }
 
-void CrossSection::arbitrary_cross_section(const vector<double> &energy_bins, vector<double> &crosssection_histogram, const vector< vector<double> > &cross_section_file){
+void CrossSection::arbitrary_cross_section(const vector<double> &energy_bins, vector<double> &crosssection_histogram, const vector<double> &energy_bins_file, const vector<double> &cross_section_file){
+
 	// Interpolate data from file	
-	ROOT::Math::Interpolator inter((unsigned int) cross_section_file[0].size(), ROOT::Math::Interpolation::kCSPLINE);
-	inter.SetData((unsigned int) cross_section_file[0].size(), &cross_section_file[0][0], &cross_section_file[1][0]);
+	ROOT::Math::Interpolator inter((unsigned int) energy_bins_file.size(), ROOT::Math::Interpolation::kCSPLINE);
+	inter.SetData((unsigned int) energy_bins_file.size(), &energy_bins_file[0], &cross_section_file[0]);
 
 	// Evaluate at the given cross section bins
 	for(unsigned int i = 0; i < settings.nbins_e; ++i){

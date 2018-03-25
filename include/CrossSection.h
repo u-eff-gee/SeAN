@@ -54,7 +54,7 @@ public:
 	double tEff(const double t, const double tD);
 	void maxwell_boltzmann_debye(const vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, const unsigned int target_number);
 
-	void arbitrary_velocity_distribution(const vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, const vector< vector<double> > &velocity_distribution_file, const vector<double> &energy_boosted, const unsigned int target_number);
+	void arbitrary_velocity_distribution(const vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, const vector<double> &velocity_bins_file, const vector<double> &velocity_distribution_file, const vector<double> &energy_boosted, const unsigned int target_number);
 
 	// Cross section calculators
 	// Using FFT
@@ -70,7 +70,7 @@ public:
 	// Special cases
 	void no_dopplershift(const vector< vector<double> > &crosssection_at_rest_histogram, vector<double> &crosssection_histogram);
 
-	void arbitrary_cross_section(const vector<double> &energy_bins, vector<double> &crosssection_histogram, const vector< vector<double> > &cross_section_file);
+	void arbitrary_cross_section(const vector<double> &energy_bins, vector<double> &crosssection_histogram, const vector<double> &energy_bins_file, const vector<double> &cross_section_file);
 
 	// Unit tests
 	// Calculate the analytical value integrated cross section, i.e. the integral of d sigma / d E with from 0 to infinity. This is a measure of the correctness of the cross section that is calculated by SeAN

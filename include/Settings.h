@@ -60,7 +60,9 @@ struct Settings{
 
 	vector<dopplerModel> dopplerBroadening;
 	vector< vector<double> > dopplerParams;
-	vector<string> dopplerFile;
+	vector<string> energyBinFile;
+	vector<string> crosssectionFile;
+	vector<string> velocityBinFile;
 	vector<string> vDistFile;
 	vector<string> omegaFile;
 	vector<string> polarizationFile;

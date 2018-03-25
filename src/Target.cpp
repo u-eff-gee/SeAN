@@ -112,7 +112,7 @@ void Target::calculateCrossSection(const vector<double> &energy_bins){
 	}
 
 	else if(settings.dopplerBroadening[target_number] == dopplerModel::arb_cs){
-		crossSection->arbitrary_cross_section(energy_bins, crosssection_histogram, cross_section_file);
+		crossSection->arbitrary_cross_section(energy_bins, crosssection_histogram, energy_bins_file, cross_section_file);
 	}
 	else if(settings.dopplerBroadening[target_number] == dopplerModel::phdos){
 		phononDensity->calculateCrossSection(energy_bins, energy_boosted, crosssection_histogram, omega_s_file, e_s_file, p_file, target_number);
@@ -175,16 +175,27 @@ void Target::calculateVelocityDistribution(const vector<double> &energy_bins){
 			break;
 
 		case dopplerModel::arb_vdist:
+			filename << VELOCITY_DISTRIBUTION_DIR << settings.velocityBinFile[target_number];
+			inputReader->read1ColumnFile(velocity_bins_file, filename.str());
+
+			filename.str("");
+			filename.clear();
 			filename << VELOCITY_DISTRIBUTION_DIR << settings.vDistFile[target_number];
-			inputReader->read2ColumnFile(velocity_distribution_file, filename.str());
-			crossSection->arbitrary_velocity_distribution(velocity_distribution_bins, velocity_distribution_histogram, velocity_distribution_file, energy_boosted, target_number);
+			inputReader->read1ColumnFile(velocity_distribution_file, filename.str());
+
+			crossSection->arbitrary_velocity_distribution(velocity_distribution_bins, velocity_distribution_histogram, velocity_bins_file, velocity_distribution_file, energy_boosted, target_number);
 			break;
 
 		case dopplerModel::arb_cs:
-			filename << CROSS_SECTION_DIR << settings.dopplerFile[target_number];
-			inputReader->read2ColumnFile(cross_section_file, filename.str());
-			crossSection->arbitrary_cross_section(energy_bins, crosssection_histogram, cross_section_file);
+			filename << CROSS_SECTION_DIR << settings.energyBinFile[target_number];
+			inputReader->read1ColumnFile(energy_bins_file, filename.str());
+
+			filename.str("");
+			filename.clear();
+			filename << CROSS_SECTION_DIR << settings.crosssectionFile[target_number];
+			inputReader->read1ColumnFile(cross_section_file, filename.str());
 			break;
+
 		case dopplerModel::phdos:
 			filename << PHONON_DIR << settings.omegaFile[target_number];
 			inputReader->read1ColumnFile(omega_s_file, filename.str());

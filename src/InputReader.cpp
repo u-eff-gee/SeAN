@@ -895,14 +895,28 @@ void InputReader::readDopplerBroadening(istringstream &stream, vector<Settings> 
 		getline(stream, value_string, DELIMITER);
 			
 		for(unsigned int i = 0; i < n_settings; ++i){
+			settings[i].velocityBinFile.push_back(regex_replace(value_string, regex("\\s+"), ""));
+		}
+
+		getline(stream, value_string, DELIMITER);
+			
+		for(unsigned int i = 0; i < n_settings; ++i){
 			settings[i].vDistFile.push_back(regex_replace(value_string, regex("\\s+"), ""));
 		}
+
 	} else if(has_cs_file){
 		getline(stream, value_string, DELIMITER);
 			
 		for(unsigned int i = 0; i < n_settings; ++i){
-			settings[i].dopplerFile.push_back(regex_replace(value_string, regex("\\s+"), ""));
+			settings[i].energyBinFile.push_back(regex_replace(value_string, regex("\\s+"), ""));
 		}
+
+		getline(stream, value_string, DELIMITER);
+			
+		for(unsigned int i = 0; i < n_settings; ++i){
+			settings[i].crosssectionFile.push_back(regex_replace(value_string, regex("\\s+"), ""));
+		}
+
 	} else{
 		if(needs_phdos){
 			getline(stream, value_string, DELIMITER);
@@ -1288,7 +1302,7 @@ void InputReader::read1ColumnFile(vector<double> &data, string filename){
 		cout << " read2ColumnFile(): File '" << filename << "' not found." << endl;
 		abort();
 	}
-        //cout << "> Reading input file '" << filename << "'" << endl;
+        cout << "> Reading input file '" << filename << "'" << endl;
 
 	while(getline(ifile, line)){
 		if(line.substr(0,1) == COMMENT)

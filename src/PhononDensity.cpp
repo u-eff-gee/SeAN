@@ -63,7 +63,7 @@ void PhononDensity::calculateCrossSection(const vector<double> &energy_bins, con
 		}
 
 		if(i % SAVE_PROGRESS == 0){
-			save_progress_filename << settings.targetNames[0] << "_crosssection_save" << i;
+			save_progress_filename << settings.targetNames[0] << "_crosssection_save_" << i;
 			writer->write1DHistogram(crosssection_histogram, save_progress_filename.str(), "Cross section / fm^2");
 			save_progress_filename.str("");
 			save_progress_filename.clear();

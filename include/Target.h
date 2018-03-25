@@ -28,14 +28,16 @@ private:
 	vector< vector<double> > crosssection_at_rest_histogram;
 
 	// Velocity distribution
-	vector< vector<double> > velocity_distribution_file;
 	vector< vector<double> > velocity_distribution_bins;
 	vector< vector<double> > velocity_distribution_histogram;
 	vector<double> vdist_norm;
+	vector<double> velocity_bins_file;
+	vector<double> velocity_distribution_file;
 	vector<unsigned int> vdist_centroid;
 
 	// Cross section transformed by velocity distribution
-	vector< vector<double> > cross_section_file;
+	vector<double> energy_bins_file;
+	vector<double> cross_section_file;
 	vector<double> crosssection_histogram;
 
 	// Phonon density files
