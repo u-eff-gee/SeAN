@@ -1265,7 +1265,6 @@ void InputReader::readNIST(vector< vector<double> > &mass_attenuation_file, cons
 
 	stringstream filename;
 	filename << MU_DIR << mass_attenuation_filename;
-	cout << filename.str() << endl;
 	ifstream ifile(filename.str());
 
         if(!ifile.is_open()){
