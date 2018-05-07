@@ -21,14 +21,12 @@ private:
 	vector<double> q_s_squared_over_E_squared;
 
 	Settings settings;
-	Integrator *integrator;
-	Writer *writer;
+	Integrator integrator;
+	Writer writer;
 
 public:
-	PhononDensity(Settings &s){ 
+	PhononDensity(Settings &s): integrator(), writer(){ 
 		settings = s; 
-		integrator = new Integrator();
-		writer = new Writer();
 	};
 
 	~PhononDensity(){}

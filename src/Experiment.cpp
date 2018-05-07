@@ -40,8 +40,8 @@ void Experiment::createTargets(){
 	unsigned int ntargets = (unsigned int) settings.targetNames.size();	
 
 	for(unsigned int i = 0; i < ntargets; ++i){
-		targets.push_back(new Target(i, settings));
-		targets[i]->initialize(energy_bins);
+		targets.push_back(Target(i, settings));
+		targets[i].initialize(energy_bins);
 	}
 }
 
@@ -50,7 +50,7 @@ void Experiment::crossSections(){
 	unsigned int ntargets = (unsigned int) settings.targetNames.size();	
 
 	for(unsigned int i = 0; i < ntargets; ++i){
-		targets[i]->calculateCrossSection(energy_bins);
+		targets[i].calculateCrossSection(energy_bins);
 	}
 };
 
@@ -61,11 +61,11 @@ void Experiment::transmission(){
 	for(unsigned int i = 0; i < ntargets; ++i){
 		// The incident beam on the first target is user-defined, the rest is determined by the transmission of the previous target
 		if(i == 0){
-			targets[0]->calculateIncidentBeam(energy_bins);
-			targets[0]->calculateTransmission(energy_bins);
+			targets[0].calculateIncidentBeam(energy_bins);
+			targets[0].calculateTransmission(energy_bins);
 		} else{
-			targets[i]->calculateIncidentBeam(targets[i-1]->getPhotonFluxDensity());
-			targets[i]->calculateTransmission(energy_bins);
+			targets[i].calculateIncidentBeam(targets[i-1].getPhotonFluxDensity());
+			targets[i].calculateTransmission(energy_bins);
 		}
 	}
 }
@@ -75,7 +75,7 @@ void Experiment::resonant_scattering(){
 	unsigned int ntargets = (unsigned int) settings.targetNames.size();	
 
 	for(unsigned int i = 0; i < ntargets; ++i){
-		targets[i]->calculateResonantScattering(energy_bins);
+		targets[i].calculateResonantScattering(energy_bins);
 	}
 }
 
@@ -88,25 +88,25 @@ void Experiment::print_results(){
 	cout << "TARGET NAME\tRESONANT SCATTERING" << endl;
 
 	for(unsigned int i = 0; i < ntargets; ++i){
-		targets[i]->print_results();
+		targets[i].print_results();
 	}
 }
 
-void Experiment::plot(unsigned int n_setting) const {
+void Experiment::plot(unsigned int n_setting) {
 
 	unsigned int ntargets = (unsigned int) settings.targetNames.size();	
 
 	for(unsigned int i = 0; i < ntargets; ++i){
-		targets[i]->plot(energy_bins, n_setting);
+		targets[i].plot(energy_bins, n_setting);
 	}
 }
 
-void Experiment::write(unsigned int n_setting) const {
+void Experiment::write(unsigned int n_setting) {
 
 	unsigned int ntargets = (unsigned int) settings.targetNames.size();	
 
 	for(unsigned int i = 0; i < ntargets; ++i){
-		targets[i]->write(energy_bins, n_setting);
+		targets[i].write(energy_bins, n_setting);
 	}
 }
 
@@ -131,6 +131,6 @@ void Experiment::write_results(string outputfile, unsigned int n_setting) const{
 	ofile << "TARGET NAME\tRESONANT SCATTERING" << endl;
 
 	for(unsigned int i = 0; i < ntargets; ++i){
-		targets[i]->write_results(outputfile);
+		targets[i].write_results(outputfile);
 	}
 }

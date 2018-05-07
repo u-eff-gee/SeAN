@@ -24,9 +24,7 @@ private:
 
 public:
 	Absorption(Settings &s){ settings = s; };
-	~Absorption(){
-		delete &matt;
-	};
+	~Absorption(){};
 
 	// Incident beam calculators
 	void const_beam(const vector<double> &energy_bins, vector<double> &incident_beam_histogram);

@@ -41,8 +41,8 @@ private:
 	vector<double> crosssection_histogram;
 
 	// Phonon density files
-	vector< vector<double> > e_s_file;
-	vector< vector<double> > p_file;
+	//vector< vector<double> > e_s_file;
+	//vector< vector<double> > p_file;
 	vector<double> omega_s_file;
 
 	// Incident beam
@@ -56,25 +56,32 @@ private:
 	vector<double> mass_attenuation_histogram;
 	vector<double> transmitted_beam_histogram;
 
-	CrossSection *crossSection;
-	Absorption *absorption;
-	InputReader *inputReader;
-	Plotter *plotter;
-	Writer *writer;
-	Integrator *integrator;
-	PhononDensity *phononDensity;
+	CrossSection crossSection;
+	Absorption absorption;
+	InputReader inputReader;
+	Plotter plotter;
+	Writer writer;
+	Integrator integrator;
+	PhononDensity phononDensity;
 
 	double n_resonantly_scattered;
 	unsigned int target_number;
 
 public:	
-	//Target(unsigned int ne, unsigned int nz, string name, unsigned int number);
-	Target(unsigned int n, Settings &s): n_resonantly_scattered(0.){ 
+	Target(unsigned int n, Settings &s): 
+		n_resonantly_scattered(0.), 
+		crossSection(s), 
+		absorption(s),
+       		inputReader(),
+		plotter(),
+		writer(),
+		integrator(),
+		phononDensity(s)	{ 
 		settings = s; 
 		target_number = n;
 	};
 	
-	~Target();
+	~Target(){};
 
 	// The order of the following functions represents the order in which they are called in a normal calculation. Indented functions are called by the function above.
 	void initialize(const vector<double> &energy_bins);
@@ -94,7 +101,7 @@ public:
 	void print_results();
 
 	// Function to plot histograms
-	void plot(const vector<double> &energy_bins, const unsigned int n_setting);
+	void plot(vector<double> &energy_bins, unsigned int n_setting) ;
 
 	// Functions to calculate histograms
 

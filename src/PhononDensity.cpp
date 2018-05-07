@@ -44,10 +44,10 @@ void PhononDensity::calculateCrossSection(const vector<double> &energy_bins, con
 		}
 		
 		// Trapezoidal integral seems to be absolutely necessary for this highly oscillating function
-		crosssection_histogram[j] += integrator->trapezoidal_rule(mu_bins, mu_hist);
+		crosssection_histogram[j] += integrator.trapezoidal_rule(mu_bins, mu_hist);
 
 		if(settings.verbosity > 0){
-			cout << "\t> Checking normalization : integral W(E) dE = " << integrator->trapezoidal_rule(energy_bins, crosssection_histogram) << " == " << (0.5*PI - atan(-2.*energy_boosted[0]/settings.gamma[target_number][0])) << " ? " << endl;
+			cout << "\t> Checking normalization : integral W(E) dE = " << integrator.trapezoidal_rule(energy_bins, crosssection_histogram) << " == " << (0.5*PI - atan(-2.*energy_boosted[0]/settings.gamma[target_number][0])) << " ? " << endl;
 		}
 	}
 	
@@ -171,16 +171,16 @@ void PhononDensity::calculate_cosine_sum(const vector<double> &omega_s_file, con
 //			}
 //			
 //			// Trapezoidal integral seems to be absolutely necessary for this highly oscillating function
-//			crosssection_histogram[j] += integrator->trapezoidal_rule(mu_bins, mu_hist);
+//			crosssection_histogram[j] += integrator.trapezoidal_rule(mu_bins, mu_hist);
 //		}
 //
 //		if(settings.verbosity > 0){
-//			cout << "\t> Checking normalization : integral W(E) dE = " << integrator->trapezoidal_rule(energy_bins, crosssection_histogram) << " == " << (i+1)*(0.5*PI - atan(-2.*energy_boosted[0]/settings.gamma[target_number][0])) << " ? " << endl;
+//			cout << "\t> Checking normalization : integral W(E) dE = " << integrator.trapezoidal_rule(energy_bins, crosssection_histogram) << " == " << (i+1)*(0.5*PI - atan(-2.*energy_boosted[0]/settings.gamma[target_number][0])) << " ? " << endl;
 //		}
 //
 //		if(i % SAVE_PROGRESS == 0){
 //			save_progress_filename << settings.targetNames[0] << "_crosssection_save_" << i;
-//			writer->write1DHistogram(crosssection_histogram, save_progress_filename.str(), "Cross section / fm^2");
+//			writer.write1DHistogram(crosssection_histogram, save_progress_filename.str(), "Cross section / fm^2");
 //			save_progress_filename.str("");
 //			save_progress_filename.clear();
 //		}

@@ -71,33 +71,34 @@ int main(int argc, char* argv[]){
 	InputReader input;
 	input.readFile(settings);
 
-	Experiment *experiment;
+	//Experiment experiment;
 
 	long unsigned int n_settings = settings.size();
+	//Experiment experiment;
 
 	for(unsigned int i = 0; i < n_settings; ++i){
 
 		if(settings[0].verbosity > 1){
 			settings[i].print();
 		}
-		experiment = new Experiment(settings[i]);
-		experiment->initialize();
-		experiment->crossSections();
-		experiment->transmission();
+		Experiment experiment = Experiment(settings[i]);
+		experiment.initialize();
+		experiment.crossSections();
+		experiment.transmission();
 		if(settings[0].plot){
-			experiment->plot(i);
+			experiment.plot(i);
 		}
 		if(settings[0].write){
-			experiment->write(i);
+			experiment.write(i);
 		}
-		experiment->resonant_scattering();
+		experiment.resonant_scattering();
 		if(settings[0].verbosity > 0){
-			experiment->print_results();
+			experiment.print_results();
 		}
 
 		if(settings[0].output){
 			settings[i].write_output(i);
-			experiment->write_results(settings[0].outputfile, i);
+			experiment.write_results(settings[0].outputfile, i);
 		}
 	}
 	

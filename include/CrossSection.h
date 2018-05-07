@@ -31,10 +31,7 @@ public:
 		integrator = new Integrator();
 	};
 	
-	~CrossSection(){
-		delete &pconv_crosssection_histogram;
-		delete &pconv_velocity_distribution_histogram;
-	};
+	~CrossSection(){};
 
 	// Cross section at rest calculators
 	void breit_wigner(const vector<double> &energy_bins, vector< vector<double> > (&crosssection_at_rest_histogram), const vector<double> &energy_boosted, const unsigned int target_number);
