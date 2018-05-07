@@ -11,8 +11,6 @@
 
 using std::stringstream;
 using std::ifstream;
-using std::cout;
-using std::endl;
 using std::regex;
 using std::regex_replace;
 
