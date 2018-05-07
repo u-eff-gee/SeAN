@@ -17,7 +17,7 @@ using std::setprecision;
 void Writer::write1DHistogram(const vector<double> &histogram, const string name, const string column_name){
 
 	stringstream filename;
-	filename << OUTPUT_DIR << name << ".txt";
+	filename << OUTPUT_DIR << name << TXT_SUFFIX;
 
 	ofstream ofile(filename.str());
 
@@ -38,7 +38,7 @@ void Writer::write1DHistogram(const vector<double> &histogram, const string name
 void Writer::write2DHistogram(const vector<vector<double> > &histogram, const string name, const string line_name, const string column_name){
 
 	stringstream filename;
-	filename << OUTPUT_DIR << name << ".txt";
+	filename << OUTPUT_DIR << name << TXT_SUFFIX;
 
 	ofstream ofile(filename.str());
 
@@ -62,4 +62,26 @@ void Writer::write2DHistogram(const vector<vector<double> > &histogram, const st
 		}
 		ofile << endl;
 	}
+}
+
+void Writer::write1DCalibration(const vector<double> &bins, const string name, const string histogram_name){
+	unsigned int nbins = (unsigned int) bins.size();
+	double a = (bins[nbins - 1] - bins[0])/((double) nbins - 1.);
+	double b = bins[0];
+
+	stringstream filename;
+	filename << OUTPUT_DIR << name << CAL_SUFFIX;
+
+	ofstream ofile(filename.str(), std::ios_base::app);
+
+        if(!ofile.is_open()){
+                cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
+		cout << " write2DHistogram(): File '" << filename.str() << "' could not be opened." << endl;
+		abort();
+	}
+        cout << "> Writing output file '" << filename.str() << "'" << endl;
+
+	ofile.precision(8);
+	ofile << scientific << histogram_name << TXT_SUFFIX << ":\t" << b << "\t" << a << endl;
+	ofile.close();
 }

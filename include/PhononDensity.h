@@ -35,13 +35,25 @@ public:
 
 	void calculate_mu_bins(const unsigned int target_number);
 	void calculate_alpha_s_mean(const vector<double> &omega_s_file, const unsigned int target_number, const unsigned int n_modes);
-	void calculate_q_s_squared_over_E_squared(const vector<double> &omega_s_file, const vector< vector<double> > &e_s_file, const double p[3], const unsigned int target_number, const unsigned int n_modes);
+	void calculate_q_s_squared_over_E_squared(const vector<double> &omega_s_file, const unsigned int target_number, const unsigned int n_modes);
 
 	void calculate_sine_sum(const vector<double> &omega_s_file, const unsigned int n_modes);
 	void calculate_cosine_sum(const vector<double> &omega_s_file, const unsigned int n_modes);
 
-	void calculateCrossSection(const vector<double> &energy_bins, const vector<double> &energy_boosted, vector<double> &crosssection_histogram, const vector<double> &omega_s_file, const vector< vector<double> > (&e_s_file), const vector< vector<double> > (&p_file), const unsigned int target_number);
+	void calculateCrossSection(const vector<double> &energy_bins, const vector<double> &energy_boosted, vector<double> &crosssection_histogram, const vector<double> &omega_s_file, const unsigned int target_number);
 
+// **********************************************************************
+// Idealistic implementation, if ALL phonons were known
+// **********************************************************************
+//
+//	void calculate_mu_bins(const unsigned int target_number);
+//	void calculate_alpha_s_mean(const vector<double> &omega_s_file, const unsigned int target_number, const unsigned int n_modes);
+//	void calculate_q_s_squared_over_E_squared(const vector<double> &omega_s_file, const vector< vector<double> > &e_s_file, const double p[3], const unsigned int target_number, const unsigned int n_modes);
+//
+//	void calculate_sine_sum(const vector<double> &omega_s_file, const unsigned int n_modes);
+//	void calculate_cosine_sum(const vector<double> &omega_s_file, const unsigned int n_modes);
+//
+//	void calculateCrossSection(const vector<double> &energy_bins, const vector<double> &energy_boosted, vector<double> &crosssection_histogram, const vector<double> &omega_s_file, const vector< vector<double> > (&e_s_file), const vector< vector<double> > (&p_file), const unsigned int target_number);
 };
 
 #endif

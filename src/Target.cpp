@@ -115,7 +115,7 @@ void Target::calculateCrossSection(const vector<double> &energy_bins){
 		crossSection->arbitrary_cross_section(energy_bins, crosssection_histogram, energy_bins_file, cross_section_file);
 	}
 	else if(settings.dopplerBroadening[target_number] == dopplerModel::phdos){
-		phononDensity->calculateCrossSection(energy_bins, energy_boosted, crosssection_histogram, omega_s_file, e_s_file, p_file, target_number);
+		phononDensity->calculateCrossSection(energy_bins, energy_boosted, crosssection_histogram, omega_s_file, target_number);
 	}
 
 	else if(settings.exact){
@@ -200,15 +200,15 @@ void Target::calculateVelocityDistribution(const vector<double> &energy_bins){
 			filename << PHONON_DIR << settings.omegaFile[target_number];
 			inputReader->read1ColumnFile(omega_s_file, filename.str());
 
-			filename.str("");
-			filename.clear();
-			filename << PHONON_DIR << settings.polarizationFile[target_number];
-			inputReader->read3ColumnFile(e_s_file, filename.str());
+		//	filename.str("");
+		//	filename.clear();
+		//	filename << PHONON_DIR << settings.polarizationFile[target_number];
+		//	inputReader->read3ColumnFile(e_s_file, filename.str());
 
-			filename.str("");
-			filename.clear();
-			filename << PHONON_DIR << settings.momentumFile[target_number];
-			inputReader->read3ColumnFile(p_file, filename.str());
+		//	filename.str("");
+		//	filename.clear();
+		//	filename << PHONON_DIR << settings.momentumFile[target_number];
+		//	inputReader->read3ColumnFile(p_file, filename.str());
 	}
 
 	vDistInfo();
@@ -346,6 +346,7 @@ void Target::write(const vector<double> &energy_bins, const unsigned int n_setti
 		filename << settings.targetNames[target_number] << "_crosssection_at_rest_"  << n_setting << "_" << i;
 
 		writer->write1DHistogram(crosssection_at_rest_histogram[i], filename.str(), "Cross section / fm^2");
+		writer->write1DCalibration(energy_bins, CAL_FILE_NAME, filename.str());
 	}
 
 	// Write cross section
@@ -355,6 +356,7 @@ void Target::write(const vector<double> &energy_bins, const unsigned int n_setti
 	filename << settings.targetNames[target_number] << "_crosssection_" << n_setting;
 
 	writer->write1DHistogram(crosssection_histogram, filename.str(), "Cross section / fm^2");
+	writer->write1DCalibration(energy_bins, CAL_FILE_NAME, filename.str());
 
 	// Write velocity distribution 
 	// In fact, each resonance has its own binning, but write only the velocity distribution for the first one
@@ -364,6 +366,7 @@ void Target::write(const vector<double> &energy_bins, const unsigned int n_setti
 
 	filename << settings.targetNames[target_number] << "_velocity_bins_" << n_setting;
 	writer->write1DHistogram(velocity_distribution_bins[0], filename.str(), "Velocity / c");
+	writer->write1DCalibration(velocity_distribution_bins[0], CAL_FILE_NAME, filename.str());
 
 	filename.str("");
 	filename.clear();
@@ -378,6 +381,7 @@ void Target::write(const vector<double> &energy_bins, const unsigned int n_setti
 
 	filename << settings.targetNames[target_number] << "_incident_beam_" << n_setting;
 	writer->write1DHistogram(incident_beam_histogram, filename.str(), "Beam intensity distribution / a.u.");
+	writer->write1DCalibration(energy_bins, CAL_FILE_NAME, filename.str());
 
 	// Write mass attenuation
 	filename.str("");
@@ -385,6 +389,7 @@ void Target::write(const vector<double> &energy_bins, const unsigned int n_setti
 
 	filename << settings.targetNames[target_number] << "_mass_attenuation_" << n_setting;
 	writer->write1DHistogram(mass_attenuation_histogram, filename.str(), "Mass attenuation / fm^2 / atom");
+	writer->write1DCalibration(energy_bins, CAL_FILE_NAME, filename.str());
 	
 	// Write photon flux density
 	filename.str("");

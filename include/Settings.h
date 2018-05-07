@@ -65,8 +65,8 @@ struct Settings{
 	vector<string> velocityBinFile;
 	vector<string> vDistFile;
 	vector<string> omegaFile;
-	vector<string> polarizationFile;
-	vector<string> momentumFile;
+	//vector<string> polarizationFile;
+	//vector<string> momentumFile;
 
 	vector<double> mass;
 

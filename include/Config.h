@@ -37,10 +37,12 @@ const string MASS_DIR = "atomic_mass/";
 const string AME_FILE_NAME = "mass16.txt";
 
 // Settings for phonon calculations
-const unsigned int SAVE_PROGRESS = 1; // After SAVE_PROGRESS calculations with different momentum vectors, thecurrent cross section will be written to file
 const unsigned int MU_MAX_INTEGRAL = 3; // Set integration range for mu in terms of the 'decay constant' 2/Gamma 
 
 // Settings for SeAN output files
 const string HORIZONTAL_LINE = "##############################################################";
+const string TXT_SUFFIX = ".txt";
+const string CAL_SUFFIX = ".cal";
+const string CAL_FILE_NAME = "calibration";
 
 #endif

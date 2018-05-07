@@ -1,13 +1,13 @@
 # Minimum and maximum energy for the calculation in eV
-2.982020e6, 2.982200e6
+2.981800e6, 2.982500e6
 # Primary beam intensity distribution
 const, 1.0
 # Number of bins on the energy axis
-2001
+10000
 # Number of bins on the z-axis
-100
+10
 # 0) Identifier of the target (string)
-27Al_Target
+27Al_new
 # 1) Resonance energies in eV (comma separated values)
 2.982000e6
 # 2) Transition widths to the ground state in eV (comma separated values)
@@ -18,8 +18,9 @@ const, 1.0
 2.5
 # 5) Angular momenta of the excited states (comma separated values)
 1.5
-# 6) Model for doppler-broadened of cross section
-phdos, hbar_omega_s.txt, e_s.txt, p.txt, 293.
+# 6) Model for doppler-broadening of cross section
+#phdos, hbar_omega_s.txt, e_s.txt, p.txt, 293.
+phdos, hbar_omega_s_real.txt, e_s_30.txt, p.txt, 10.
 #arb_cross_section, flat.txt
 # 7) Nuclear mass in atomic mass units
 27Al

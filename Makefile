@@ -5,7 +5,6 @@ EXE=sean
 
 CC=g++
 CFLAGS=-g -Wall -Wconversion -Wsign-conversion -I$(INCDIR) -fopenmp -lfftw3
-#CFLAGS=-O3 -Wall -Wconversion -Wsign-conversion -I$(INCDIR) -fopenmp -lfftw3
 ROOTFLAGS=`root-config --cflags --glibs` -lMathMore -lm
 
 _DEPS = Experiment.h Config.h CrossSection.h Target.h Absorption.h Settings.h InputReader.h PhononDensity.h Plotter.h Writer.h Integrator.h

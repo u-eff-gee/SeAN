@@ -151,7 +151,8 @@ void Settings::printTarget(unsigned int i){
 				cout << "Maxwell-Boltzmann (using Debye and integral approximation), T = " << dopplerParams[i][0] << " K, T_D = " << dopplerParams[i][1] << " K " << endl;
 				break;
 			case dopplerModel::phdos:
-				cout << "phDOS, omega_s = " << omegaFile[i] << ", e_s = " << polarizationFile[i] << ", p = " << momentumFile[i] << ", T = " << dopplerParams[i][0] << " K, N = " << dopplerParams[i][1] << endl;
+				//cout << "phDOS, omega_s = " << omegaFile[i] << ", e_s = " << polarizationFile[i] << ", p = " << momentumFile[i] << ", T = " << dopplerParams[i][0] << " K, N = " << dopplerParams[i][1] << endl;
+				cout << "phDOS, omega_s = " << omegaFile[i] << ", T = " << dopplerParams[i][0] << " K" << endl;
 				break;
 			default: break;
 		}
@@ -386,7 +387,7 @@ void Settings::writeTarget(unsigned int i) const{
 				ofile << "Maxwell-Boltzmann (using Debye and integral approximation), T = " << dopplerParams[i][0] << " K, T_D = " << dopplerParams[i][1] << " K " << endl;
 				break;
 			case dopplerModel::phdos:
-				ofile << "phDOS, omega_s = " << omegaFile[i] << ", e_s = " << polarizationFile[i] << ", p = " << momentumFile[i] << ", T = " << dopplerParams[i][0] << " K, N = " << dopplerParams[i][1] << endl;
+				ofile << "phDOS, omega_s = " << omegaFile[i] << ", T = " << dopplerParams[i][0] << " K" << endl;
 				break;
 			default: break;
 		}

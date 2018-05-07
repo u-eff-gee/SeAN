@@ -925,17 +925,17 @@ void InputReader::readDopplerBroadening(istringstream &stream, vector<Settings> 
 				settings[i].omegaFile.push_back(regex_replace(value_string, regex("\\s+"), ""));
 			}
 
-			getline(stream, value_string, DELIMITER);
-				
-			for(unsigned int i = 0; i < n_settings; ++i){
-				settings[i].polarizationFile.push_back(regex_replace(value_string, regex("\\s+"), ""));
-			}
-
-			getline(stream, value_string, DELIMITER);
-				
-			for(unsigned int i = 0; i < n_settings; ++i){
-				settings[i].momentumFile.push_back(regex_replace(value_string, regex("\\s+"), ""));
-			}
+//			getline(stream, value_string, DELIMITER);
+//				
+//			for(unsigned int i = 0; i < n_settings; ++i){
+//				settings[i].polarizationFile.push_back(regex_replace(value_string, regex("\\s+"), ""));
+//			}
+//
+//			getline(stream, value_string, DELIMITER);
+//				
+//			for(unsigned int i = 0; i < n_settings; ++i){
+//				settings[i].momentumFile.push_back(regex_replace(value_string, regex("\\s+"), ""));
+//			}
 		}
 
 
