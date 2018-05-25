@@ -91,7 +91,7 @@ If you don't have openmp installed in your system, remove the `-fopenmp` compile
 
 ##### Optimization
 
-By default, the program is built in debug mode. A small increase in computation speed can be gained by replacing the `-g` compiler flag with an optimization flag `-O1`, `-O2` or `-O3`. No extensive testing has been done by the author as to which of the three is the best tradeoff between compilation time and speedup, at the moment.
+By default, the program is built as release version with the optimization flag `-O3`. To build in debug mode, use the `-g` option.
 
 ##### Change C++ compiler
 
@@ -113,7 +113,7 @@ All output will be saved to the directory `output/`. Several other directories w
 
 `SeAN` accepts the following command line options:
 
- * `-e`, `--exact`: Instead of using the FFT approximation to calculate the broadening of the Breit-Wigner cross section, evaluate the integral exactly. The speed advantage by FFT is enormous, but the user is advised to check with this option whether it is applicable.
+ * `-e`, `--exact`: Instead of using the FFT approximation to calculate the broadening of the Breit-Wigner cross section, evaluate the integral exactly. The speed advantage of using FFT is enormous, but the user is advised to check with this option whether it is applicable.
  * `-o`, `--output=OUTPUTFILENAME`: Write the input from `INPUTFILE` and the results of the calculation (the amount of resonant scattering on each of the targets) to a file called OUTPUTFILENAME.
  * `-p`, `--plot`: Create plots of all calculated intermediate quantities that can be shown in a histogram or graph. Note that this may take a lot of time and create very large files depending on the values of `NBINS_E` and `NBINS_Z`.
  * `-r`, `--recoil`: Consider the recoil of the nucleus when the absorption is calculated. This is a little tricky, because the absorption line is very narrow in the sub-eV range, but depending on the nucleus the recoil may shift the absorption line by up to several keV. This has to be considered when setting the integration range. The resulting resonant scattering is actually independent of the recoil, therefore it is left to the user to include this effect if strictly realistic results are desired.
@@ -170,7 +170,7 @@ The remaining options describe the matter state of the nuclei with the given res
 
  * `VELOCITY_DISTRIBUTION, {PARAMETERS}` (string, ...): The velocity distribution model of the nuclei in their matter state. Determines the doppler broadening of the Breit-Wigner cross section.
  * `NUCLEAR MASS` (double OR string): Mass of the nucleus in atomic mass units. It is possible to enter the numerical value or a unique identifier like '6Li'. If the identifier is entered, the value will be taken from the database of the National Institute of Standards and Technology (NIST) [[1]](#ref-nist-masses).
- * `MASS_ATTENUATION, {PARAMETERS}` (string, ...): The model for the non-resonant attenuation of photons in matter. The most convenient choice is to use the mass attenuation data from NIST (#ref-nist-attenuation) [[2]](#ref-nist-attenuation) by selecting `MASS_ATTENUATION == 'nist'` and giving the file name in `mass_attenuation/` as a string parameter. The unit of the mass attenuation coefficient is `fm^2/atom` 'femtometer squared per atom'.
+ * `MASS_ATTENUATION, {PARAMETERS}` (string, ...): The model for the non-resonant attenuation of photons in matter. The most convenient choice is to use the mass attenuation data from NIST [[2]](#ref-nist-attenuation) by selecting `MASS_ATTENUATION == 'nist'` and giving the file name in `mass_attenuation/` as a string parameter. The unit of the mass attenuation coefficient is `fm^2/atom` 'femtometer squared per atom'.
  * `TARGET_THICKNESS` (double): Thickness of the target in the microscopic unit `atoms/fm^2` 'atoms per femtometer squared'
  * `VELOCITY` (double): Velocity component of the target along the z-axis. This can be used to artificially doppler-shift the resonance energies.
 
@@ -216,5 +216,6 @@ This code is distributed under the terms of the GNU General Public License. See 
 ### 5. References <a name="references"></a>
 
 <a name="ref-nist-masses">[1]</a> Coursey, J.S., Schwab, D.J., Tsai, J.J., and Dragoset, R.A. (2015), Atomic Weights and Isotopic Compositions (version 4.1). (https://physics.nist.gov/Comp)
+
 <a name="ref-nist-attenuation">[2]</a> Hubbell, J.H. and Seltzer, S.M., Tables of X-Ray Mass Attenuation Coefficients
 and Mass Energy-Absorption Coefficients from 1 keV to 20 MeV for Elements Z = 1 to 92 and 48 Additional Substances of Dosimetric Interest. (https://www.nist.gov/pml/x-ray-mass-attenuation-coefficients)
