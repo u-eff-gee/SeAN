@@ -19,11 +19,11 @@ const, 1.0
 # 5) Angular momenta of the excited states (comma separated values)
 0
 # 6) Model for velocity distribution
-maxwell_boltzmann, 10.
+maxwell_boltzmann, 412.5
 # 7) Nuclear mass in atomic mass units
 6Li
 # 8) Mass attenuation coefficient
-const, 0.
+nist, Li.dat
 # 9) Target thickness in atoms/fm^2
 0.000556
 # 10) Velocity of the target along the beam direction in m/s

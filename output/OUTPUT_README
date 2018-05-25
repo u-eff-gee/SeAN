@@ -1,0 +1,5 @@
+`SeAN` will store and text and graphical output in this directory. This includes:
+
+ * Information about input and results which is created by the `-o` option with a user-defined name
+ * Text files created by the `-w` option with the suffix `.txt`
+ * Graphs and histograms created by the `-p` option as PDF files with the suffix `.pdf`

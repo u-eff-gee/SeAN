@@ -1,3 +1,21 @@
+/*    
+    This file is part of SeAN.
+
+    SeAN is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    SeAN is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with SeAN.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
 #include "InputReader.h"
 #include "Config.h"
 
@@ -925,6 +943,7 @@ void InputReader::readDopplerBroadening(istringstream &stream, vector<Settings> 
 				settings[i].omegaFile.push_back(regex_replace(value_string, regex("\\s+"), ""));
 			}
 
+// Read file of polarization vectors e_s and momentum vectors p. Not needed when using the approximation p*e_s ~ 1/3
 //			getline(stream, value_string, DELIMITER);
 //				
 //			for(unsigned int i = 0; i < n_settings; ++i){
