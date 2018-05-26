@@ -7,7 +7,7 @@ const, 1.0
 # Number of bins on the z-axis
 10
 # 0) Identifier of the target (string)
-27Al_new
+27Al_phdos
 # 1) Resonance energies in eV (comma separated values)
 2.982000e6
 # 2) Transition widths to the ground state in eV (comma separated values)
@@ -19,14 +19,12 @@ const, 1.0
 # 5) Angular momenta of the excited states (comma separated values)
 1.5
 # 6) Model for doppler-broadening of cross section
-#phdos, hbar_omega_s.txt, e_s.txt, p.txt, 293.
-phdos, hbar_omega_s_real.txt, e_s_30.txt, p.txt, 10.
-#arb_cross_section, flat.txt
+phdos, hbar_omega_s_Al.txt, {1.; 1000.; 4}
 # 7) Nuclear mass in atomic mass units
 27Al
 # 8) Mass attenuation coefficient
 const, 0.
 # 9) Target thickness in atoms/fm^2
-0.000282
+0.0001
 # 10) Velocity of the target along the beam direction in m/s
 0.

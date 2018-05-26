@@ -122,6 +122,8 @@ void Target::boost_and_recoil(){
 	for(unsigned int i = 0; i < nenergies; ++i){
 		if(settings.recoil){
 			recoil = settings.energy[target_number][i]*settings.energy[target_number][i]/(2.*settings.mass[target_number]*AtomicMassUnit);
+
+			cout << "RECOIL_CORRECTION:\t" << recoil << " eV" << endl;
 		}
 
 		energy_boosted.push_back((1. + beta)/sqrt(1. - beta*beta)*settings.energy[target_number][i] + recoil);

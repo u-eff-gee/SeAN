@@ -40,7 +40,7 @@ void PhononDensity::calculateCrossSection(const vector<double> &energy_bins, con
 
 	if(settings.verbosity > 0){
 		cout << HORIZONTAL_LINE << endl;
-		cout << "> Calculating cross section from " << n_modes << " phonon modes of crystal lattice."; 
+		cout << "> Calculating cross section from " << n_modes << " phonon modes of crystal lattice." << endl; 
 	}
 
 	calculate_mu_bins(target_number);
@@ -64,9 +64,10 @@ void PhononDensity::calculateCrossSection(const vector<double> &energy_bins, con
 		// Trapezoidal integral seems to be absolutely necessary for this highly oscillating function
 		crosssection_histogram[j] += integrator.trapezoidal_rule(mu_bins, mu_hist);
 
-		if(settings.verbosity > 0){
-			cout << "\t> Checking normalization : integral W(E) dE = " << integrator.trapezoidal_rule(energy_bins, crosssection_histogram) << " == " << (0.5*PI - atan(-2.*energy_boosted[0]/settings.gamma[target_number][0])) << " ? " << endl;
-		}
+// Debugging information
+//		if(settings.verbosity > 1){
+//			cout << "\t> Checking normalization : integral W(E) dE = " << integrator.trapezoidal_rule(energy_bins, crosssection_histogram) << " == " << (0.5*PI - atan(-2.*energy_boosted[0]/settings.gamma[target_number][0])) << " ? " << endl;
+//		}
 	}
 	
 

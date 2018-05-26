@@ -87,14 +87,15 @@ private:
 
 public:	
 	Target(unsigned int n, Settings &s): 
-		n_resonantly_scattered(0.), 
 		crossSection(s), 
 		absorption(s),
        		inputReader(),
 		plotter(),
 		writer(),
 		integrator(),
-		phononDensity(s)	{ 
+		phononDensity(s),
+		n_resonantly_scattered(0.)
+	{ 
 		settings = s; 
 		target_number = n;
 	};

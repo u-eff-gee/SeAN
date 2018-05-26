@@ -18,6 +18,7 @@ output/*.pdf
 output/*.txt
 !output/output.txt
 output/*.out
+output/*.cal
 
 # valgrind output
 *.out.*
