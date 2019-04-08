@@ -4,7 +4,6 @@
 \usepackage{hyperref}
 \usepackage{amsmath}
 \usepackage{mathtools}
-\usepackage{bbold}
 
 \begin{document}
 \title{SeAN, Self-Absorption Numerical \\ Theoretical background}
@@ -166,14 +165,14 @@ Using the completeness relation
 
 \begin{equation}
 	\label{completeness_relation_system}
-	\sum_{\beta_s} | \beta_s \rangle \langle \beta_s | = \mathbb{1}
+	\sum_{\beta_s} | \beta_s \rangle \langle \beta_s | = \mathbf{1} 
 \end{equation}
 
 for the states $\beta_s$ the numerator in the second line of Eq. \ref{absorption_simplification_3} can be turned into a delta function in $m_s$ and $n_s$:
 
 \begin{equation}
 	\label{absorption_simplification_4}
-	\underbrace{\langle m_s | \underbrace{\exp{\left( i \mathbf{k} \cdot \mathbf{x} / \hbar \right)} \underbrace{\sum_{\beta_s} \left( | \beta_s \rangle \langle \beta_s | \right)}_{ = \mathbb{1}} \exp{\left( - i \mathbf{k} \cdot \mathbf{x} / \hbar \right)} }_{ = \mathbb{1}} | n_s \rangle }_{ = \delta_{m_s, n_s}}
+	\underbrace{\langle m_s | \underbrace{\exp{\left( i \mathbf{k} \cdot \mathbf{x} / \hbar \right)} \underbrace{\sum_{\beta_s} \left( | \beta_s \rangle \langle \beta_s | \right)}_{ = \mathbf{1}} \exp{\left( - i \mathbf{k} \cdot \mathbf{x} / \hbar \right)} }_{ = \mathbf{1}} | n_s \rangle }_{ = \delta_{m_s, n_s}}
 \end{equation}
 
 As expected when the final states are of no interest, the momentum $\mathbf{k}$ of the emitted particle drops out as well. 
@@ -233,14 +232,14 @@ This imposes a restriction on the possible values for the momentum $\mathbf{k}_{
 \end{equation}
 
 \begin{equation*}
-	n_i \in \mathbb{Z}
+	n_i \in \mathbf{Z}
 \end{equation*}
 
 %At the end of a calculation in the finite space, taking the limit $L \to \infty$ should be possible if the calculated observable is independent of the size of the space. 
 Using plane waves, considering that $\mathbf{p}$ is not an operator but a constant vector, and inserting unity operators in real space
 
 \begin{equation}
-	\int_{-L/2}^{L/2} \mathrm{d}^3 x' \left| x' \rangle \langle x' \right| = \mathbb{1}
+	\int_{-L/2}^{L/2} \mathrm{d}^3 x' \left| x' \rangle \langle x' \right| = \mathbf{1}
 \end{equation}
 
 the matrix element in the numerator in Eq. \ref{absorption_general_summed} becomes:
