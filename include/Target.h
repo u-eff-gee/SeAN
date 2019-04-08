@@ -90,8 +90,8 @@ public:
 		crossSection(s), 
 		absorption(s),
        		inputReader(),
-		plotter(),
-		writer(),
+		plotter(s),
+		writer(s),
 		integrator(),
 		phononDensity(s),
 		n_resonantly_scattered(0.)

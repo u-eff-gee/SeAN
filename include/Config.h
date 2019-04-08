@@ -45,7 +45,6 @@ const unsigned int N_TARGET_SETTINGS = 11;
 
 // Settings for the directories
 
-const string OUTPUT_DIR = "output/";
 const string VELOCITY_DISTRIBUTION_DIR = "velocity_distribution/";
 const string PHONON_DIR = "phdos/";
 const string CROSS_SECTION_DIR = "cross_section/";

@@ -220,10 +220,9 @@ void Settings::printTarget(unsigned int i){
 void Settings::write_output(unsigned int n_setting) const {
 
 	stringstream filename;
-	filename << "output/" << outputfile;
 
 	ofstream ofile;
-	ofile.open(filename.str(), std::ios_base::out | std::ios_base::app);
+	ofile.open(outputfile, std::ios_base::out | std::ios_base::app);
 
         if(!ofile.is_open()){
                 cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
@@ -243,10 +242,9 @@ void Settings::write_output(unsigned int n_setting) const {
 void Settings::writeOptions(unsigned int n_setting) const{
 
 	stringstream filename;
-	filename << "output/" << outputfile;
 
 	ofstream ofile;
-	ofile.open(filename.str(), std::ios_base::out | std::ios_base::app);
+	ofile.open(outputfile, std::ios_base::out | std::ios_base::app);
 
         if(!ofile.is_open()){
                 cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
@@ -293,10 +291,10 @@ void Settings::writeOptions(unsigned int n_setting) const{
 
 void Settings::writeExperiment() const{
 
-	stringstream filename; filename << "output/" << outputfile;
+	stringstream filename; 
 
 	ofstream ofile;
-	ofile.open(filename.str(), std::ios_base::out | std::ios_base::app);
+	ofile.open(outputfile, std::ios_base::out | std::ios_base::app);
 
         if(!ofile.is_open()){
                 cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
@@ -339,10 +337,10 @@ void Settings::writeExperiment() const{
 
 void Settings::writeTarget(unsigned int i) const{
 
-	stringstream filename; filename << "output/" << outputfile;
+	stringstream filename; 
 
 	ofstream ofile;
-	ofile.open(filename.str(), std::ios_base::out | std::ios_base::app);
+	ofile.open(outputfile, std::ios_base::out | std::ios_base::app);
 
         if(!ofile.is_open()){
                 cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 

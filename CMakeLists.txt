@@ -4,7 +4,7 @@ project (sean)
 add_subdirectory("src/")
 include_directories("include/")
 
-add_executable(sean src/main.cpp)
+add_executable(sean src/SeAN.cpp)
 target_link_libraries(sean sean_lib)
 
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})

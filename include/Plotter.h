@@ -22,13 +22,20 @@
 #include <string>
 #include <vector>
 
+#include "Settings.h"
+
 using std::string;
 using std::vector;
 
 class Plotter{
 
+private:
+	Settings settings;
+
 public:
-	Plotter(){};
+	Plotter(Settings &s){
+		settings = s;
+	};
 	~Plotter(){};
 
 	void plot1DHistogram(const vector<double> &bins, const vector<double> &histogram, const string name, const string xaxis_label, const string yaxis_label);

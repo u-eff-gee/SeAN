@@ -131,7 +131,7 @@ void Experiment::write(unsigned int n_setting) {
 void Experiment::write_results(string outputfile, unsigned int n_setting) const{
 
 	stringstream filename;
-	filename << "output/" << outputfile;
+	filename << outputfile;
 
 	ofstream ofile;
 	ofile.open(filename.str(), std::ios_base::out | std::ios_base::app);

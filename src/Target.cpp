@@ -392,10 +392,9 @@ void Target::write(const vector<double> &energy_bins, const unsigned int n_setti
 void Target::write_results(string outputfile) const{
 
 	stringstream filename;
-	filename << "output/" << outputfile;
 
 	ofstream ofile;
-	ofile.open(filename.str(), std::ios_base::out | std::ios_base::app);
+	ofile.open(outputfile, std::ios_base::out | std::ios_base::app);
 
         if(!ofile.is_open()){
                 cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 

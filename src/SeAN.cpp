@@ -121,7 +121,7 @@ int main(int argc, char* argv[]){
 	}
 	
 	if(settings[0].verbosity > 0 && settings[0].output){
-		cout << "> Created output file 'output/" << settings[0].outputfile << "'" << endl;
+		cout << "> Created output file " << settings[0].outputfile << "'" << endl;
 	}
 	
 	// Stop the clock

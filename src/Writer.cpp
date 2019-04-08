@@ -35,7 +35,7 @@ using std::setprecision;
 void Writer::write1DHistogram(const vector<double> &histogram, const string name, const string column_name){
 
 	stringstream filename;
-	filename << OUTPUT_DIR << name << TXT_SUFFIX;
+	filename << settings.outputfile << "_" << name << TXT_SUFFIX;
 
 	ofstream ofile(filename.str());
 
@@ -56,7 +56,7 @@ void Writer::write1DHistogram(const vector<double> &histogram, const string name
 void Writer::write2DHistogram(const vector<vector<double> > &histogram, const string name, const string line_name, const string column_name){
 
 	stringstream filename;
-	filename << OUTPUT_DIR << name << TXT_SUFFIX;
+	filename << settings.outputfile << "_" << name << TXT_SUFFIX;
 
 	ofstream ofile(filename.str());
 
@@ -88,7 +88,7 @@ void Writer::write1DCalibration(const vector<double> &bins, const string name, c
 	double b = bins[0];
 
 	stringstream filename;
-	filename << OUTPUT_DIR << name << CAL_SUFFIX;
+	filename << settings.outputfile << "_" << name << CAL_SUFFIX;
 
 	ofstream ofile(filename.str(), std::ios_base::app);
 

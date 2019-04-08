@@ -28,9 +28,13 @@ using std::string;
 using std::vector;
 
 class Writer{
+private:
+	Settings settings;
 
 public:
-	Writer(){};
+	Writer(Settings &s){
+		settings = s;
+	};
 	~Writer(){};
 
 	// Methods to write histograms to a file

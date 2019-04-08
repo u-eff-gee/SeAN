@@ -43,7 +43,7 @@ private:
 	Writer writer;
 
 public:
-	PhononDensity(Settings &s): integrator(), writer(){ 
+	PhononDensity(Settings &s): integrator(), writer(s){ 
 		settings = s; 
 	};
 
