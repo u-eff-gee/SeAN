@@ -24,9 +24,6 @@
 
 #include "math.h"
 
-#include "TCanvas.h"
-#include "TLegend.h"
-
 #include "Config.h"
 #include "Settings.h"
 #include "Integrator.h"

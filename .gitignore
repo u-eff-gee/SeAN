@@ -7,6 +7,14 @@ edit.sh
 # Compiled binary
 sean
 
+# CMake output
+CMakeFiles/*
+src/CMakeFiles/*
+src/libsean_lib.a
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+
 # Object files
 *.o
 

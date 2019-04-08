@@ -21,7 +21,6 @@
 #include <iostream>
 #include <sstream>
 #include <algorithm>
-#include <complex.h>
 
 #include "omp.h"
 #include "fftw3.h"
@@ -29,8 +28,10 @@
 #include "Math/Interpolator.h"
 #include "Math/Integrator.h"
 #include "Math/Functor.h"
-#include "TGraph.h"
 #include "TAxis.h"
+#include "TCanvas.h"
+#include "TGraph.h"
+#include "TLegend.h"
 
 using std::cout;
 using std::endl;
@@ -217,15 +218,15 @@ void CrossSection::fft_input(const vector<double> &energy_bins, vector< vector<d
 void CrossSection::dopplershiftFFT(const vector<double> &energy_bins, vector<double> &crosssection_histogram, vector< vector <double> > &crosssection_at_rest_histogram, vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, vector<double> &vdist_norm, vector<unsigned int> &vdist_centroid){
 
 	fftw_plan vdist_plan, crosssection_plan, product_fft_plan;
-	fftw_complex vdist_fft[settings.nbins_e/2 + 1] = {{0.}};
-	fftw_complex crosssection_fft[settings.nbins_e/2 + 1] = {{0.}};
-	fftw_complex product_fft[settings.nbins_e/2 + 1] = {{0.}};
-	double convolution[settings.nbins_e] = {0.};
+	vector<fftw_complex> vdist_fft(settings.nbins_e/2 + 1);
+	vector<fftw_complex> crosssection_fft(settings.nbins_e/2 + 1);
+	vector<fftw_complex> product_fft(settings.nbins_e/2 + 1);
+	vector<double> convolution(settings.nbins_e, 0.);
 
 	for(unsigned int i = 0; i < crosssection_at_rest_histogram.size(); ++i){
 
-		vdist_plan = fftw_plan_dft_r2c_1d((int) settings.nbins_e, &pconv_velocity_distribution_histogram[i][0], vdist_fft, FFTW_ESTIMATE);
-		crosssection_plan = fftw_plan_dft_r2c_1d((int) settings.nbins_e, &pconv_crosssection_histogram[i][0], crosssection_fft, FFTW_ESTIMATE);
+		vdist_plan = fftw_plan_dft_r2c_1d((int) settings.nbins_e, &pconv_velocity_distribution_histogram[i][0], &vdist_fft[0], FFTW_ESTIMATE);
+		crosssection_plan = fftw_plan_dft_r2c_1d((int) settings.nbins_e, &pconv_crosssection_histogram[i][0], &crosssection_fft[0], FFTW_ESTIMATE);
 
 		// Calculate Fourier transform of both arrays
 		fftw_execute(vdist_plan);
@@ -238,7 +239,7 @@ void CrossSection::dopplershiftFFT(const vector<double> &energy_bins, vector<dou
 		}
 
 		// Transform the product back
-		product_fft_plan = fftw_plan_dft_c2r_1d((int) settings.nbins_e, product_fft, convolution, FFTW_ESTIMATE);
+		product_fft_plan = fftw_plan_dft_c2r_1d((int) settings.nbins_e, &product_fft[0], &convolution[0], FFTW_ESTIMATE);
 		fftw_execute(product_fft_plan);
 
 		 // Add the i-th convoluted cross section to the total cross section, observing that the transformation back changed the order of the elements in the array and leaves them scaled by settings.nbins_e.
