@@ -22,7 +22,6 @@
 #include <sstream>
 #include <algorithm>
 
-#include "omp.h"
 #include "fftw3.h"
 
 #include "Math/Interpolator.h"

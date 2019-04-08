@@ -40,10 +40,11 @@ Essential requirements:
 * C++11 or more recent
 * [ROOT](https://root.cern.ch/) (plotting, interpolation, integration) [tested with version 6.10/06]
 * [FFTW](http://www.fftw.org/) (FFT algorithm for fast convolutions) [tested with version 3.3.7]
-
+* [openmp](http://www.openmp.org/) (parallelization)
+* [CMake](https://cmake.org/) (building and installing)
+ 
 Optional:
 
-* [openmp](http://www.openmp.org/) (parallelization)
 * latex, bibtex (building the documentation)
 * python3, matplotlib, scipy, numpy (running one of the unit tests)
 
@@ -59,6 +60,7 @@ Enter the newly created directory `sean/` and execute
 
 ```
 $ cd sean/
+$ cmake .
 $ make
 ```
 
@@ -77,25 +79,20 @@ To remove all files which are created during the compilation, including the exec
 $ make clean
 ```
 
+In addition, to install `SeAN` in the system, type
+
+```
+$ make install
+```
+
+after the installation steps above. If correctly installed, it should be possible to execute `sean` in any directory.
+
 #### 2.3 Build options <a name="build_options"></a>
 
-At the moment, build options can only be set by manually changing the `sean/Makefile` and executing `make` again in the same directory.
+There are several build options that can be supplied to `CMake`:
 
-##### No openmp
-
-If you don't have openmp installed in your system, remove the `-fopenmp` compiler flag. This will result in warning messages during the compilation, but the program will run as usual (only slower):
-
-```
-[...] warning: ignoring #pragma omp [...]
-```
-
-##### Optimization
-
-By default, the program is built as release version with the optimization flag `-O3`. To build in debug mode, use the `-g` option.
-
-##### Change C++ compiler
-
-If you don't have the default compiler `g++` or want to use another one on purpose, change the value of the `CC` variable in the Makefile.
+ * **FFTW3_DIR**: Indicates the directory in which `FFTW3Config.cmake` can be found. Unfortunately, `fftw3` does not supply a `FindFFTW3.cmake` file to be used with the `find_package()` method of `CMake`, so it might be necessary to set this path manually.
+ * **CMAKE_BUILD_TYPE**: Determines whether `SeAN` is built in the `RELEASE` (default), `DEBUG`, or `RELWITHDEBUGINFO` mode. To see which compiler flags are set by which option have a look at the `CMakeLists.txt` file.
 
 ### 3. Usage <a name="usage"></a>
 
