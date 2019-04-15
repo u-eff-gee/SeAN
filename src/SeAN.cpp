@@ -40,13 +40,13 @@ static char doc[] = "SeAN, Self-Absorption Numerical";
 static char args_doc[] = "INPUTFILE";
 
 static struct argp_option options[] = {
-  { "exact", 'e', 0, 0, "Do not use convolution approximation (increased computing time)" },
-  { "plot", 'p', 0, 0, "Create plots of all calculated quantities" },
-  { "write", 'w', 0, 0, "Create text output files for all calculated quantities" },
-  { "verbosity", 'v', "VERBOSITY", 0, "Set command line verbosity (0 = print nothing, 1 = print results, 2 [default] = print input and results)" },
-  { "recoil", 'r', 0, 0, "Include nuclear recoil in the calculation of the cross section maximum."},
-  { "output", 'o', "OUTPUTFILENAME", 0, "Write input and results to file" },
-  { 0 }
+  { "exact", 'e', 0, 0, "Do not use convolution approximation (increased computing time)", 0 },
+  { "plot", 'p', 0, 0, "Create plots of all calculated quantities", 0 },
+  { "write", 'w', 0, 0, "Create text output files for all calculated quantities", 0 },
+  { "verbosity", 'v', "VERBOSITY", 0, "Set command line verbosity (0 = print nothing, 1 = print results, 2 [default] = print input and results)", 0 },
+  { "recoil", 'r', 0, 0, "Include nuclear recoil in the calculation of the cross section maximum.", 0 },
+  { "output", 'o', "OUTPUTFILENAME", 0, "Write input and results to file", 0 },
+  { 0, 0, 0, 0, 0, 0 }
 };
 
 static error_t parse_opt(int key, char *arg, struct argp_state *state) {

@@ -6,6 +6,7 @@ add_library(sean_lib Absorption.cpp CrossSection.cpp Experiment.cpp InputReader.
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS}$)
 find_package(ROOT REQUIRED COMPONENTS MathMore)
 include(${ROOT_USE_FILE})
+target_include_directories(sean_lib SYSTEM PUBLIC ${ROOT_INCLUDE_DIRS})
 target_link_libraries(sean_lib ${ROOT_LIBRARIES})
 
 #set(FFTW3_DIR "/usr/local/lib/cmake/fftw3")
