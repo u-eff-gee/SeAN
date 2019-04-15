@@ -172,6 +172,7 @@ void CrossSection::dopplershift(const vector<double> &energy_bins, vector<double
 		long unsigned int resonance_position = (unsigned long int) (upper_bound(energy_bins.begin(), energy_bins.end(), energy_boosted[n]) - energy_bins.begin());
 		resonance_energy_squared = energy_boosted[n]*energy_boosted[n];
 
+		#pragma omp parallel for
 		for(unsigned int i = 0; i < settings.nbins_e; ++i){
 			for(unsigned int j = 0; j < settings.nbins_e - 1; ++j){
 				crosssection_histogram[i] += 0.5*(

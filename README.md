@@ -40,11 +40,11 @@ Essential requirements:
 * C++11 or more recent
 * [ROOT](https://root.cern.ch/) (plotting, interpolation, integration) [tested with version 6.10/06]
 * [FFTW](http://www.fftw.org/) (FFT algorithm for fast convolutions) [tested with version 3.3.7]
-* [openmp](http://www.openmp.org/) (parallelization)
 * [CMake](https://cmake.org/) (building and installing)
  
 Optional:
 
+* [openmp](http://www.openmp.org/) (parallelization, only included in the code by `#pragma` directives, which will simply be ignored if the library is not found)
 * latex, bibtex (building the documentation)
 * python3, matplotlib, scipy, numpy (running one of the unit tests)
 
@@ -91,6 +91,7 @@ after the installation steps above. If correctly installed, it should be possibl
 
 There are several build options that can be supplied to `CMake`:
 
+ * **USE_OPENMP**: Flag which determines whether `OpenMP` should be used to parallelize some calculations. Default value `ON`.
  * **FFTW3_DIR**: Indicates the directory in which `FFTW3Config.cmake` can be found. Unfortunately, `fftw3` does not supply a `FindFFTW3.cmake` file to be used with the `find_package()` method of `CMake`, so it might be necessary to set this path manually.
  * **CMAKE_BUILD_TYPE**: Determines whether `SeAN` is built in the `RELEASE` (default), `DEBUG`, or `RELWITHDEBUGINFO` mode. To see which compiler flags are set by which option have a look at the `CMakeLists.txt` file.
 
