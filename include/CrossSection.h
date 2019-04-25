@@ -21,6 +21,7 @@
 
 #include <vector>
 #include <string>
+#include <utility>
 
 #include "math.h"
 
@@ -28,8 +29,9 @@
 #include "Settings.h"
 #include "Integrator.h"
 
-using std::vector;
+using std::pair;
 using std::string;
+using std::vector;
 
 class CrossSection{
 
@@ -89,7 +91,7 @@ public:
 	double integrated_crosssection_analytical(vector<double> energy_boosted, unsigned int target_number) const;
 
 	// Check whether the total integral over the cross section equals the analytical expression for a Breit-Wigner cross section folded with an arbitrary velocity distribution
-	void check_crosssection_normalization(const vector<double> &energy_bins, vector<double> &crosssection_histogram, vector<double> energy_boosted, unsigned int target_number) const;
+	void check_crosssection_normalization(const vector<double> &energy_bins, const vector<double> &crosssection_histogram, const vector<double> energy_boosted, const unsigned int target_number, double crosssection_integral_analytical, double crosssection_integral_numerical, pair<double, double> crosssection_integral_numerical_limits);
 
 private:
 	double eGamma(double energy, double velocity){

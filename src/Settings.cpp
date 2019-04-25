@@ -65,6 +65,12 @@ void Settings::printOptions(){
 	else{
 		cout << "\tRECOIL:\t" << "false" << endl;
 	}
+	cout << "\tUNCERTAINTY:\t";
+       	if(uncertainty){
+		cout << "true" << endl;
+	} else{
+		cout << "false" << endl;
+	}
 	cout << "\tVERBOSITY:\t" << verbosity << endl;
 	if(output){
 		if(outputfile != ""){
@@ -273,6 +279,12 @@ void Settings::writeOptions(unsigned int n_setting) const{
 	}
 	else{
 		ofile << "\tRECOIL:\t" << "false" << endl;
+	}
+	ofile << "\tUNCERTAINTY:\t";
+       	if(uncertainty){
+		ofile << "true" << endl;
+	} else{
+		ofile << "false" << endl;
 	}
 	ofile << "\tVERBOSITY:\t" << verbosity << endl;
 	if(output){

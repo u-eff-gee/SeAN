@@ -30,9 +30,9 @@ using std::cout;
 using std::endl;
 using std::ifstream;
 using std::ofstream;
-using std::stringstream;
 using std::regex;
 using std::scientific;
+using std::stringstream;
 
 void Target::initialize(const vector<double> &energy_bins){
 	unsigned int nenergies = (unsigned int) settings.energy[target_number].size();
@@ -107,8 +107,8 @@ void Target::calculateCrossSection(const vector<double> &energy_bins){
 		crossSection.dopplershiftFFT(energy_bins, crosssection_histogram, crosssection_at_rest_histogram, velocity_distribution_bins, velocity_distribution_histogram, vdist_norm, vdist_centroid);
 	}
 
-	if(settings.verbosity > 0){
-		crossSection.check_crosssection_normalization(energy_bins, crosssection_histogram, energy_boosted, target_number);
+	if(settings.uncertainty){
+		crossSection.check_crosssection_normalization(energy_bins, crosssection_histogram, energy_boosted, target_number, crosssection_integral_analytical, crosssection_integral_numerical, crosssection_integral_numerical_limits);
 	}
 }
 
@@ -439,10 +439,11 @@ void Target::vDistInfo(){
 
 void Target::calculateResonantScattering(const vector<double> energy_bins){
 
-	n_resonantly_scattered = integrator.integrate2DHistogram(z_bins, energy_bins, resonance_absorption_density_histogram);
-
+	n_resonantly_scattered = integrator.trapezoidal_rule2D(z_bins, energy_bins, resonance_absorption_density_histogram);
+	n_resonantly_scattered_limits = integrator.darboux2D(z_bins, energy_bins, resonance_absorption_density_histogram);
 }
 
 void Target::print_results(){
-	cout << settings.targetNames[target_number] << "\t" << n_resonantly_scattered << endl;
+	cout << settings.targetNames[target_number] << "\t" << n_resonantly_scattered << 
+		" +- " << 0.5*(n_resonantly_scattered_limits.second - n_resonantly_scattered_limits.first) << endl;
 }

@@ -21,6 +21,7 @@
 
 #include <string>
 #include <vector>
+#include <utility>
 
 #include "Config.h"
 #include "CrossSection.h"
@@ -32,6 +33,7 @@
 #include "Integrator.h"
 #include "PhononDensity.h"
 
+using std::pair;
 using std::string;
 using std::vector;
 
@@ -82,7 +84,11 @@ private:
 	Integrator integrator;
 	PhononDensity phononDensity;
 
+	double crosssection_integral_analytical;
+	double crosssection_integral_numerical;
+	pair<double, double> crosssection_integral_numerical_limits;
 	double n_resonantly_scattered;
+	pair<double, double> n_resonantly_scattered_limits;
 	unsigned int target_number;
 
 public:	
@@ -94,7 +100,11 @@ public:
 		writer(s),
 		integrator(),
 		phononDensity(s),
-		n_resonantly_scattered(0.)
+		crosssection_integral_analytical(0.),
+		crosssection_integral_numerical(0.),
+		crosssection_integral_numerical_limits({0., 0.}),
+		n_resonantly_scattered(0.),
+		n_resonantly_scattered_limits({0., 0.})
 	{ 
 		settings = s; 
 		target_number = n;
@@ -127,8 +137,6 @@ public:
 	void calculateTransmittedBeam();
 	void calculateZBins();
 	void calculateZBins(double z0, double z1);
-	void calculatePhotonFluxDensity();
-	void calculateResonanceAbsorptionDensity();
 	void calculateAbsorption(vector<double> &energy_bins);
 
 	// Functions to write histograms to file

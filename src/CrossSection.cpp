@@ -16,11 +16,9 @@
 */
 
 
-#include "CrossSection.h"
-
+#include <algorithm>
 #include <iostream>
 #include <sstream>
-#include <algorithm>
 
 #include "fftw3.h"
 
@@ -32,10 +30,13 @@
 #include "TGraph.h"
 #include "TLegend.h"
 
+#include "CrossSection.h"
+
 using std::cout;
 using std::endl;
-using std::upper_bound;
+using std::max;
 using std::max_element;
+using std::upper_bound;
 
 void CrossSection::breit_wigner(const vector<double> &energy_bins, vector<vector<double> > &crosssection_at_rest_bins, const vector<double> &energy_boosted, const unsigned int target_number){
 
@@ -315,14 +316,18 @@ double CrossSection::integrated_crosssection_analytical(vector<double> energy_bo
 	return cs_int;
 }
 	
-void CrossSection::check_crosssection_normalization(const vector<double> &energy_bins, vector<double> &crosssection_histogram, vector<double> energy_boosted, unsigned int target_number) const {
+void CrossSection::check_crosssection_normalization(const vector<double> &energy_bins, const vector<double> &crosssection_histogram, const vector<double> energy_boosted, const unsigned int target_number, double crosssection_integral_analytical, double crosssection_integral_numerical, pair<double, double> crosssection_integral_numerical_limits){
 
-	double cs_int_analytical = integrated_crosssection_analytical(energy_boosted, target_number);
-	double cs_int_numerical = integrator->trapezoidal_rule(energy_bins, crosssection_histogram);
+	crosssection_integral_analytical = integrated_crosssection_analytical(energy_boosted, target_number);
+	crosssection_integral_numerical = integrator->trapezoidal_rule(energy_bins, crosssection_histogram);
+	crosssection_integral_numerical_limits = integrator->darboux(energy_bins, crosssection_histogram);
+	double crosssection_integral_numerical_uncertainty = 0.5*(crosssection_integral_numerical_limits.second - crosssection_integral_numerical_limits.first);
 
-	cout << HORIZONTAL_LINE << endl;
-	cout << "> Checking cross section normalization for target '" << settings.targetNames[target_number] << "':" << endl;
-	cout << "\tAnalytical integral: " << cs_int_analytical << " eV fm^2" << endl;
-	cout << "\tIntegral of numerically calculated cross section: " << cs_int_numerical << " eV fm^2" << endl;
-	cout << "\tDeviation: " << (cs_int_analytical - cs_int_numerical)/cs_int_analytical*100. << " %" << endl;
+	if(settings.verbosity > 0){
+		cout << HORIZONTAL_LINE << endl;
+		cout << "> Checking cross section normalization for target '" << settings.targetNames[target_number] << "':" << endl;
+		cout << "\tAnalytical integral: \n\t\t" << crosssection_integral_analytical << " eV fm^2" << endl;
+		cout << "\tIntegral of numerically calculated cross section: \n\t\t" << crosssection_integral_numerical << " +- < " << crosssection_integral_numerical_uncertainty << " eV fm^2 ( " << crosssection_integral_numerical_uncertainty/crosssection_integral_numerical*100. << " % )" << endl;
+		cout << "\tDeviation: " << (crosssection_integral_analytical - crosssection_integral_numerical)/crosssection_integral_analytical*100. << " % ( < " << max(fabs(crosssection_integral_analytical - crosssection_integral_numerical_limits.first), fabs(crosssection_integral_analytical - crosssection_integral_numerical_limits.second))/crosssection_integral_analytical*100. << " % )" << endl;
+	}
 }

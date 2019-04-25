@@ -50,13 +50,14 @@ struct Settings{
 	
 	// Command-line options
         string inputfile = "";
-	string outputfile = "";
+	string outputfile = "out";
 	int verbosity = 2;
 	bool recoil = false;
 	bool output = false;
 	bool exact = false;
 	bool plot = false;
 	bool write = false;
+	bool uncertainty = false;
 
 	// Settings for Experiment
 	double emin = 0.;
