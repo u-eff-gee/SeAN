@@ -53,8 +53,10 @@ public:
 	void resonant_scattering();
 
 	// Functions for output
+	string result_string(unsigned int n_setting) const;
+	string uncertainty_string() const;
 	void plot(unsigned int n_setting) ;
-	void print_results();
+	void print_results(unsigned int n_setting);
 	void write(unsigned int n_setting) ;
 	void write_results(string outputfile, unsigned int n_setting) const;
 

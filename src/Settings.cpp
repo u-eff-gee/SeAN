@@ -42,92 +42,109 @@ void Settings::print(){
 		printTarget(i);
 }
 
-void Settings::printOptions(){
-	cout << HORIZONTAL_LINE << endl;
-	cout << ">>> SeAN INPUT" << endl;
+string Settings::option_string() const {
+
+	stringstream opss;
+	
+	opss << HORIZONTAL_LINE << "\n";
+	opss << ">>> SeAN INPUT\n";
 	if(inputfile != ""){
-		cout << "FILE:\t" << inputfile << endl;
+		opss << "FILE:\t" << inputfile << "\n" ;
 	} else{
-		cout << "FILE:\tnot set" << endl;
+		opss << "FILE:\tnot set\n" ;
 	}
-	cout << "COMMAND LINE OPTIONS: " << endl;
-	cout << "\tEXACT:\t" << exact << endl;
-	cout << "\tPLOT :\t" << plot << endl;
-	if(write){
-		cout << "\tWRITE:\t" << "true" << endl;
+	opss << "COMMAND LINE OPTIONS: \n" ;
+	opss << "\tEXACT:\t" << exact << "\n";
+	opss << "\tPLOT :\t" << plot << "\n";
+	if(multi){
+		opss << "\tMULTI:\t" << "true\n" ;
 	}
 	else{
-		cout << "\tWRITE:\t" << "false" << endl;
+		opss << "\tMULTI:\t" << "false\n" ;
+	}
+	if(write){
+		opss << "\tWRITE:\t" << "true\n" ;
+	}
+	else{
+		opss << "\tWRITE:\t" << "false\n" ;
 	}
 	if(recoil){
-		cout << "\tRECOIL:\t" << "true" << endl;
+		opss << "\tRECOIL:\t" << "true\n" ;
 	}
 	else{
-		cout << "\tRECOIL:\t" << "false" << endl;
+		opss << "\tRECOIL:\t" << "false\n" ;
 	}
-	cout << "\tUNCERTAINTY:\t";
+	opss << "\tUNCERTAINTY:\t";
        	if(uncertainty){
-		cout << "true" << endl;
+		opss << "true\n" ;
 	} else{
-		cout << "false" << endl;
+		opss << "false\n" ;
 	}
-	cout << "\tVERBOSITY:\t" << verbosity << endl;
+	opss << "\tVERBOSITY:\t" << verbosity << "\n";
 	if(output){
 		if(outputfile != ""){
-			cout << "\tOUTPUT:\t" << outputfile << endl;
+			opss << "\tOUTPUT:\t" << outputfile << "\n";
 		}
 		else{
-			cout << "\tOUTPUT:\ttrue" << endl;
+			opss << "\tOUTPUT:\ttrue\n" ;
 		}
 	}
 	else
-		cout << "\tOUTPUT:\t" << "false" << endl;
-}
+		opss << "\tOUTPUT:\t" << "false\n" ;
 
-void Settings::printExperiment(){
+	return opss.str();
+};
+
+string Settings::experiment_string() const {
 	long int default_precision = cout.precision();
 
-	cout << HORIZONTAL_LINE << endl;
-	cout << ">>> EXPERIMENT" << endl;
+	stringstream exss;
+
+	exss << HORIZONTAL_LINE << "\n";
+	exss << ">>> EXPERIMENT\n" ;
 	// Since eV is the standard energy unit of SeAN, but the absolute energy of resonances is in the order of several MeV, increase the precision for the output of double numbers and reset it later
-	cout << setprecision(7) << "EMIN\t\t:\t" << scientific << emin << " eV" << endl;
-	cout << setprecision(7) << "EMAX\t\t:\t" << scientific << emax << " eV" << endl;
-	cout << "PRIMARY BEAM\t:\t";
+	exss << setprecision(7) << "EMIN\t\t:\t" << scientific << emin << " eV\n" ;
+	exss << setprecision(7) << "EMAX\t\t:\t" << scientific << emax << " eV\n" ;
+	exss << "PRIMARY BEAM\t:\t";
 	
 	// Reset precision
-	cout << defaultfloat << setprecision((int) default_precision);
+	exss << defaultfloat << setprecision((int) default_precision);
 
 	if(incidentBeamParams.size()){
 		switch(incidentBeam){
 			case incidentBeamModel::constant:
-				cout << "constant, " << incidentBeamParams[0] << endl;
+				exss << "constant, " << incidentBeamParams[0] ;
 				break;
 			case incidentBeamModel::gauss:
-				cout << "gauss, MU = " << incidentBeamParams[0] << " eV, SIGMA = " << incidentBeamParams[1] << " eV, NORM = " << incidentBeamParams[2] << endl;
+				exss << "gauss, MU = " << incidentBeamParams[0] << " eV, SIGMA = " << incidentBeamParams[1] << " eV, NORM = " << incidentBeamParams[2] ;
 				break;
 			case incidentBeamModel::arb:
-				cout << "arb, " << incidentBeamFile << endl;
+				exss << "arb, " << incidentBeamFile ;
 				break;
 			default: break;
 		}
 	} else{
-		cout << "not set" << endl;
+		exss << "not set" ;
 	}
 
-	cout << "NBINS_ENERGY\t:\t" << nbins_e << endl;
-	cout << "NBINS_Z\t\t:\t" << nbins_z << endl;
+	exss << "\nNBINS_ENERGY\t:\t" << nbins_e ;
+	exss << "\nNBINS_Z\t\t:\t" << nbins_z <<"\n";
 
+	return exss.str();
 }
 
-void Settings::printTarget(unsigned int i){
+string Settings::target_string(unsigned int i) const {
+
 	long int default_precision = cout.precision();
 
-	cout << HORIZONTAL_LINE << endl;
-	cout << ">>> TARGET #" << (i + 1) << " : " << targetNames[i]  << endl;
-	cout << "RESONANCES:\tENERGY\tGAMMA0\tGAMMA\tJ0\tJ" << endl;
+	stringstream tass;
+
+	tass << HORIZONTAL_LINE << "\n";
+	tass << ">>> TARGET #" << (i + 1) << " : " << targetNames[i] << "\n" ;
+	tass << "RESONANCES:\tENERGY\tGAMMA0\tGAMMA\tJ0\tJ\n" ;
 
 	if(energy.size() == 0 || gamma0.size() == 0 || gamma.size() == 0 || jj.size() == 0){
-		cout << "\tno resonances given or incomplete input" << endl;
+		tass << "\tno resonances given or incomplete input\n" ;
 	} else{
 
 		long unsigned int nresonances = energy[i].size();
@@ -135,106 +152,110 @@ void Settings::printTarget(unsigned int i){
 		if(energy[i].size() == nresonances && gamma0[i].size() == nresonances && gamma[i].size() && jj[i].size() == nresonances){
 
 			for(long unsigned int j = 0; j < nresonances; ++j){
-				cout << "\t\t" << scientific << setprecision(7) << energy[i][j] << defaultfloat << "\t" << gamma0[i][j] << "\t" << gamma[i][j] << "\t" << ji[i] << "\t" << jj[i][j] << endl;
+				tass << "\t\t" << scientific << setprecision(7) << energy[i][j] << defaultfloat << "\t" << gamma0[i][j] << "\t" << gamma[i][j] << "\t" << ji[i] << "\t" << jj[i][j] << "\n";
 			}
 			
 			// Reset precision
-			cout << defaultfloat << setprecision((int) default_precision);
+			tass << defaultfloat << setprecision((int) default_precision);
 		} else{
-			cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
-			cout << " printTarget(): Number of parameters ENERGY, GAMMA0, GAMMA, J0 and J does not match." << endl;
+			cout << "Error: " << __FILE__ << ":" << __LINE__ << ": " << endl; 
+			cout << " printTarget(): Number of parameters ENERGY, GAMMA0, GAMMA, J0 and J does not match."  << endl;
 			abort();
 		}
 	}
 
-	cout << "DOPPLER_BROADENING:\t";
+	tass << "DOPPLER_BROADENING:\t";
 
 	if(dopplerBroadening.size() == 0){
-		cout << "not set" << endl;
+		tass << "not set" ;
 	} else{
 		switch(dopplerBroadening[i]){
 			case dopplerModel::zero:
-				cout << "zero" << endl;
+				tass << "zero" ;
 				break;
 			case dopplerModel::arb_vdist:
-				cout << "arb_vdist, bins " << velocityBinFile[i] << ", velocity distribution = " << vDistFile[i] << endl;
+				tass << "arb_vdist, bins " << velocityBinFile[i] << ", velocity distribution = " << vDistFile[i] ;
 				break;
 			case dopplerModel::arb_cs:
-				cout << "arb_cs, bins = " << energyBinFile[i] << ", cross section = " << crosssectionFile[i] << endl;
+				tass << "arb_cs, bins = " << energyBinFile[i] << ", cross section = " << crosssectionFile[i] ;
 				break;
 			case dopplerModel::mb:
-				cout << "Maxwell-Boltzmann, T_eff = " << dopplerParams[i][0] << " K" << endl;
+				tass << "Maxwell-Boltzmann, T_eff = " << dopplerParams[i][0] << " K" ;
 				break;
 			case dopplerModel::mba:
-				cout << "Maxwell-Boltzmann (using approximation), T_eff = " << dopplerParams[i][0] << " K " << endl;
+				tass << "Maxwell-Boltzmann (using approximation), T_eff = " << dopplerParams[i][0] << " K " ;
 				break;
 			case dopplerModel::mbd:
-				cout << "Maxwell-Boltzmann (using Debye approximation), T = " << dopplerParams[i][0] << " K, T_D = " << dopplerParams[i][1] << " K " << endl;
+				tass << "Maxwell-Boltzmann (using Debye approximation), T = " << dopplerParams[i][0] << " K, T_D = " << dopplerParams[i][1] << " K " ;
 				break;
 			case dopplerModel::mbad:
-				cout << "Maxwell-Boltzmann (using Debye and integral approximation), T = " << dopplerParams[i][0] << " K, T_D = " << dopplerParams[i][1] << " K " << endl;
+				tass << "Maxwell-Boltzmann (using Debye and integral approximation), T = " << dopplerParams[i][0] << " K, T_D = " << dopplerParams[i][1] << " K " ;
 				break;
 			case dopplerModel::phdos:
-				//cout << "phDOS, omega_s = " << omegaFile[i] << ", e_s = " << polarizationFile[i] << ", p = " << momentumFile[i] << ", T = " << dopplerParams[i][0] << " K, N = " << dopplerParams[i][1] << endl;
-				cout << "phDOS, omega_s = " << omegaFile[i] << ", T = " << dopplerParams[i][0] << " K" << endl;
+				//tass << "phDOS, omega_s = " << omegaFile[i] << ", e_s = " << polarizationFile[i] << ", p = " << momentumFile[i] << ", T = " << dopplerParams[i][0] << " K, N = " << dopplerParams[i][1] ;
+				tass << "phDOS, omega_s = " << omegaFile[i] << ", T = " << dopplerParams[i][0] << " K" ;
 				break;
 			default: break;
 		}
 	}
 	
-	cout << "ATOMIC MASS:\t\t";
+	tass << "\nATOMIC MASS:\t\t";
 	if(mass.size() == 0){
-		cout << "not set" << endl;
+		tass << "not set" ;
 	} else{
-		cout << mass[i] << " u" << endl;
+		tass << mass[i] << " u" ;
 	}
 	
-	cout << "MASS ATTENUATION:\t";
+	tass << "\nMASS ATTENUATION:\t";
 
 	if(mAttParams.size() == 0 && mAttFile.size() == 0){
-		cout << "not set" << endl;
+		tass << "not set" ;
 	} else{
 		switch(mAtt[i]){
 			case mAttModel::constant:
-				cout << "constant, " << mAttParams[i][0] << endl;
+				tass << "constant, " << mAttParams[i][0] ;
 				break;
 			case mAttModel::nist:
-				cout << "nist, " << mAttFile[i] << endl;
+				tass << "nist, " << mAttFile[i] ;
 				break;
 			case mAttModel::arb:
-				cout << "arb" << mAttFile[i] << endl;
+				tass << "arb" << mAttFile[i] ;
 				break;
 			default: break;
 		}
 	}
 	
-	cout << "TARGET THICKNESS:\t";
+	tass << "\nTARGET THICKNESS:\t";
 	if(thickness.size() == 0){
-		cout << "not set" << endl;
+		tass << "not set" ;
 	} else{
-	 	cout << thickness[i] << " atoms/fm^2" << endl;
+	 	tass << thickness[i] << " atoms/fm^2" ;
 	}
 
-	cout << "VELOCITY:\t\t";
+	tass << "\nVELOCITY:\t\t";
 	if(velocity.size() == 0){
-		cout << "not set" << endl;
+		tass << "not set" ;
 	} else{
-		cout << velocity[i] << " m/s" << endl;
+		tass << velocity[i] << " m/s" ;
 	}
+	tass << "\n";
+	
+	return tass.str();
+}
+
+void Settings::printOptions(){
+	cout << option_string();
+}
+
+void Settings::printExperiment(){
+	cout << experiment_string();
+}
+
+void Settings::printTarget(unsigned int i){
+	cout << target_string(i);
 }
 
 void Settings::write_output(unsigned int n_setting) const {
-
-	stringstream filename;
-
-	ofstream ofile;
-	ofile.open(outputfile, std::ios_base::out | std::ios_base::app);
-
-        if(!ofile.is_open()){
-                cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
-		cout << " write_output(): File '" << outputfile << "' could not be opened." << endl;
-		abort();
-	}
 
 	writeOptions(n_setting);
 	writeExperiment();
@@ -242,7 +263,6 @@ void Settings::write_output(unsigned int n_setting) const {
 	for(unsigned int i = 0; i < ntargets; ++i)
 		writeTarget(i);
 
-	ofile.close();
 }
 
 void Settings::writeOptions(unsigned int n_setting) const{
@@ -258,46 +278,7 @@ void Settings::writeOptions(unsigned int n_setting) const{
 		abort();
 	}
 
-	ofile << HORIZONTAL_LINE << endl;
-	ofile << ">>> SeAN INPUT #" << n_setting << endl;
-	if(inputfile != ""){
-		ofile << "FILE:\t" << inputfile << endl;
-	} else{
-		ofile << "FILE:\tnot set" << endl;
-	}
-	ofile << "COMMAND LINE OPTIONS: " << endl;
-	ofile << "\tEXACT:\t" << exact << endl;
-	ofile << "\tPLOT :\t" << plot << endl;
-	if(write){
-		ofile << "\tWRITE:\t" << "true" << endl;
-	}
-	else{
-		ofile << "\tWRITE:\t" << "false" << endl;
-	}
-	if(recoil){
-		ofile << "\tRECOIL:\t" << "true" << endl;
-	}
-	else{
-		ofile << "\tRECOIL:\t" << "false" << endl;
-	}
-	ofile << "\tUNCERTAINTY:\t";
-       	if(uncertainty){
-		ofile << "true" << endl;
-	} else{
-		ofile << "false" << endl;
-	}
-	ofile << "\tVERBOSITY:\t" << verbosity << endl;
-	if(output){
-		if(outputfile != ""){
-			ofile << "\tOUTPUT:\t" << outputfile << endl;
-		}
-		else{
-			ofile << "\tOUTPUT:\ttrue" << endl;
-		}
-	}
-	else
-		ofile << "\tOUTPUT:\t" << "false" << endl;
-
+	ofile << option_string();
 	ofile.close();
 }
 
@@ -314,37 +295,8 @@ void Settings::writeExperiment() const{
 		abort();
 	}
 
-	long int default_precision = ofile.precision();
-
-	ofile << HORIZONTAL_LINE << endl;
-	ofile << ">>> EXPERIMENT" << endl;
-	// Since eV is the standard energy unit of SeAN, but the absolute energy of resonances is in the order of several MeV, increase the precision for the output of double numbers and reset it later
-	ofile << setprecision(7) << "EMIN\t\t:\t" << scientific << emin << " eV" << endl;
-	ofile << setprecision(7) << "EMAX\t\t:\t" << scientific << emax << " eV" << endl;
-	ofile << "PRIMARY BEAM\t:\t";
-	
-	// Reset precision
-	ofile << defaultfloat << setprecision((int) default_precision);
-
-	if(incidentBeamParams.size()){
-		switch(incidentBeam){
-			case incidentBeamModel::constant:
-				ofile << "constant, " << incidentBeamParams[0] << endl;
-				break;
-			case incidentBeamModel::gauss:
-				ofile << "gauss, MU = " << incidentBeamParams[0] << " eV, SIGMA = " << incidentBeamParams[1] << " eV, NORM = " << incidentBeamParams[2] << endl;
-				break;
-			case incidentBeamModel::arb:
-				ofile << "arb, " << incidentBeamFile << endl;
-				break;
-			default: break;
-		}
-	} else{
-		ofile << "not set" << endl;
-	}
-
-	ofile << "NBINS_ENERGY\t:\t" << nbins_e << endl;
-	ofile << "NBINS_Z\t\t:\t" << nbins_z << endl;
+	ofile << experiment_string();
+	ofile.close();
 }
 
 void Settings::writeTarget(unsigned int i) const{
@@ -360,104 +312,6 @@ void Settings::writeTarget(unsigned int i) const{
 		abort();
 	}
 
-	long int default_precision = ofile.precision();
-
-	ofile << HORIZONTAL_LINE << endl;
-	ofile << ">>> TARGET #" << (i + 1) << " : " << targetNames[i]  << endl;
-	ofile << "RESONANCES:\tENERGY\tGAMMA0\tGAMMA\tJ0\tJ" << endl;
-
-	if(energy.size() == 0 || gamma0.size() == 0 || gamma.size() == 0 || jj.size() == 0){
-		ofile << "\tno resonances given or incomplete input" << endl;
-	} else{
-
-		long unsigned int nresonances = energy[i].size();
-
-		if(energy[i].size() == nresonances && gamma0[i].size() == nresonances && gamma[i].size() && jj[i].size() == nresonances){
-
-			for(long unsigned int j = 0; j < nresonances; ++j){
-				ofile << "\t\t" << scientific << setprecision(7) << energy[i][j] << defaultfloat << "\t" << gamma0[i][j] << "\t" << gamma[i][j] << "\t" << ji[i] << "\t" << jj[i][j] << endl;
-			}
-			
-			// Reset precision
-			ofile << defaultfloat << setprecision((int) default_precision);
-		} else{
-			ofile << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
-			ofile << " printTarget(): Number of parameters ENERGY, GAMMA0, GAMMA, J0 and J does not match." << endl;
-			abort();
-		}
-	}
-
-	ofile << "DOPPLER BROADENING:\t";
-
-	if(dopplerBroadening.size() == 0){
-		ofile << "not set" << endl;
-	} else{
-		switch(dopplerBroadening[i]){
-			case dopplerModel::zero:
-				ofile << "zero" << endl;
-				break;
-			case dopplerModel::arb_vdist:
-				ofile << "arb_vdist, bins " << velocityBinFile[i] << ", velocity distribution = " << vDistFile[i] << endl;
-				break;
-			case dopplerModel::arb_cs:
-				ofile << "arb_cs, bins = " << energyBinFile[i] << ", cross section = " << crosssectionFile[i] << endl;
-				break;
-			case dopplerModel::mb:
-				ofile << "Maxwell-Boltzmann, T_eff = " << dopplerParams[i][0] << " K" << endl;
-				break;
-			case dopplerModel::mba:
-				ofile << "Maxwell-Boltzmann (using approximation), T_eff = " << dopplerParams[i][0] << " K " << endl;
-				break;
-			case dopplerModel::mbd:
-				ofile << "Maxwell-Boltzmann (using Debye approximation), T = " << dopplerParams[i][0] << " K, T_D = " << dopplerParams[i][1] << " K " << endl;
-				break;
-			case dopplerModel::mbad:
-				ofile << "Maxwell-Boltzmann (using Debye and integral approximation), T = " << dopplerParams[i][0] << " K, T_D = " << dopplerParams[i][1] << " K " << endl;
-				break;
-			case dopplerModel::phdos:
-				ofile << "phDOS, omega_s = " << omegaFile[i] << ", T = " << dopplerParams[i][0] << " K" << endl;
-				break;
-			default: break;
-		}
-	}
-	
-	ofile << "ATOMIC MASS:\t\t";
-	if(mass.size() == 0){
-		ofile << "not set" << endl;
-	} else{
-		ofile << mass[i] << " u" << endl;
-	}
-	
-	ofile << "MASS ATTENUATION:\t";
-
-	if(mAttParams.size() == 0 && mAttFile.size() == 0){
-		ofile << "not set" << endl;
-	} else{
-		switch(mAtt[i]){
-			case mAttModel::constant:
-				ofile << "constant, " << mAttParams[i][0] << endl;
-				break;
-			case mAttModel::nist:
-				ofile << "nist, " << mAttFile[i] << endl;
-				break;
-			case mAttModel::arb:
-				ofile << "arb" << mAttFile[i] << endl;
-				break;
-			default: break;
-		}
-	}
-	
-	ofile << "TARGET THICKNESS:\t";
-	if(thickness.size() == 0){
-		ofile << "not set" << endl;
-	} else{
-	 	ofile << thickness[i] << " atoms/fm^2" << endl;
-	}
-
-	ofile << "VELOCITY:\t\t";
-	if(velocity.size() == 0){
-		ofile << "not set" << endl;
-	} else{
-		ofile << velocity[i] << " m/s" << endl;
-	}
+	ofile << target_string(i);
+	ofile.close();
 }

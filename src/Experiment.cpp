@@ -97,16 +97,42 @@ void Experiment::resonant_scattering(){
 	}
 }
 
-void Experiment::print_results(){
+string Experiment::result_string(unsigned int n_setting) const {
+
+	stringstream resss;
+	resss<< HORIZONTAL_LINE << "\n";
+	resss << ">>> SeAN RESULTS #" << n_setting << "\n";
+	resss << "TARGET NAME\tRESONANT SCATTERING";
+//	if(settings.uncertainty)
+//		resss << " +- LOW-UP +- NLO-N2LO";
+	resss << "\n";
+
+	return resss.str();
+}
+
+string Experiment::uncertainty_string() const {
 
 	unsigned int ntargets = (unsigned int) settings.targetNames.size();	
 
-	cout << HORIZONTAL_LINE << endl;
-	cout << ">>> SeAN RESULTS" << endl;
-	cout << "TARGET NAME\tRESONANT SCATTERING";
-	if(settings.uncertainty)
-		cout << " +- LOW-UP +- TRAP-SIM";
-	cout << endl;
+	stringstream unss;
+	
+	for(unsigned int i = 0; i < ntargets; ++i){
+		unss << HORIZONTAL_LINE << "\n";
+		unss << ">>> TARGET #" << i+1 << "\t: NUMERICAL UNCERTAINY ESTIMATES\n";
+		unss << targets[i].uncertainty_string();
+	}
+
+	return unss.str();
+};
+
+void Experiment::print_results(unsigned int n_setting){
+
+	unsigned int ntargets = (unsigned int) settings.targetNames.size();	
+
+	if(settings.uncertainty){
+		cout << uncertainty_string();
+	}
+	cout << result_string(n_setting);
 
 	for(unsigned int i = 0; i < ntargets; ++i){
 		targets[i].print_results();
@@ -147,9 +173,10 @@ void Experiment::write_results(string outputfile, unsigned int n_setting) const{
 	
 	unsigned int ntargets = (unsigned int) settings.targetNames.size();	
 
-	ofile << ">>> SeAN RESULTS #" << n_setting << endl;
-	ofile << HORIZONTAL_LINE << endl;
-	ofile << "TARGET NAME\tRESONANT SCATTERING" << endl;
+	if(settings.uncertainty)
+		ofile << uncertainty_string();
+	ofile << result_string(n_setting);
+	ofile.close();
 
 	for(unsigned int i = 0; i < ntargets; ++i){
 		targets[i].write_results(outputfile);

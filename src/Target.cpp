@@ -277,7 +277,7 @@ void Target::calculateIncidentBeam(const vector< vector<double> > &photon_flux_d
 
 void Target::calculateZBins(){
 	
-	double delta_z = settings.thickness[target_number]/settings.nbins_z;
+	double delta_z = settings.thickness[target_number]/(settings.nbins_z-1);
 
 	for(unsigned int i = 0; i < settings.nbins_z; ++i){
 		z_bins[i] = i*delta_z;
@@ -389,6 +389,39 @@ void Target::write(const vector<double> &energy_bins, const unsigned int n_setti
 	writer.write2DHistogram(resonance_absorption_density_histogram, filename.str(), "Alpha (z, E = const) / fm^2", "Alpha (z = const, E) / fm^2");
 }
 
+string Target::result_string() const{
+	stringstream resss;	
+	resss << settings.targetNames[target_number] << "\t" << n_resonantly_scattered;
+//	if(settings.uncertainty){
+//		resss << " +- " << 0.5*(n_resonantly_scattered_limits.second - n_resonantly_scattered_limits.first) << " +- " << 0.5*fabs(n_resonantly_scattered - n_resonantly_scattered_n2lo);
+//	}
+	resss << "\n";
+
+	return resss.str();
+}
+
+string Target::uncertainty_string() const{
+	stringstream unss;
+
+	unss << "CS ANALYTICAL:\t" << crosssection_integral_analytical << "\n";
+	unss << "CS NUMERICAL:\t" << crosssection_integral_numerical_limits.first << " <= " << crosssection_integral_numerical << " <= " << crosssection_integral_numerical_limits.second << "\n";
+	unss << "             \t100 % - " << (1.-crosssection_integral_numerical_limits.first/crosssection_integral_numerical)*100. << " % <= 100 % <= 100 % + " << (crosssection_integral_numerical_limits.second/crosssection_integral_numerical-1.)*100. << " %\n";
+	unss << "CS_DEVIATION:\t" << (crosssection_integral_numerical_limits.first - crosssection_integral_analytical)/crosssection_integral_analytical*100. << " % | " << (crosssection_integral_numerical - crosssection_integral_analytical)/crosssection_integral_analytical*100. << " % | "<< (crosssection_integral_numerical_limits.second - crosssection_integral_analytical)/crosssection_integral_analytical*100. << " % \n\n";
+
+	if(!settings.multi){
+		unss << "RS_TRAPEZOID:\t" << n_resonantly_scattered_limits.first << " <= " << n_resonantly_scattered << " <= " << n_resonantly_scattered_limits.second << "\n";
+		unss << "             \t100 % - " << (1.-n_resonantly_scattered_limits.first/n_resonantly_scattered)*100. << " % <= 100 % <= 100 % + " << (n_resonantly_scattered_limits.second/n_resonantly_scattered-1.)*100. << " %\n";
+	} else{
+		unss << "RS_SIMPSON:\t" << n_resonantly_scattered_n2lo << "\n";
+		unss << "RS_TRAPEZOID:\t" << n_resonantly_scattered_limits.first << " <= " << n_resonantly_scattered << " <= " << n_resonantly_scattered_limits.second << "\n";
+		unss << "             \t100 % - " << (1.-n_resonantly_scattered_limits.first/n_resonantly_scattered)*100. << " % <= 100 % <= 100 % + " << (n_resonantly_scattered_limits.second/n_resonantly_scattered-1.)*100. << " %\n";
+		unss << "RS_DEVIATION:\t" << (n_resonantly_scattered_limits.first - n_resonantly_scattered_n2lo)/n_resonantly_scattered_n2lo*100. << " % | " << (n_resonantly_scattered - n_resonantly_scattered_n2lo)/n_resonantly_scattered_n2lo*100. << " % | "<< (n_resonantly_scattered_limits.second - n_resonantly_scattered_n2lo)/n_resonantly_scattered_n2lo*100. << " % \n";
+
+	}
+
+	return unss.str();
+}
+
 void Target::write_results(string outputfile) const{
 
 	stringstream filename;
@@ -402,7 +435,7 @@ void Target::write_results(string outputfile) const{
 		abort();
 	}
 
-	ofile << "Target #" << target_number << "\t" << n_resonantly_scattered << endl;
+	ofile << result_string();
 }
 
 void Target::vDistInfo(){
@@ -439,18 +472,34 @@ void Target::vDistInfo(){
 
 void Target::calculateResonantScattering(const vector<double> energy_bins){
 
-	n_resonantly_scattered = integrator.trapezoidal_rule2D(z_bins, energy_bins, resonance_absorption_density_histogram);
-	n_resonantly_scattered_limits = integrator.darboux2D(z_bins, energy_bins, resonance_absorption_density_histogram);
+	if(settings.multi){
+		n_resonantly_scattered = integrator.trapezoidal_rule2D(z_bins, energy_bins, resonance_absorption_density_histogram);
+			if(settings.uncertainty){
+				n_resonantly_scattered_limits = integrator.darboux2D(z_bins, energy_bins, resonance_absorption_density_histogram);
+				n_resonantly_scattered_n2lo = integrator.simpsons_rule2D(z_bins, energy_bins, resonance_absorption_density_histogram);
+			}
+	} else{
+		vector<double> integrand(settings.nbins_e, 0.);
 
-	if(settings.uncertainty)
-		n_resonantly_scattered_n2lo = integrator.simpsons_rule2D(z_bins, energy_bins, resonance_absorption_density_histogram);
+		if(settings.mAtt[target_number] == mAttModel::constant && settings.mAttParams[target_number][0] == 0.){
+			#pragma omp parallel for
+			for(unsigned int i = 0; i < settings.nbins_e; ++i){
+				integrand[i] = photon_flux_density_histogram[0][i] - photon_flux_density_histogram[settings.nbins_z-1][i];
+			}
+		} else{
+			#pragma omp parallel for
+			for(unsigned int i = 0; i < settings.nbins_e; ++i){
+				integrand[i] = crosssection_histogram[i]/(crosssection_histogram[i]+mass_attenuation_histogram[i])*(photon_flux_density_histogram[0][i] - photon_flux_density_histogram[settings.nbins_z-1][i]);
+			}
+		}
+
+		n_resonantly_scattered = integrator.trapezoidal_rule(energy_bins, integrand);
+		if(settings.uncertainty){
+			n_resonantly_scattered_limits = integrator.darboux(energy_bins, integrand);
+		}
+	}
 }
 
 void Target::print_results(){
-	if(settings.uncertainty){
-		cout << settings.targetNames[target_number] << "\t" << n_resonantly_scattered << 
-			" +- " << 0.5*(n_resonantly_scattered_limits.second - n_resonantly_scattered_limits.first) << " +- " << 0.5*fabs(n_resonantly_scattered - n_resonantly_scattered_n2lo)<< endl;
-	} else{
-		cout << settings.targetNames[target_number] << "\t" << n_resonantly_scattered << endl;
-	}
+	cout << result_string();
 }

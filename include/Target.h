@@ -127,6 +127,8 @@ public:
 	void calculateResonantScattering(const vector<double> energy_bins);
 
 	// Function to print information to the command line
+	string result_string() const;
+	string uncertainty_string() const;
 	void print();
 	void print_results();
 

@@ -41,6 +41,7 @@ static char args_doc[] = "INPUTFILE";
 
 static struct argp_option options[] = {
   { "exact", 'e', 0, 0, "Do not use convolution approximation (increased computing time, default: false)", 0 },
+  { "multi", 'm', 0, 0, "Compute multidimensional integrals (increased computing time, default: false)", 0 },
   { "output", 'o', "OUTPUTFILENAME", 0, "Write input and results to a file called OUTPUTFILENAME (default: no output writing)", 0 },
   { "plot", 'p', 0, 0, "Create plots of all calculated quantities (default: false).", 0 },
   { "recoil", 'r', 0, 0, "Include nuclear recoil in the calculation of the cross section maximum (default: false).", 0 },
@@ -56,6 +57,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     switch (key) {
     	case ARGP_KEY_ARG: settings->inputfile = arg; break;
 	case 'e': settings->exact = true; break;
+	case 'm': settings->multi = true; break;
 	case 'o': settings->output = true;
 		  settings->outputfile = arg;
 			break;
@@ -91,10 +93,7 @@ int main(int argc, char* argv[]){
 	InputReader input;
 	input.readFile(settings);
 
-	//Experiment experiment;
-
 	long unsigned int n_settings = settings.size();
-	//Experiment experiment;
 
 	for(unsigned int i = 0; i < n_settings; ++i){
 
@@ -113,7 +112,7 @@ int main(int argc, char* argv[]){
 		}
 		experiment.resonant_scattering();
 		if(settings[0].verbosity > 0){
-			experiment.print_results();
+			experiment.print_results(i);
 		}
 
 		if(settings[0].output){
@@ -123,7 +122,7 @@ int main(int argc, char* argv[]){
 	}
 	
 	if(settings[0].verbosity > 0 && settings[0].output){
-		cout << "> Created output file " << settings[0].outputfile << "'" << endl;
+		cout << "> Created output file '" << settings[0].outputfile << "'" << endl;
 	}
 	
 	// Stop the clock

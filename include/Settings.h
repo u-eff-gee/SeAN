@@ -58,6 +58,7 @@ struct Settings{
 	bool plot = false;
 	bool write = false;
 	bool uncertainty = false;
+	bool multi = false;
 
 	// Settings for Experiment
 	double emin = 0.;
@@ -95,6 +96,11 @@ struct Settings{
 
 	vector<double> thickness;
 	vector<double> velocity;
+
+	// Methods to create output strings
+	string option_string() const;
+	string experiment_string() const;
+	string target_string(unsigned int i) const;
 
 	// Methods to print settings
 	void print();
