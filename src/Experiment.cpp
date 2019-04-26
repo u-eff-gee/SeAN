@@ -103,7 +103,10 @@ void Experiment::print_results(){
 
 	cout << HORIZONTAL_LINE << endl;
 	cout << ">>> SeAN RESULTS" << endl;
-	cout << "TARGET NAME\tRESONANT SCATTERING" << endl;
+	cout << "TARGET NAME\tRESONANT SCATTERING";
+	if(settings.uncertainty)
+		cout << " +- LOW-UP +- TRAP-SIM";
+	cout << endl;
 
 	for(unsigned int i = 0; i < ntargets; ++i){
 		targets[i].print_results();

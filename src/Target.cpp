@@ -441,9 +441,16 @@ void Target::calculateResonantScattering(const vector<double> energy_bins){
 
 	n_resonantly_scattered = integrator.trapezoidal_rule2D(z_bins, energy_bins, resonance_absorption_density_histogram);
 	n_resonantly_scattered_limits = integrator.darboux2D(z_bins, energy_bins, resonance_absorption_density_histogram);
+
+	if(settings.uncertainty)
+		n_resonantly_scattered_n2lo = integrator.simpsons_rule2D(z_bins, energy_bins, resonance_absorption_density_histogram);
 }
 
 void Target::print_results(){
-	cout << settings.targetNames[target_number] << "\t" << n_resonantly_scattered << 
-		" +- " << 0.5*(n_resonantly_scattered_limits.second - n_resonantly_scattered_limits.first) << endl;
+	if(settings.uncertainty){
+		cout << settings.targetNames[target_number] << "\t" << n_resonantly_scattered << 
+			" +- " << 0.5*(n_resonantly_scattered_limits.second - n_resonantly_scattered_limits.first) << " +- " << 0.5*fabs(n_resonantly_scattered - n_resonantly_scattered_n2lo)<< endl;
+	} else{
+		cout << settings.targetNames[target_number] << "\t" << n_resonantly_scattered << endl;
+	}
 }

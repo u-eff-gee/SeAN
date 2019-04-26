@@ -16,8 +16,12 @@
 */
 
 #include <algorithm>
+#include <iostream>
+
 #include "Integrator.h"
 
+using std::cout;
+using std::endl;
 using std::max;
 using std::max_element;
 using std::min;
@@ -63,11 +67,12 @@ double Integrator::trapezoidal_rule2D(const vector<double> &bins1, const vector<
 
 	// Sum over inner area
 	#pragma omp parallel for reduction (+:integral_inside)
-	for(unsigned int i = 2; i < bins1.size() - 2; ++i){
-		for(unsigned int j = 2; j < bins2.size() - 2; ++j){
+	for(unsigned int i = 1; i < bins1.size() - 1; ++i){
+		for(unsigned int j = 1; j < bins2.size() - 1; ++j){
 			integral_inside += histogram[i][j];
 		}
 	}
+
 	return bin_area*(0.25*integral_corners + 0.5*integral_sides + integral_inside);
 }
 

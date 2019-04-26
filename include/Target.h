@@ -88,6 +88,7 @@ private:
 	double crosssection_integral_numerical;
 	pair<double, double> crosssection_integral_numerical_limits;
 	double n_resonantly_scattered;
+	double n_resonantly_scattered_n2lo;
 	pair<double, double> n_resonantly_scattered_limits;
 	unsigned int target_number;
 
