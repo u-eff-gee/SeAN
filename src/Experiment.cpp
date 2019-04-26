@@ -94,6 +94,11 @@ void Experiment::resonant_scattering(){
 
 	for(unsigned int i = 0; i < ntargets; ++i){
 		targets[i].calculateResonantScattering(energy_bins);
+		if(settings.uncertainty){
+			targets[i].calculateTransmission(energy_bins,
+					targets[i].get_ana_num_ratio());
+			targets[i].calculateResonantScattering(energy_bins);
+		}
 	}
 }
 
@@ -103,8 +108,8 @@ string Experiment::result_string(unsigned int n_setting) const {
 	resss<< HORIZONTAL_LINE << "\n";
 	resss << ">>> SeAN RESULTS #" << n_setting << "\n";
 	resss << "TARGET NAME\tRESONANT SCATTERING";
-//	if(settings.uncertainty)
-//		resss << " +- LOW-UP +- NLO-N2LO";
+	if(settings.uncertainty)
+		resss << " +- CS_UNCERTAINTY +- SCATTERING_UNCERTAINTY";
 	resss << "\n";
 
 	return resss.str();

@@ -114,3 +114,23 @@ void Absorption::resonance_absorption_density(const vector<double> &crosssection
 		}
 	}
 }
+
+void Absorption::photon_flux_density(const vector<double> &crosssection_histogram, const vector<double> &mass_attenuation_histogram, const vector<double> &z_bins, const vector<double> &incident_beam_histogram, vector<vector<double> > &photon_flux_density_histogram, const double cs_enhancement_factor){
+
+	#pragma omp parallel for
+	for(unsigned int i = 0; i < settings.nbins_z; ++i){
+		for(unsigned int j = 0; j < settings.nbins_e; ++j){
+			photon_flux_density_histogram[i][j] = incident_beam_histogram[j]*exp(-(cs_enhancement_factor*crosssection_histogram[j] + mass_attenuation_histogram[j])*z_bins[i]);
+		}
+	}
+}
+
+void Absorption::resonance_absorption_density(const vector<double> &crosssection_histogram, const vector<vector<double> > &photon_flux_density_histogram, vector< vector<double> > &resonance_absorption_density_histogram, const double cs_enhancement_factor){
+
+	#pragma omp parallel for
+	for(unsigned int i = 0; i < settings.nbins_z; ++i){
+		for(unsigned int j = 0; j < settings.nbins_e; ++j){
+			resonance_absorption_density_histogram[i][j] = cs_enhancement_factor*crosssection_histogram[j]*photon_flux_density_histogram[i][j];
+		}
+	}
+}

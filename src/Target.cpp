@@ -312,6 +312,13 @@ void Target::calculateTransmission(const vector<double> energy_bins){
 	absorption.resonance_absorption_density(crosssection_histogram, photon_flux_density_histogram, resonance_absorption_density_histogram);
 }
 
+void Target::calculateTransmission(const vector<double> energy_bins, const double cs_enhancement_factor){
+	
+	absorption.photon_flux_density(crosssection_histogram, mass_attenuation_histogram, z_bins, incident_beam_histogram, photon_flux_density_histogram, cs_enhancement_factor);
+
+	absorption.resonance_absorption_density(crosssection_histogram, photon_flux_density_histogram, resonance_absorption_density_histogram, cs_enhancement_factor);
+}
+
 void Target::write(const vector<double> &energy_bins, const unsigned int n_setting) {
 	
 	stringstream filename;
@@ -391,10 +398,11 @@ void Target::write(const vector<double> &energy_bins, const unsigned int n_setti
 
 string Target::result_string() const{
 	stringstream resss;	
-	resss << settings.targetNames[target_number] << "\t" << n_resonantly_scattered;
-//	if(settings.uncertainty){
-//		resss << " +- " << 0.5*(n_resonantly_scattered_limits.second - n_resonantly_scattered_limits.first) << " +- " << 0.5*fabs(n_resonantly_scattered - n_resonantly_scattered_n2lo);
-//	}
+	resss << settings.targetNames[target_number] << ":\t" << n_resonantly_scattered[n_resonantly_scattered.size()-1];
+	if(settings.uncertainty){
+		resss << " +- " << fabs(n_resonantly_scattered[0] - n_resonantly_scattered[n_resonantly_scattered.size()-1]) << " +- " << 0.5*(n_resonantly_scattered_limits[0].second - n_resonantly_scattered_limits[0].first) << "\n";
+		resss << "\t\t\t" << "100 % +- " << fabs(n_resonantly_scattered[0] - n_resonantly_scattered[n_resonantly_scattered.size()-1])/n_resonantly_scattered[n_resonantly_scattered.size()-1]*100. << " % +- " << 0.5*(n_resonantly_scattered_limits[0].second - n_resonantly_scattered_limits[0].first)/n_resonantly_scattered[n_resonantly_scattered.size()-1]*100. << " %";
+	}
 	resss << "\n";
 
 	return resss.str();
@@ -409,13 +417,13 @@ string Target::uncertainty_string() const{
 	unss << "CS_DEVIATION:\t" << (crosssection_integral_numerical_limits.first - crosssection_integral_analytical)/crosssection_integral_analytical*100. << " % | " << (crosssection_integral_numerical - crosssection_integral_analytical)/crosssection_integral_analytical*100. << " % | "<< (crosssection_integral_numerical_limits.second - crosssection_integral_analytical)/crosssection_integral_analytical*100. << " % \n\n";
 
 	if(!settings.multi){
-		unss << "RS_TRAPEZOID:\t" << n_resonantly_scattered_limits.first << " <= " << n_resonantly_scattered << " <= " << n_resonantly_scattered_limits.second << "\n";
-		unss << "             \t100 % - " << (1.-n_resonantly_scattered_limits.first/n_resonantly_scattered)*100. << " % <= 100 % <= 100 % + " << (n_resonantly_scattered_limits.second/n_resonantly_scattered-1.)*100. << " %\n";
+		unss << "RS_TRAPEZOID:\t" << n_resonantly_scattered_limits[0].first << " <= " << n_resonantly_scattered[0] << " <= " << n_resonantly_scattered_limits[0].second << "\n";
+		unss << "             \t100 % - " << (1.-n_resonantly_scattered_limits[0].first/n_resonantly_scattered[0])*100. << " % <= 100 % <= 100 % + " << (n_resonantly_scattered_limits[0].second/n_resonantly_scattered[0]-1.)*100. << " %\n";
 	} else{
-		unss << "RS_SIMPSON:\t" << n_resonantly_scattered_n2lo << "\n";
-		unss << "RS_TRAPEZOID:\t" << n_resonantly_scattered_limits.first << " <= " << n_resonantly_scattered << " <= " << n_resonantly_scattered_limits.second << "\n";
-		unss << "             \t100 % - " << (1.-n_resonantly_scattered_limits.first/n_resonantly_scattered)*100. << " % <= 100 % <= 100 % + " << (n_resonantly_scattered_limits.second/n_resonantly_scattered-1.)*100. << " %\n";
-		unss << "RS_DEVIATION:\t" << (n_resonantly_scattered_limits.first - n_resonantly_scattered_n2lo)/n_resonantly_scattered_n2lo*100. << " % | " << (n_resonantly_scattered - n_resonantly_scattered_n2lo)/n_resonantly_scattered_n2lo*100. << " % | "<< (n_resonantly_scattered_limits.second - n_resonantly_scattered_n2lo)/n_resonantly_scattered_n2lo*100. << " % \n";
+		unss << "RS_SIMPSON:\t" << n_resonantly_scattered_n2lo[0] << "\n";
+		unss << "RS_TRAPEZOID:\t" << n_resonantly_scattered_limits[0].first << " <= " << n_resonantly_scattered[0] << " <= " << n_resonantly_scattered_limits[0].second << "\n";
+		unss << "             \t100 % - " << (1.-n_resonantly_scattered_limits[0].first/n_resonantly_scattered[0])*100. << " % <= 100 % <= 100 % + " << (n_resonantly_scattered_limits[0].second/n_resonantly_scattered[0]-1.)*100. << " %\n";
+		unss << "RS_DEVIATION:\t" << (n_resonantly_scattered_limits[0].first - n_resonantly_scattered_n2lo[0])/n_resonantly_scattered_n2lo[0]*100. << " % | " << (n_resonantly_scattered[0] - n_resonantly_scattered_n2lo[0])/n_resonantly_scattered_n2lo[0]*100. << " % | "<< (n_resonantly_scattered_limits[0].second - n_resonantly_scattered_n2lo[0])/n_resonantly_scattered_n2lo[0]*100. << " % \n";
 
 	}
 
@@ -473,10 +481,10 @@ void Target::vDistInfo(){
 void Target::calculateResonantScattering(const vector<double> energy_bins){
 
 	if(settings.multi){
-		n_resonantly_scattered = integrator.trapezoidal_rule2D(z_bins, energy_bins, resonance_absorption_density_histogram);
+		n_resonantly_scattered.push_back(integrator.trapezoidal_rule2D(z_bins, energy_bins, resonance_absorption_density_histogram));
 			if(settings.uncertainty){
-				n_resonantly_scattered_limits = integrator.darboux2D(z_bins, energy_bins, resonance_absorption_density_histogram);
-				n_resonantly_scattered_n2lo = integrator.simpsons_rule2D(z_bins, energy_bins, resonance_absorption_density_histogram);
+				n_resonantly_scattered_limits.push_back(integrator.darboux2D(z_bins, energy_bins, resonance_absorption_density_histogram));
+				n_resonantly_scattered_n2lo.push_back(integrator.simpsons_rule2D(z_bins, energy_bins, resonance_absorption_density_histogram));
 			}
 	} else{
 		vector<double> integrand(settings.nbins_e, 0.);
@@ -493,9 +501,9 @@ void Target::calculateResonantScattering(const vector<double> energy_bins){
 			}
 		}
 
-		n_resonantly_scattered = integrator.trapezoidal_rule(energy_bins, integrand);
+		n_resonantly_scattered.push_back(integrator.trapezoidal_rule(energy_bins, integrand));
 		if(settings.uncertainty){
-			n_resonantly_scattered_limits = integrator.darboux(energy_bins, integrand);
+			n_resonantly_scattered_limits.push_back(integrator.darboux(energy_bins, integrand));
 		}
 	}
 }

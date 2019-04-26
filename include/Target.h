@@ -87,9 +87,9 @@ private:
 	double crosssection_integral_analytical;
 	double crosssection_integral_numerical;
 	pair<double, double> crosssection_integral_numerical_limits;
-	double n_resonantly_scattered;
-	double n_resonantly_scattered_n2lo;
-	pair<double, double> n_resonantly_scattered_limits;
+	vector<double> n_resonantly_scattered;
+	vector<double> n_resonantly_scattered_n2lo;
+	vector<pair<double, double>> n_resonantly_scattered_limits;
 	unsigned int target_number;
 
 public:	
@@ -103,9 +103,7 @@ public:
 		phononDensity(s),
 		crosssection_integral_analytical(0.),
 		crosssection_integral_numerical(0.),
-		crosssection_integral_numerical_limits({0., 0.}),
-		n_resonantly_scattered(0.),
-		n_resonantly_scattered_limits({0., 0.})
+		crosssection_integral_numerical_limits({0., 0.})
 	{ 
 		settings = s; 
 		target_number = n;
@@ -124,6 +122,8 @@ public:
 	void calculateIncidentBeam(const vector<double> &energy_bins);
 	void calculateIncidentBeam(const vector<vector<double> > &photon_flux_density_histogram);
 	void calculateTransmission(const vector<double> energy_bins);
+	void calculateTransmission(const vector<double> energy_bins,
+			const double cs_enhancement_factor);
 	void calculateResonantScattering(const vector<double> energy_bins);
 
 	// Function to print information to the command line
@@ -157,6 +157,12 @@ public:
 	double integrateEEHistogram(vector<double> &energy_bins, vector<vector<double> > &eehist);
 
 	void vDistInfo();
+
+	// Function to return the ratio of the analytical integral over the cross section
+	// and the corresponding numerical integral. This is used can be used in a second 
+	// iteration over the calculation to improve the results or estimate uncertainties.
+	double get_ana_num_ratio() const { return crosssection_integral_analytical/
+		crosssection_integral_numerical; };
 };
 
 #endif

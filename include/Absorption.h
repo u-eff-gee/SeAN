@@ -65,6 +65,13 @@ public:
 
 	void resonance_absorption_density(const vector<double> &crosssection_histogram, const vector<vector<double> > &photon_flux_density_histogram, vector< vector<double> > &resonance_absorption_density_histogram);
 
+	// Transmission calculators with an additional parameter to be multiplied to the
+	// cross section. This is to estimate the uncertainty when the cross section is
+	// scaled.
+	void photon_flux_density(const vector<double> &crosssection_histogram, const vector<double> &mass_attenuation_histogram, const vector<double> &z_bins, const vector<double> &incident_beam_histogram, vector<vector<double> > &photon_flux_density_histogram, const double cs_enhancement_factor);
+
+	void resonance_absorption_density(const vector<double> &crosssection_histogram, const vector<vector<double> > &photon_flux_density_histogram, vector< vector<double> > &resonance_absorption_density_histogram, const double cs_enhancement_factor);
+
 	// Plot functions
 	void plot_photon_flux_density(vector<double> &energy_bins, vector<double> &z_bins, vector<vector<double> > &photon_flux_density_bins, string title, TCanvas *canvas, TLegend* legend, string legend_entry);
 
