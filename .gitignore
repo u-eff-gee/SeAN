@@ -15,6 +15,7 @@ install_manifest.txt
 Makefile
 src/CMakeFiles/*
 src/libsean_lib.a
+include/Config.h
 
 # Object files
 *.o
