@@ -205,9 +205,9 @@ TODO
 
 ### 4. License <a name="license"></a>
 
-Copyright (C) 2018
+Copyright (C) 2019
 
-U. Gayer (gayer.udo@gmail.com)
+U. Friman-Gayer (gayer.udo@gmail.com)
 
 This code is distributed under the terms of the GNU General Public License. See the COPYING file for more information.
 
