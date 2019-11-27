@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 
+#include "Constants.h"
 #include "ExcitedState.h"
 #include "Nucleus.h"
 #include "TestUtilities.h"
@@ -12,8 +13,9 @@ int main(){
     TestUtilities test;
 
     Nucleus nuc;
+    nuc.set_two_J(1);
 
-    double exc1_excitation_energy = 1e6;
+    double exc1_excitation_energy = 1.;
     double exc1_ground_state_width = 1.;
     double exc1_total_width = 1.;
     unsigned int exc1_two_J = 1;
@@ -36,6 +38,12 @@ int main(){
 
     nuc.add_excited_state(exc1);
     nuc.add_excited_state(exc2);
+
+    // Test the analytical calculation of the energy-integrated cross section, which is an
+    // important benchmark for numerical integrations of cross sections.
+
+    test.is_close_relative(nuc.get_energy_integrated_cs(0),
+        Constants::pi_squared*Constants::hbarc_squared, test.num_tol_rel);
 
     // Test the method of Nucleus which creates an energy grid for the evaluation of multiple
     // Breit-Wigner (BW) like resonances.

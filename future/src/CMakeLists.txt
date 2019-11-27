@@ -5,3 +5,6 @@ target_link_libraries(lib_VoigtProfile ${ROOT_LIBRARIES})
 
 add_library(lib_Nucleus Nucleus.cc)
 target_link_libraries(lib_Nucleus ${ROOT_LIBRARIES})
+
+add_library(lib_ExcitedState ExcitedState.cc)
+target_link_libraries(lib_ExcitedState ${ROOT_LIBRARIES})

@@ -3,9 +3,16 @@
 #include "Math/QuantFuncMathCore.h"
 #include "Math/ProbFuncMathCore.h"
 
+#include "Constants.h"
 #include "Nucleus.h"
 
 Nucleus::Nucleus():excited_states(0){}
+
+double Nucleus::get_energy_integrated_cs( const size_t i ) const {
+    return Constants::pi_squared*Constants::hbarc_squared
+        /(excited_states[i].get_excitation_energy()*excited_states[i].get_excitation_energy())
+        *(excited_states[i].get_two_J()+1)/(two_J+1)*excited_states[i].get_ground_state_width();
+}
 
 vector<double> Nucleus::energies(const double e_min, const double e_max,
 const size_t n_energies_per_state) const 
