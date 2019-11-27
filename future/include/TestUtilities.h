@@ -25,4 +25,6 @@ public:
         if(fabs((x-y)/(0.5*(x+y))) > epsilon_relative)
             throw 0;
     }
+
+    static constexpr double num_tol_rel = 1e-5;
 };

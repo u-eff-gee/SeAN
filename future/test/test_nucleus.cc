@@ -1,38 +1,78 @@
 #include <iostream>
+#include <vector>
 
 #include "ExcitedState.h"
 #include "Nucleus.h"
 #include "TestUtilities.h"
+
+using std::vector;
 
 int main(){
 
     TestUtilities test;
 
     Nucleus nuc;
-    ExcitedState exc1, exc2;
-    exc1.set_excitation_energy(1.);
-    exc1.set_ground_state_width(1.);
-    exc1.set_total_width(1.);
-    exc1.set_two_J(1);
 
-    exc2.set_excitation_energy(2.);
-    exc2.set_ground_state_width(2.);
-    exc2.set_total_width(2.);
-    exc2.set_two_J(2);
+    double exc1_excitation_energy = 1e6;
+    double exc1_ground_state_width = 1.;
+    double exc1_total_width = 1.;
+    unsigned int exc1_two_J = 1;
+
+    double exc2_excitation_energy = 2e6;
+    double exc2_ground_state_width = 2.;
+    double exc2_total_width = 2.;
+    unsigned int exc2_two_J = 2;
+
+    ExcitedState exc1, exc2;
+    exc1.set_excitation_energy(exc1_excitation_energy);
+    exc1.set_ground_state_width(exc1_ground_state_width);
+    exc1.set_total_width(exc1_total_width);
+    exc1.set_two_J(exc1_two_J);
+
+    exc2.set_excitation_energy(exc2_excitation_energy);
+    exc2.set_ground_state_width(exc2_ground_state_width);
+    exc2.set_total_width(exc2_total_width);
+    exc2.set_two_J(exc2_two_J);
 
     nuc.add_excited_state(exc1);
     nuc.add_excited_state(exc2);
 
-    test.is_equal<size_t, size_t>(nuc.get_n_excited_states(), 2);
+    // Test the method of Nucleus which creates an energy grid for the evaluation of multiple
+    // Breit-Wigner (BW) like resonances.
+    // In order to have a grid which is more dense close to the resonance and less dense
+    // far away from it, the energy values are determined from the inverse CDF of the
+    // BW distribution.
+    //
+    // Here, the limits of the energy interval are set far away from the actual resonances,
+    // so that the CDF of both BW distributions will be 0 and 1 at both limits.
+    // Three energy values within this interval are requested. They are the
+    // 25%, 50%, and 75% quantiles of the BW distribution, which are at 
+    //  excitation_energy - 0.5*total_width
+    //  excitation_energy
+    //  excitation_energy + 0.5*total_width
+   
+    vector<double> energies = nuc.energies(
+        exc1.get_excitation_energy()
+        -0.5*(exc2.get_excitation_energy()-exc1.get_excitation_energy()),
+        exc2.get_excitation_energy()
+        +0.5*(exc2.get_excitation_energy()-exc1.get_excitation_energy()), 3);
 
-    test.is_equal<double, double>(nuc.get_excited_state(0).get_excitation_energy(), 1.);
-    test.is_equal<double, double>(nuc.get_excited_state(0).get_ground_state_width(), 1.);
-    test.is_equal<double, double>(nuc.get_excited_state(0).get_total_width(), 1.);
-    test.is_equal<unsigned int, unsigned int>(nuc.get_excited_state(0).get_two_J(), 1);
+    test.is_equal<size_t, size_t>(energies.size(), 8);
+    test.is_equal<double, double>(energies[0], exc1.get_excitation_energy()
+            -0.5*(exc2.get_excitation_energy()-exc1.get_excitation_energy()));
 
-    test.is_equal<double, double>(nuc.get_excited_state(1).get_excitation_energy(), 2.);
-    test.is_equal<double, double>(nuc.get_excited_state(1).get_ground_state_width(), 2.);
-    test.is_equal<double, double>(nuc.get_excited_state(1).get_total_width(), 2.);
-    test.is_equal<unsigned int, unsigned int>(nuc.get_excited_state(1).get_two_J(), 2);
-    
+    test.is_close_absolute(energies[1], exc1.get_excitation_energy()-0.5*exc1.get_total_width(), 
+        test.num_tol_rel*exc1.get_total_width());
+    test.is_close_absolute(energies[2], exc1.get_excitation_energy(), test.num_tol_rel*exc1.get_total_width());
+    test.is_close_absolute(energies[3], exc1.get_excitation_energy()+0.5*exc1.get_total_width(), 
+        test.num_tol_rel*exc1.get_total_width());
+
+    test.is_close_absolute(energies[4], exc2.get_excitation_energy()-0.5*exc2.get_total_width(), 
+        test.num_tol_rel*exc2.get_total_width());
+    test.is_close_absolute(energies[5], exc2.get_excitation_energy(), test.num_tol_rel*exc2.get_total_width());
+    test.is_close_absolute(energies[6], exc2.get_excitation_energy()+0.5*exc2.get_total_width(), 
+        test.num_tol_rel*exc2.get_total_width());
+
+    test.is_equal<double, double>(energies[7], exc2.get_excitation_energy()
+        +0.5*(exc2.get_excitation_energy()-exc1.get_excitation_energy()));
 }

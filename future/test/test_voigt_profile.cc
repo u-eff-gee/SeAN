@@ -15,9 +15,9 @@ int main(){
     //  I) sigma = 1, gamma = 0, i.e. a normal distribution, which should evaluate to 1/sqrt(2*pi)
     test.is_close_relative(voigt.pdf(0., 1., 0.),
                             Constants::inverse_sqrt_twopi,
-                            1e-5);
+                            test.num_tol_rel);
     // II) sigma = 0, gamma = 1, i.e. a Breit-Wigner distribution, which should evaluate to 2/pi
     test.is_close_relative(voigt.pdf(0., 0., 1.),
                             2*Constants::inverse_pi,
-                            1e-5);
+                            test.num_tol_rel);
 }

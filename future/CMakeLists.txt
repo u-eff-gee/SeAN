@@ -20,6 +20,7 @@ if(CMAKE_BUILD_TYPE MATCHES DEBUG)
 
     add_executable(test_excited_state test/test_excited_state)
     add_executable(test_nucleus test/test_nucleus)
+    target_link_libraries(test_nucleus lib_Nucleus)
     add_executable(test_voigt_profile test/test_voigt_profile)
     target_link_libraries(test_voigt_profile lib_VoigtProfile)
 
