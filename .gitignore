@@ -51,3 +51,6 @@ doc/*.toc
 
 # phdos directory
 phdos/*
+
+# future
+build

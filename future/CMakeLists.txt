@@ -11,11 +11,14 @@ add_executable(sean src/main.cc)
 
 if(CMAKE_BUILD_TYPE MATCHES DEBUG)
     enable_testing()
+
     add_executable(test_excited_state test/test_excited_state)
+    add_executable(test_nucleus test/test_nucleus)
 
     add_test(NAME Execution COMMAND sean)
     add_test(NAME ExcitedState COMMAND test_excited_state)
+    add_test(NAME Nucleus COMMAND test_nucleus)
     message(STATUS "Debug build activated.")
     message(STATUS "To run tests, execute\n\tmake test")
-    message(STATUS "To view code coverage after testing, execute, e.g.,\n\tgcovr -r ${CMAKE_SOURCE_DIR}\n   if 'gcovr' is installed.")
+    message(STATUS "To view code coverage after testing, execute, e.g.,\ngcovr -r ${CMAKE_SOURCE_DIR} --exclude ${CMAKE_SOURCE_DIR}/include/TestUtilities.h\n   if 'gcovr' is installed.")
 endif()
