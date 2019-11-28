@@ -8,3 +8,6 @@ target_link_libraries(lib_Nucleus ${ROOT_LIBRARIES})
 
 add_library(lib_ExcitedState ExcitedState.cc)
 target_link_libraries(lib_ExcitedState ${ROOT_LIBRARIES})
+
+add_library(lib_Integrator Integrator.cc)
+target_link_libraries(lib_Integrator ${ROOT_LIBRARIES})

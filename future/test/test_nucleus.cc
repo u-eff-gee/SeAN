@@ -1,8 +1,9 @@
-#include <iostream>
+#include <numeric>
 #include <vector>
 
 #include "Constants.h"
 #include "ExcitedState.h"
+#include "Integrator.h"
 #include "Nucleus.h"
 #include "TestUtilities.h"
 
@@ -42,7 +43,7 @@ int main(){
     // Test the analytical calculation of the energy-integrated cross section, which is an
     // important benchmark for numerical integrations of cross sections.
 
-    test.is_close_relative(nuc.get_energy_integrated_cs(0),
+    test.is_close_relative(nuc.energy_integrated_cs(0),
         Constants::pi_squared*Constants::hbarc_squared, test.num_tol_rel);
 
     // Test the method of Nucleus which creates an energy grid for the evaluation of multiple
@@ -83,4 +84,25 @@ int main(){
 
     test.is_equal<double, double>(energies[7], exc2.get_excitation_energy()
         +0.5*(exc2.get_excitation_energy()-exc1.get_excitation_energy()));
+
+    // Calculate the cross section and test whether it is correct by
+    // comparing the numerical integral to the analytical value.
+    //
+    // To compensate for a too-small integration range of the very slowly
+    // decaying BW distribution, scale the numerical result by the inverse
+    // of the expected quantile.
+    // The remaining deviation will then be purely numerical.
+    Integrator inte;
+    nuc = Nucleus();
+    nuc.set_two_J(exc1.get_two_J());
+    nuc.add_excited_state(exc1);
+    double e_min = exc1_excitation_energy - 5*exc1_total_width;
+    double e_max = exc1_excitation_energy + 5*exc1_total_width;
+    energies = nuc.energies(e_min, e_max, 2000); // Empirically determined this number of 
+        //points to achieve the required numerical precision
+    vector<double> cs_cov = nuc.cross_section_coverage(e_min, e_max);
+    vector<double> cs = nuc.cross_section(energies);
+    vector<double> cs_ene_int = nuc.energy_integrated_cs();
+    test.is_close_relative(inte.trapezoidal_rule(energies, cs)/cs_cov[0],
+        std::accumulate(cs_ene_int.begin(), cs_ene_int.end(), 0.), test.num_tol_rel);
 }

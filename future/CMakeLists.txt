@@ -19,13 +19,17 @@ if(CMAKE_BUILD_TYPE MATCHES DEBUG)
     enable_testing()
 
     add_executable(test_excited_state test/test_excited_state)
+    add_executable(test_integrator test/test_integrator)
+    target_link_libraries(test_integrator lib_Integrator)
     add_executable(test_nucleus test/test_nucleus)
     target_link_libraries(test_nucleus lib_Nucleus)
+    target_link_libraries(test_nucleus lib_Integrator)
     add_executable(test_voigt_profile test/test_voigt_profile)
     target_link_libraries(test_voigt_profile lib_VoigtProfile)
 
     add_test(NAME Execution COMMAND sean)
     add_test(NAME ExcitedState COMMAND test_excited_state)
+    add_test(NAME Integrator COMMAND test_integrator)
     add_test(NAME Nucleus COMMAND test_nucleus)
     add_test(NAME VoigtProfile COMMAND test_voigt_profile)
 

@@ -17,10 +17,11 @@ public:
     unsigned int get_two_J() const { return two_J; };
     void set_two_J( unsigned int tJ ){ two_J = tJ; };
 
-    double get_energy_integrated_cs( const size_t i ) const;
-    vector<double> get_energy_integrated_cs() const;
+    double energy_integrated_cs( const size_t i ) const;
+    vector<double> energy_integrated_cs() const;
 
     vector<double> energies(const double e_min, const double e_max, const size_t n_energies) const;
+    vector<double> cross_section_coverage(const double e_min, const double e_max) const;
     vector<double> cross_section(const vector<double> &energies) const;
 
 private:
