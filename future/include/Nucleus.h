@@ -18,8 +18,10 @@ public:
     void set_two_J( unsigned int tJ ){ two_J = tJ; };
 
     double get_energy_integrated_cs( const size_t i ) const;
+    vector<double> get_energy_integrated_cs() const;
 
     vector<double> energies(const double e_min, const double e_max, const size_t n_energies) const;
+    vector<double> cross_section(const vector<double> &energies) const;
 
 private:
     vector<ExcitedState> excited_states;
