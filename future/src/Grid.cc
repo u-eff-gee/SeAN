@@ -79,7 +79,7 @@ void Grid::strictly_increasing(vector<double> &x) const {
     }
     // Special case that the equal numbers include the last one
     if(x[x.size()-1] == x[x.size()-2]){
-        for(size_t i = x.size()-2; i >= 0; --i){
+        for(size_t i = x.size()-2; i != 0; --i){
             if(x[i] != x[x.size()-1]){
                 increment = (x[x.size()-1] - x[i])/(x.size()-1-i);
                 for(size_t j = 1; j < x.size()-1-i; ++j){

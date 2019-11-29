@@ -1,8 +1,5 @@
-#include <algorithm>
-
 #include "Math/PdfFuncMathCore.h"
 #include "Math/ProbFuncMathCore.h"
-#include "Math/QuantFuncMathCore.h"
 
 #include "Constants.h"
 #include "Grid.h"
