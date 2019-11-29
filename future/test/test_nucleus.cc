@@ -15,8 +15,9 @@ int main(){
 
     Nucleus nuc;
     nuc.set_two_J(1);
+    nuc.set_mass(1.);
 
-    double exc1_excitation_energy = 1.;
+    double exc1_excitation_energy = 1e6;
     double exc1_ground_state_width = 1.;
     double exc1_total_width = 1.;
     unsigned int exc1_two_J = 1;
@@ -44,7 +45,14 @@ int main(){
     // important benchmark for numerical integrations of cross sections.
 
     test.is_close_relative(nuc.energy_integrated_cs(0),
-        Constants::pi_squared*Constants::hbarc_squared, test.num_tol_rel);
+        Constants::pi_squared*Constants::hbarc_squared
+            /(exc1_excitation_energy*exc1_excitation_energy), test.num_tol_rel);
+
+    // Test calculation of Doppler width
+    // For a simple result, enter a temperature for which the square-root term equals 1
+    vector<double> doppler_widths = nuc.doppler_width( 0.5*nuc.get_mass()*Constants::u / Constants::kB );
+    test.is_close_relative(doppler_widths[0], nuc.get_excited_state(0).get_excitation_energy(), 
+        test.num_tol_rel);
 
     // Test the method of Nucleus which creates an energy grid for the evaluation of multiple
     // Breit-Wigner (BW) like resonances.

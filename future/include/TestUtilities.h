@@ -15,13 +15,17 @@ public:
 
     template<typename T, typename U>
     inline void is_equal(T t, U u) const {
-        if(t != u)
+        if(t != u){
+            cout << __FILE__ << ": " << __FUNCTION__ << "( " << t << ", " << u << " )" << endl;
             throw;
+        }
     }
 
     inline void is_close_absolute(double x, double y, double epsilon) const {
-        if(fabs(x-y) > epsilon)
+        if(fabs(x-y) > epsilon){
+            cout << __FILE__ << ": " << __FUNCTION__ << "( " << x << ", " << y << ", " << epsilon << " )" << endl;
             throw;
+        }
     }
 
     inline void is_close_relative(double x, double y, double epsilon_relative) const {

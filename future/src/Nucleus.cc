@@ -9,6 +9,22 @@
 
 Nucleus::Nucleus():excited_states(0){}
 
+double Nucleus::doppler_width( const size_t i, const double temperature ) const {
+    return excited_states[i].get_excitation_energy()
+        *sqrt(2.*Constants::kB*temperature/(mass*Constants::u));
+}
+
+
+vector<double> Nucleus::doppler_width( const double temperature ) const {
+    vector<double> widths(excited_states.size());
+
+    for(size_t i = 0; i < excited_states.size(); ++i){
+        widths[i] = doppler_width(i, temperature);
+    }
+
+    return widths;
+}
+
 double Nucleus::energy_integrated_cs( const size_t i ) const {
     return Constants::pi_squared*Constants::hbarc_squared
         /(excited_states[i].get_excitation_energy()*excited_states[i].get_excitation_energy())
@@ -26,8 +42,7 @@ vector<double> Nucleus::energy_integrated_cs() const {
 }
 
 vector<double> Nucleus::energies(const double e_min, const double e_max,
-const size_t n_energies_per_state) const 
-{
+    const size_t n_energies_per_state) const {
     size_t n_energies = n_energies_per_state*excited_states.size()+2;
     vector<double> ene(n_energies, 0.);
     ene[0] = e_min;

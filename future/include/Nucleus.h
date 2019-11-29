@@ -16,6 +16,12 @@ public:
 
     unsigned int get_two_J() const { return two_J; };
     void set_two_J( unsigned int tJ ){ two_J = tJ; };
+    
+    unsigned int get_mass() const { return mass; };
+    void set_mass( unsigned int m ){ mass = m; };
+
+    double doppler_width( const size_t i, const double temperature ) const;
+    vector<double> doppler_width( const double temperature ) const;
 
     double energy_integrated_cs( const size_t i ) const;
     vector<double> energy_integrated_cs() const;
