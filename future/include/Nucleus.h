@@ -26,7 +26,7 @@ public:
     double energy_integrated_cs( const size_t i ) const;
     vector<double> energy_integrated_cs() const;
 
-    vector<double> energies(const double e_min, const double e_max, const size_t n_energies) const;
+    vector<double> energies(const double e_min, const double e_max, const size_t n_energies_per_state) const;
     vector<double> cross_section_coverage(const double e_min, const double e_max) const;
     vector<double> cross_section(const vector<double> &energies) const;
 

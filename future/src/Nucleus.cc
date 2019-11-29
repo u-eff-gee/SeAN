@@ -5,6 +5,7 @@
 #include "Math/QuantFuncMathCore.h"
 
 #include "Constants.h"
+#include "Grid.h"
 #include "Nucleus.h"
 
 Nucleus::Nucleus():excited_states(0){}
@@ -13,7 +14,6 @@ double Nucleus::doppler_width( const size_t i, const double temperature ) const 
     return excited_states[i].get_excitation_energy()
         *sqrt(2.*Constants::kB*temperature/(mass*Constants::u));
 }
-
 
 vector<double> Nucleus::doppler_width( const double temperature ) const {
     vector<double> widths(excited_states.size());
@@ -43,29 +43,21 @@ vector<double> Nucleus::energy_integrated_cs() const {
 
 vector<double> Nucleus::energies(const double e_min, const double e_max,
     const size_t n_energies_per_state) const {
-    size_t n_energies = n_energies_per_state*excited_states.size()+2;
+    size_t n_energies = n_energies_per_state*excited_states.size();
     vector<double> ene(n_energies, 0.);
-    ene[0] = e_min;
-    ene[n_energies-1] = e_max;
 
-    double quantile_increment{0.}, quantile_min{0.}, quantile_max{0.};
+    Grid grid;
 
+    vector<double> ene_state(n_energies_per_state);
     for(size_t i = 0; i < excited_states.size(); ++i){
-
-        quantile_min = ROOT::Math::breitwigner_cdf(
-            e_min, excited_states[i].get_total_width(), excited_states[i].get_excitation_energy());
-        quantile_max = ROOT::Math::breitwigner_cdf(
-            e_max, excited_states[i].get_total_width(), excited_states[i].get_excitation_energy());
-        quantile_increment = (quantile_max-quantile_min)/(n_energies_per_state+1);
-
-        for(size_t j = 1; j < n_energies_per_state + 1; ++j){
-            ene[i*n_energies_per_state+j] = ROOT::Math::breitwigner_quantile(
-                quantile_min+j*quantile_increment, excited_states[i].get_total_width())
-                +excited_states[i].get_excitation_energy();
+        ene_state = grid.breit_wigner(excited_states[i].get_excitation_energy(),
+            excited_states[i].get_total_width(), e_min, e_max, n_energies_per_state);
+        for(size_t j = 0; j < n_energies_per_state; ++j){
+            ene[j+i*n_energies_per_state] = ene_state[j];
         }
     }
 
-    std::sort(ene.begin(), ene.end());
+    grid.strictly_increasing(ene);
 
     return ene;
 }

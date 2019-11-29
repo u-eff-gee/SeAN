@@ -11,6 +11,7 @@ target_link_libraries(lib_Integrator ${ROOT_LIBRARIES})
 
 add_library(lib_Nucleus Nucleus.cc)
 target_link_libraries(lib_Nucleus ${ROOT_LIBRARIES})
+target_link_libraries(lib_Nucleus lib_Grid)
 
 add_library(lib_Target Target.cc)
 target_link_libraries(lib_Target ${ROOT_LIBRARIES})

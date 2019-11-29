@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "Math/ProbFuncMathCore.h"
 #include "Math/QuantFuncMathCore.h"
 
@@ -49,4 +51,42 @@ double Grid::normal_coverage(const double mu, const double sigma,
     const double x_min, const double x_max) const {
         return ROOT::Math::normal_cdf(x_max, sigma, mu)
             -ROOT::Math::normal_cdf(x_min, sigma, mu);
+}
+
+void Grid::strictly_increasing(vector<double> &x) const {
+    std::sort(x.begin(), x.end());
+
+    // Eliminate equal numbers by interpolating linearly to the next higher different number,
+    // i.e. {1.0, 2.0, 2.0, 3.0} -> {1.0, 2.0, 2.5, 3.0}
+    // Interpolation to the next higher number does not work if the equal number include the last
+    // one. In this case, the numbers are interpolated backwards.
+    double increment = 0.;
+    for(size_t i = 0; i < x.size()-1; ++i){
+        if(x[i] == x[i+1]){
+            if(i+1 == x.size()-1)
+                break;
+            for(size_t j = i+2; j < x.size(); ++j){
+                if(x[i] != x[j]){
+                    increment = (x[j] - x[i])/(j-i);
+                    for(size_t k = 1; k < j-i; ++k){
+                        x[i+k] += k*increment;
+                    }
+
+                    break;
+                }
+            }
+        }
+    }
+    // Special case that the equal numbers include the last one
+    if(x[x.size()-1] == x[x.size()-2]){
+        for(size_t i = x.size()-2; i >= 0; --i){
+            if(x[i] != x[x.size()-1]){
+                increment = (x[x.size()-1] - x[i])/(x.size()-1-i);
+                for(size_t j = 1; j < x.size()-1-i; ++j){
+                    x[x.size()-1-j] -= j*increment;
+                }
+                break;
+            }
+        }
+    }
 }

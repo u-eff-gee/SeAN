@@ -54,45 +54,6 @@ int main(){
     test.is_close_relative(doppler_widths[0], nuc.get_excited_state(0).get_excitation_energy(), 
         test.num_tol_rel);
 
-    // Test the method of Nucleus which creates an energy grid for the evaluation of multiple
-    // Breit-Wigner (BW) like resonances.
-    // In order to have a grid which is more dense close to the resonance and less dense
-    // far away from it, the energy values are determined from the inverse CDF of the
-    // BW distribution.
-    //
-    // Here, the limits of the energy interval are set far away from the actual resonances,
-    // so that the CDF of both BW distributions will be 0 and 1 at both limits.
-    // Three energy values within this interval are requested. They are the
-    // 25%, 50%, and 75% quantiles of the BW distribution, which are at 
-    //  excitation_energy - 0.5*total_width
-    //  excitation_energy
-    //  excitation_energy + 0.5*total_width
-   
-    vector<double> energies = nuc.energies(
-        exc1.get_excitation_energy()
-        -0.5*(exc2.get_excitation_energy()-exc1.get_excitation_energy()),
-        exc2.get_excitation_energy()
-        +0.5*(exc2.get_excitation_energy()-exc1.get_excitation_energy()), 3);
-
-    test.is_equal<size_t, size_t>(energies.size(), 8);
-    test.is_equal<double, double>(energies[0], exc1.get_excitation_energy()
-            -0.5*(exc2.get_excitation_energy()-exc1.get_excitation_energy()));
-
-    test.is_close_absolute(energies[1], exc1.get_excitation_energy()-0.5*exc1.get_total_width(), 
-        test.num_tol_rel*exc1.get_total_width());
-    test.is_close_absolute(energies[2], exc1.get_excitation_energy(), test.num_tol_rel*exc1.get_total_width());
-    test.is_close_absolute(energies[3], exc1.get_excitation_energy()+0.5*exc1.get_total_width(), 
-        test.num_tol_rel*exc1.get_total_width());
-
-    test.is_close_absolute(energies[4], exc2.get_excitation_energy()-0.5*exc2.get_total_width(), 
-        test.num_tol_rel*exc2.get_total_width());
-    test.is_close_absolute(energies[5], exc2.get_excitation_energy(), test.num_tol_rel*exc2.get_total_width());
-    test.is_close_absolute(energies[6], exc2.get_excitation_energy()+0.5*exc2.get_total_width(), 
-        test.num_tol_rel*exc2.get_total_width());
-
-    test.is_equal<double, double>(energies[7], exc2.get_excitation_energy()
-        +0.5*(exc2.get_excitation_energy()-exc1.get_excitation_energy()));
-
     // Calculate the cross section and test whether it is correct by
     // comparing the numerical integral to the analytical value.
     //
@@ -106,7 +67,7 @@ int main(){
     nuc.add_excited_state(exc1);
     double e_min = exc1_excitation_energy - 5*exc1_total_width;
     double e_max = exc1_excitation_energy + 5*exc1_total_width;
-    energies = nuc.energies(e_min, e_max, 2000); // Empirically determined this number of 
+    vector<double> energies = nuc.energies(e_min, e_max, 2000); // Empirically determined this number of 
         //points to achieve the required numerical precision
     vector<double> cs_cov = nuc.cross_section_coverage(e_min, e_max);
     vector<double> cs = nuc.cross_section(energies);
