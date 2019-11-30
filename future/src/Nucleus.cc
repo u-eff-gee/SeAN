@@ -4,6 +4,7 @@
 #include "Constants.h"
 #include "Grid.h"
 #include "Nucleus.h"
+#include "VoigtProfile.h"
 
 Nucleus::Nucleus():excited_states(0){}
 Nucleus::Nucleus(vector<ExcitedState> exc_sta, const double m, const unsigned int tJ):
@@ -84,6 +85,28 @@ vector<double> Nucleus::cross_section(const vector<double> &energies) const {
         for(size_t j = 0; j < energies.size(); ++j){
             cs[j] += ene_int_cs[i]*ROOT::Math::breitwigner_pdf(energies[j],
                 excited_states[i].get_total_width(), excited_states[i].get_excitation_energy());
+        }
+    }
+
+    return cs;
+}
+
+vector<double> Nucleus::cs_doppler_broadened(const vector<double> &energies, const double temperature) const {
+    vector<double> cs(energies.size(), 0.);
+    vector<double> ene_int_cs = energy_integrated_cs();
+    vector<double> dop_wid = doppler_width(temperature);
+
+    VoigtProfile voigt;
+    double sigma{0.}, gamma{0.}, excitation_energy{0.};
+
+    for(size_t i = 0; i < excited_states.size(); ++i){
+        sigma = dop_wid[i]*Constants::inverse_sqrt_two; // This is the actual standard deviation of the normal-distributed
+                                                        // absorption cross section in the limit 
+                                                        // Doppler width >> level width
+        gamma = excited_states[i].get_total_width();
+        excitation_energy = excited_states[i].get_excitation_energy();
+        for(size_t j = 0; j < energies.size(); ++j){
+            cs[j] += ene_int_cs[i]*voigt.pdf(energies[j]-excitation_energy, sigma, gamma);
         }
     }
 

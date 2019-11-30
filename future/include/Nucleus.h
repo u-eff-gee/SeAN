@@ -31,6 +31,8 @@ public:
     vector<double> cross_section_coverage(const double e_min, const double e_max) const;
     vector<double> cross_section(const vector<double> &energies) const;
 
+    vector<double> cs_doppler_broadened(const vector<double> &energies, const double temperature) const;
+
 private:
     vector<ExcitedState> excited_states;
 

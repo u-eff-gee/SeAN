@@ -10,6 +10,7 @@ add_library(lib_Integrator Integrator.cc)
 add_library(lib_Nucleus Nucleus.cc)
 target_link_libraries(lib_Nucleus ${ROOT_LIBRARIES})
 target_link_libraries(lib_Nucleus lib_Grid)
+target_link_libraries(lib_Nucleus lib_VoigtProfile)
 
 add_library(lib_Target Target.cc)
 

@@ -39,3 +39,17 @@ vector<double> Target::energies(const double e_min, const double e_max,
     grid.strictly_increasing(ene);
     return ene;
 }
+
+vector<double> Target::cross_section(const vector<double> &energies) const {
+    vector<double> cs(energies.size(), 0.);
+    vector<double> cs_nuc(energies.size());
+
+    for(size_t i = 0; i < nuclei.size(); ++i){
+        cs_nuc = nuclei[i].cs_doppler_broadened(energies, temperature);
+        for(size_t j = 0; j < energies.size(); ++j){
+            cs[j] += cs_nuc[j];
+        }
+    }
+
+    return cs;
+}

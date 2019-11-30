@@ -1,5 +1,6 @@
 #include "Constants.h"
 #include "ExcitedState.h"
+#include "Integrator.h"
 #include "Target.h"
 #include "TestUtilities.h"
 
@@ -11,7 +12,7 @@ int main(){
     
     // With the given choices of the nuclear mass and the temperature,
     // the Doppler width will be equal to 1e-6 times the excitation energy
-    vector<Nucleus> nuc{Nucleus(exc, 1./(Constants::u), 1)};
+    vector<Nucleus> nuc{Nucleus(exc, 1./Constants::u, 1)};
     double temperature = 1e-12/(2.*Constants::kB);
     test.is_equal<double, double>(nuc[0].doppler_width(0, temperature), (1e6-5.)*1e-6);
     test.is_equal<double, double>(nuc[0].doppler_width(1, temperature), (1e6+5.)*1e-6);
@@ -72,4 +73,38 @@ int main(){
         *target.get_nucleus(0).doppler_width(1, temperature))), 1e-2*test.num_tol_rel);
 
     test.is_equal<double, double>(energies[9], 1e6+energy_range);
+
+    // Test the calculation of the Doppler-broadened resonance by comparing the
+    // numerical integral to the analytical solution.
+    // This is done for several values of the temperature to study the transition
+    // from a Breit-Wigner to a normal distribution.
+    Integrator inte;
+    target = Target(
+        vector<Nucleus>{
+            Nucleus(vector<ExcitedState>{
+                ExcitedState(1e6, 1., 1., 1, true)
+            }, 1./Constants::u, 1)
+        }, 1.
+    );
+
+    vector<double> temperatures{1e-4, 1e-2, 1., 1e2};
+    for(size_t i = 0; i < temperatures.size(); ++i){
+        temperatures[i] = 1e-12/(2.*Constants::kB)*temperatures[i];
+    } // Corresponds to Doppler widths 0.01, 0.1, 1., and 10.
+
+    double coverage = 1.;
+    //for(auto t: temperatures){
+        double t = temperatures[3];
+        coverage = 1.;
+
+        target.set_temperature(t);
+        double range = 20.;
+        energies = target.energies(1e6-range, 1e6+range, 10000);
+        vector<double> cs = target.cross_section(energies);
+        if(target.get_nucleus(0).doppler_width(0, t) <= target.get_nucleus(0).get_excited_state(0).get_total_width())
+            coverage = target.get_nucleus(0).cross_section_coverage(energies[0], energies[energies.size()-1])[0];
+        test.is_close_relative(inte.trapezoidal_rule(energies, cs),
+            target.get_nucleus(0).energy_integrated_cs(0)*coverage,
+            test.num_tol_rel);
+    //}
  }

@@ -3,6 +3,7 @@
 
 #include "Constants.h"
 #include "ExcitedState.h"
+#include "Grid.h"
 #include "Integrator.h"
 #include "Nucleus.h"
 #include "TestUtilities.h"
