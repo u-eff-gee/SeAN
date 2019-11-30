@@ -6,6 +6,10 @@
 #include "Nucleus.h"
 
 Nucleus::Nucleus():excited_states(0){}
+Nucleus::Nucleus(vector<ExcitedState> exc_sta, const double m, const unsigned int tJ):
+    excited_states(exc_sta),
+    mass(m), two_J(tJ)
+{}
 
 double Nucleus::doppler_width( const size_t i, const double temperature ) const {
     return excited_states[i].get_excitation_energy()

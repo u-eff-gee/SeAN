@@ -4,6 +4,9 @@ class ExcitedState{
 
 public:
     ExcitedState(){};
+    ExcitedState(const double exc_ene, const double gamma,
+        const double gamma_0, const unsigned int twoJ,
+        const bool p);
 
     double get_excitation_energy() const { return excitation_energy; };
     void set_excitation_energy(const double exc){ excitation_energy = exc; };
@@ -17,10 +20,14 @@ public:
     unsigned int get_two_J() const { return two_J; };
     void set_two_J(const unsigned int tJ){ two_J = tJ; };
 
+    bool get_parity() const { return parity; };
+    void set_parity(const bool p) { parity = p; };
+
 private:
     double excitation_energy;
-    double ground_state_width;
     double total_width;
+    double ground_state_width;
 
     unsigned int two_J;
+    bool parity;
 };

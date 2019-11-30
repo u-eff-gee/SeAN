@@ -9,16 +9,17 @@ using std::vector;
 class Nucleus{
 public:
     Nucleus();
+    Nucleus(vector<ExcitedState> exc_sta, const double m, const unsigned int tJ);
 
     void add_excited_state( ExcitedState &exc ){ excited_states.push_back(exc); };
     size_t get_n_excited_states() const { return excited_states.size(); };
-    ExcitedState get_excited_state( size_t i ) const { return excited_states.at(i); };
+    ExcitedState& get_excited_state( const size_t i ) { return excited_states.at(i); };
 
     unsigned int get_two_J() const { return two_J; };
-    void set_two_J( unsigned int tJ ){ two_J = tJ; };
+    void set_two_J( const unsigned int tJ ){ two_J = tJ; };
     
     unsigned int get_mass() const { return mass; };
-    void set_mass( unsigned int m ){ mass = m; };
+    void set_mass( const unsigned int m ){ mass = m; };
 
     double doppler_width( const size_t i, const double temperature ) const;
     vector<double> doppler_width( const double temperature ) const;
