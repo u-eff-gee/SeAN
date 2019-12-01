@@ -44,33 +44,33 @@ int main(){
         target.get_nucleus(0).get_excited_state(0).get_excitation_energy()-
         0.5*target.get_nucleus(0).get_excited_state(0).get_total_width()-
         0.5*(target.get_nucleus(0).get_excited_state(0).get_excitation_energy()-
-        0.5*target.get_nucleus(0).get_excited_state(0).get_total_width()-1e6+energy_range), 1e-2*test.num_tol_rel);
+        0.5*target.get_nucleus(0).get_excited_state(0).get_total_width()-1e6+energy_range), test.num_tol_rel_ene);
     test.is_close_relative(energies[2],
         target.get_nucleus(0).get_excited_state(0).get_excitation_energy()
         -0.5*target.get_nucleus(0).get_excited_state(0).get_total_width(),
-        1e-2*test.num_tol_rel);
+        test.num_tol_rel_ene);
     test.is_close_relative(energies[3],
-        target.get_nucleus(0).get_excited_state(0).get_excitation_energy(), 1e-2*test.num_tol_rel);
+        target.get_nucleus(0).get_excited_state(0).get_excitation_energy(), test.num_tol_rel_ene);
     test.is_close_relative(energies[4],
         target.get_nucleus(0).get_excited_state(0).get_excitation_energy()
         +0.5*target.get_nucleus(0).get_excited_state(0).get_total_width(),
-        1e-2*test.num_tol_rel);
+        test.num_tol_rel_ene);
 
     test.is_close_relative(energies[5],
         target.get_nucleus(0).get_excited_state(1).get_excitation_energy()-
         0.6744897501960817*Constants::inverse_sqrt_two
-        *target.get_nucleus(0).doppler_width(1, temperature), 1e-2*test.num_tol_rel);
+        *target.get_nucleus(0).doppler_width(1, temperature), test.num_tol_rel_ene);
     test.is_close_relative(energies[6],
-        target.get_nucleus(0).get_excited_state(1).get_excitation_energy(), 1e-2*test.num_tol_rel);
+        target.get_nucleus(0).get_excited_state(1).get_excitation_energy(), test.num_tol_rel_ene);
     test.is_close_relative(energies[7],
         target.get_nucleus(0).get_excited_state(1).get_excitation_energy()+
         0.6744897501960817*Constants::inverse_sqrt_two
-        *target.get_nucleus(0).doppler_width(1, temperature), 1e-2*test.num_tol_rel);
+        *target.get_nucleus(0).doppler_width(1, temperature), test.num_tol_rel_ene);
     test.is_close_relative(energies[8],
         1e6+energy_range - 0.5*(1e6+energy_range-
         (target.get_nucleus(0).get_excited_state(1).get_excitation_energy()+
         0.6744897501960817*Constants::inverse_sqrt_two
-        *target.get_nucleus(0).doppler_width(1, temperature))), 1e-2*test.num_tol_rel);
+        *target.get_nucleus(0).doppler_width(1, temperature))), test.num_tol_rel_ene);
 
     test.is_equal<double, double>(energies[9], 1e6+energy_range);
 
@@ -92,19 +92,21 @@ int main(){
         temperatures[i] = 1e-12/(2.*Constants::kB)*temperatures[i];
     } // Corresponds to Doppler widths 0.01, 0.1, 1., and 10.
 
-    double coverage = 1.;
-    //for(auto t: temperatures){
-        double t = temperatures[3];
-        coverage = 1.;
+    double int_ana{0.}, int_tra{0.};
+    //pair<double, double> int_dar{0., 0.}; // May be used to cross-check the integrals
+    for(auto t: temperatures){
 
         target.set_temperature(t);
-        double range = 20.;
-        energies = target.energies(1e6-range, 1e6+range, 10000);
+        int_ana = target.get_nucleus(0).energy_integrated_cs(0);
+
+        double range = 100.;
+        energies = target.energies(
+            target.get_nucleus(0).get_excited_state(0).get_excitation_energy()-range,
+            target.get_nucleus(0).get_excited_state(0).get_excitation_energy()+range, 1e5);
         vector<double> cs = target.cross_section(energies);
-        if(target.get_nucleus(0).doppler_width(0, t) <= target.get_nucleus(0).get_excited_state(0).get_total_width())
-            coverage = target.get_nucleus(0).cross_section_coverage(energies[0], energies[energies.size()-1])[0];
-        test.is_close_relative(inte.trapezoidal_rule(energies, cs),
-            target.get_nucleus(0).energy_integrated_cs(0)*coverage,
-            test.num_tol_rel);
-    //}
+        
+        int_tra = inte.trapezoidal_rule(energies, cs);
+        //int_dar = inte.darboux(energies, cs);
+        test.is_close_relative(int_tra, int_ana, test.num_tol_rel_int);
+    }
  }

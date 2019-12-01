@@ -35,5 +35,13 @@ public:
         }
     }
 
-    static constexpr double num_tol_rel = 1e-5;
+    static constexpr double num_tol_rel = 1e-5; // Standard required numerical precision
+    static constexpr double num_tol_rel_ene = 1e-7; // Numerical precision for energies.
+        // Due to the factor of 10^6 between eV and MeV, this value is smaller than 
+        // num_tol_rel to be able to perform tests on the sub-eV level
+    static constexpr double num_tol_rel_int = 1e-2; // Numerical precision for integrations.
+        // The integrations are strongly dependent on the chosen range and the number 
+        // of sampled points. The low threshold above is used for integrations of 
+        // Breit-Wigner- and normal distributions with the same settings. For this reason,
+        // it is considerably larger than num_tol_rel
 };
