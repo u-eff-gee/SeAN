@@ -8,7 +8,7 @@ using std::vector;
 
 class Nucleus{
 public:
-    Nucleus();
+    Nucleus() = default;
     Nucleus(vector<ExcitedState> exc_sta, const double m, const unsigned int tJ);
 
     void add_excited_state( ExcitedState &exc ){ excited_states.push_back(exc); };

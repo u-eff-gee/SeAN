@@ -54,3 +54,5 @@ phdos/*
 
 # future
 build
+!doc
+future/doc

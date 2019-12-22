@@ -56,10 +56,6 @@ double Grid::normal_coverage(const double mu, const double sigma,
 void Grid::strictly_increasing(vector<double> &x) const {
     std::sort(x.begin(), x.end());
 
-    // Eliminate equal numbers by interpolating linearly to the next higher different number,
-    // i.e. {1.0, 2.0, 2.0, 3.0} -> {1.0, 2.0, 2.5, 3.0}
-    // Interpolation to the next higher number does not work if the equal number include the last
-    // one. In this case, the numbers are interpolated backwards.
     double increment = 0.;
     for(size_t i = 0; i < x.size()-1; ++i){
         if(x[i] == x[i+1]){

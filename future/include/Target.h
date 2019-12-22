@@ -15,7 +15,7 @@ public:
     double get_temperature() const { return temperature; };
     void set_temperature( const double t ){ temperature = t; };
 
-    vector<double> energies(const double e_min, const double e_max, const size_t n_energies);
+    vector<double> energies(const double e_min, const double e_max, const size_t n_energies_per_state);
 
     vector<double> cross_section(const vector<double> &energies) const;
 

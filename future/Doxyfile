@@ -1,0 +1,8 @@
+DOXYFILE_ENCODING      = UTF-8
+
+PROJECT_NAME           = "SeAN"
+PROJECT_NUMBER         = "0.1.0"
+PROJECT_BRIEF          = "Self-Absorption Numerical"
+
+INPUT = include src test
+OUTPUT_DIRECTORY       = doc
