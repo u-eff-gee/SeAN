@@ -5,4 +5,5 @@ PROJECT_NUMBER         = "0.1.0"
 PROJECT_BRIEF          = "Self-Absorption Numerical"
 
 INPUT = include src test
+CITE_BIB_FILES = bibliography.bib
 OUTPUT_DIRECTORY       = doc
