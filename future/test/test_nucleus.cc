@@ -20,22 +20,22 @@ int main(){
     nuc.set_two_J(1);
     nuc.set_mass(1.);
     nuc.get_excited_state(0).set_total_width(1.);
-    test.is_equal<double, double> (nuc.get_excited_state(0).get_total_width(), 1.);
+    test.test_equality<double, double> (nuc.get_excited_state(0).get_total_width(), 1.);
 
-    test.is_equal<double, double>(nuc.get_mass(), 1.);
-    test.is_equal<unsigned int, unsigned int>(nuc.get_two_J(), 1);
+    test.test_equality<double, double>(nuc.get_mass(), 1.);
+    test.test_equality<unsigned int, unsigned int>(nuc.get_two_J(), 1);
 
     // Test the analytical calculation of the energy-integrated cross section, which is an
     // important benchmark for numerical integrations of cross sections.
 
-    test.is_close_relative(nuc.energy_integrated_cs(0),
+    test.test_closeness(nuc.energy_integrated_cs(0),
         Constants::pi_squared*Constants::hbarc_squared
             /(exc[0].get_excitation_energy()*exc[0].get_excitation_energy()), test.num_tol_rel);
 
     // Test calculation of Doppler width
     // For a simple result, enter a temperature for which the square-root term equals 1
     vector<double> doppler_widths = nuc.doppler_width( 0.5*nuc.get_mass()*Constants::u / Constants::kB );
-    test.is_close_relative(doppler_widths[0], nuc.get_excited_state(0).get_excitation_energy(), 
+    test.test_closeness(doppler_widths[0], nuc.get_excited_state(0).get_excitation_energy(), 
         test.num_tol_rel);
 
     // Calculate the cross section and test whether it is correct by
@@ -56,6 +56,6 @@ int main(){
     vector<double> cs_cov = nuc.cross_section_coverage(e_min, e_max);
     vector<double> cs = nuc.cross_section(energies);
     vector<double> cs_ene_int = nuc.energy_integrated_cs();
-    test.is_close_relative(inte.trapezoidal_rule(energies, cs)/cs_cov[0],
+    test.test_closeness(inte.trapezoidal_rule(energies, cs)/cs_cov[0],
         std::accumulate(cs_ene_int.begin(), cs_ene_int.end(), 0.), test.num_tol_rel);
 }
