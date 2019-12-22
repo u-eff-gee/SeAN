@@ -2,9 +2,6 @@ cmake_minimum_required(VERSION 3.10)
 
 project(SeAN)
 
-# Include ROOT as library
-find_package(ROOT REQUIRED)
-
 # DEBUG flags include '-fprofile-arcs -ftest-coverage' options of g++, which are
 # used to provide code coverage information to the tool 'gcov'.
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -fprofile-arcs -ftest-coverage -fPIC -Wall -Wextra -Wshadow")
@@ -50,6 +47,6 @@ if(CMAKE_BUILD_TYPE MATCHES DEBUG)
     add_test(NAME VoigtProfile COMMAND test_voigt_profile)
 
     message(STATUS "Debug build activated.")
-    message(STATUS "To run tests, execute\n\tmake test")
+    message(STATUS "To run tests, execute\n\tmake test\nor\n\tctest")
     message(STATUS "To view code coverage after testing, execute, e.g.,\ngcovr -r ${CMAKE_SOURCE_DIR} --exclude ${CMAKE_SOURCE_DIR}/include/TestUtilities.h\n   if 'gcovr' is installed.")
 endif()

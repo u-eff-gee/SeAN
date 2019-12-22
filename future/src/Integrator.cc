@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <gsl/gsl_spline.h>
 
 #include "Integrator.h"
 
@@ -11,6 +12,15 @@ double Integrator::trapezoidal_rule(const vector<double> &x, const vector<double
 	}
 
 	return 0.5*integral;
+}
+	
+double Integrator::spline(const vector<double> &x, const vector<double> &y) const {
+	
+	gsl_interp_accel *acc = gsl_interp_accel_alloc();
+	gsl_spline *inter = gsl_spline_alloc(gsl_interp_steffen, x.size());
+	gsl_spline_init(inter, &x[0], &y[0], x.size());
+
+	return gsl_spline_eval_integ(inter, x[0], x[x.size()-1], acc);
 }
 
 pair<double, double> Integrator::darboux(const vector<double> &x, const vector<double> &y) const {
