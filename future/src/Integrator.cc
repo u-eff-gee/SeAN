@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <gsl/gsl_spline.h>
+#include <memory>
 
 #include "Integrator.h"
 
@@ -20,7 +21,12 @@ double Integrator::spline(const vector<double> &x, const vector<double> &y) cons
 	gsl_spline *inter = gsl_spline_alloc(gsl_interp_steffen, x.size());
 	gsl_spline_init(inter, &x[0], &y[0], x.size());
 
-	return gsl_spline_eval_integ(inter, x[0], x[x.size()-1], acc);
+	double result = gsl_spline_eval_integ(inter, x[0], x[x.size()-1], acc);
+
+	gsl_spline_free(inter);
+	gsl_interp_accel_free(acc);
+	
+	return result;
 }
 
 pair<double, double> Integrator::darboux(const vector<double> &x, const vector<double> &y) const {

@@ -10,7 +10,7 @@ using std::vector;
 class Nucleus{
 public:
     /// \brief Default constructor.
-    Nucleus() = default;
+    Nucleus();
     /// \brief Default destructor.
     ~Nucleus() = default;
     /// \brief Constructor for the initialization of all members.
