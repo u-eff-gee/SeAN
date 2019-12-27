@@ -10,6 +10,7 @@ struct Constants{
     static constexpr double pi = 3.141592653589793; ///< pi
     static constexpr double pi_squared = 9.869604401089358; ///< pi*pi
     static constexpr double inverse_pi = 0.3183098861837907; ///< 1/pi
+    static constexpr double inverse_twopi = 0.15915494309189535; ///< 1/(2*pi)
     static constexpr double inverse_sqrt_two = 0.7071067811865475; ///< 1/sqrt(2)
     static constexpr double inverse_sqrt_twopi = 0.3989422804014327; ///< 1/sqrt(2*pi)
 

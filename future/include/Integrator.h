@@ -53,4 +53,5 @@ public:
 	/// For a sufficiently fine grid, they can be seen as strict lower and upper limits of the trapezoidal rule and the spline interpolation.
 	pair<double, double> darboux(const vector<double> &x, const vector<double> &y) const;
 
+	double trapezoidal_rule_2d(const vector<double> &x, const vector<double> &y, const vector<vector<double>> &z) const;
 };

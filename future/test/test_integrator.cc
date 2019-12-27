@@ -1,5 +1,7 @@
 #include <vector>
 
+#include "Math/ProbFuncMathCore.h"
+
 #include "Integrator.h"
 #include "TestUtilities.h"
 
@@ -22,5 +24,4 @@ int main(){
     pair<double, double> inte_darb = inte.darboux(x, x);
     test.test_equality(inte_darb.first, 0.05*0.95);
     test.test_equality(inte_darb.second, 0.05*0.05+0.95*1.);
-
 }

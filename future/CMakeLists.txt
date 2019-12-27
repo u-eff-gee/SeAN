@@ -13,6 +13,9 @@ add_subdirectory(src)
 add_executable(sean src/main.cc)
 
 if(CMAKE_BUILD_TYPE MATCHES DEBUG)
+
+    find_package(ROOT REQUIRED)
+
     enable_testing()
 
     add_executable(test_excited_state test/test_excited_state)
@@ -22,6 +25,10 @@ if(CMAKE_BUILD_TYPE MATCHES DEBUG)
     
     add_executable(test_integrator test/test_integrator)
     target_link_libraries(test_integrator lib_Integrator)
+
+    add_executable(test_integrator_2d test/test_integrator_2d)
+    target_link_libraries(test_integrator_2d lib_Integrator)
+    target_link_libraries(test_integrator_2d ${ROOT_LIBRARIES})
 
     add_executable(test_nucleus test/test_nucleus)
     target_link_libraries(test_nucleus lib_ExcitedState)

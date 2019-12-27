@@ -92,8 +92,7 @@ int main(){
         temperatures[i] = 1e-12/(2.*Constants::kB)*temperatures[i];
     } // Corresponds to Doppler widths 0.01, 0.1, 1., and 10.
 
-    double int_ana{0.}, int_tra{0.}, int_spl{0.};
-    pair<double, double> int_dar{0., 0.}; // May be used to cross-check the integrals
+    double int_ana{0.}, int_tra{0.};
     for(auto t: temperatures){
 
         target.set_temperature(t);
@@ -102,12 +101,10 @@ int main(){
         double range = 100.;
         energies = target.energies(
             target.get_nucleus(0).get_excited_state(0).get_excitation_energy()-range,
-            target.get_nucleus(0).get_excited_state(0).get_excitation_energy()+range, 1e3);
+            target.get_nucleus(0).get_excited_state(0).get_excitation_energy()+range, 1e5);
         vector<double> cs = target.cross_section(energies);
 
         int_tra = inte.trapezoidal_rule(energies, cs);
-        int_dar = inte.darboux(energies, cs);
-        int_spl = inte.spline(energies, cs);
         test.test_closeness(int_tra, int_ana, test.num_tol_rel_int);
     }
  }
