@@ -13,7 +13,7 @@ using std::vector;
 /// \f[
 ///     F(x) \in [0, 1].
 /// \f]
-/// The grid generation is related to the inverse transform sampling method for generating random numbers from an arbitrary distribution.
+/// The grid generation is related to the inverse transform sampling method \cite InverseTransformSampling2019 for generating random numbers from an arbitrary distribution.
 /// It is based on the fact that a set of points \f$x_i\f$, obtained from a number of \f$n\f$ uniformly distributed points \f$u_i\f$ by
 /// \f[
 ///     x_i = F^{-1}(u_i)
@@ -41,7 +41,7 @@ public:
     /// \brief Default destructor.
     ~Grid() = default;
 
-    /// \brief Generate a grid for a Breit-Wigner distribution.
+    /// \brief Generate a grid for a Breit-Wigner (Cauchy) distribution \cite CauchyDistribution2019.
     /// \param x_0 Centroid.
     /// \param gamma Scale parameter.
     /// \param x_min Start point of the grid.
@@ -57,7 +57,7 @@ public:
     double breit_wigner_coverage(const double x_0, const double gamma,
         const double x_min, const double x_max) const;
     
-    /// \brief Generate a grid for a normal distribution.
+    /// \brief Generate a grid for a normal distribution \cite NormalDistribution2019.
     /// \param mu Mean value.
     /// \param sigma Standard deviation.
     /// \param x_min Start point of the grid.
