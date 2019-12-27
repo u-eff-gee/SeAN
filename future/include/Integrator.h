@@ -32,6 +32,7 @@ public:
 	///
 	/// The spline interpolation interpolates the sampled points \f$x_i\f$ and \f$y_i\f$ by a cubic spline which conserves their monotonicity \cite Steffen1990.
 	/// After that, the cubic spline is integrated.
+	/// This function uses the so-called 'Steffen interpolation' from the GNU Scientific Library (GSL) \cite Galassi2019.
 	double spline(const vector<double> &x, const vector<double> &y) const;
 
 	/// \brief Darboux integration (lower and upper sum)

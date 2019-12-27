@@ -9,11 +9,11 @@ using std::vector;
 /// \brief Class for a nucleus
 class Nucleus{
 public:
-    /// \brief Default constructor
+    /// \brief Default constructor.
     Nucleus() = default;
-    /// \brief Default destructor
+    /// \brief Default destructor.
     ~Nucleus() = default;
-    /// \brief Constructor for the initialization of all members
+    /// \brief Constructor for the initialization of all members.
     /// \param exc_sta Vector of ExcitedState objects.
     /// \param m Nuclear mass.
     /// \param tJ Ground-state angular momentum times 2.
@@ -110,7 +110,7 @@ public:
     /// width of the excited state.
     vector<double> cross_section(const vector<double> &energies) const;
     /// \brief Function to calculate the Doppler-broadened total absorption cross section of a nucleus at the given energies.
-    /// \param energies Vector of energies, at which the cross section should be evaluated.
+    /// \param energies Vector of energies at which the cross section should be evaluated.
     /// \param temperature (Effective) temperature of the material.
     ///
     /// It is assumed that, at a finite temperature \f$T\f$, the probability distribution \f$p\f$ for the velocity component of the nuclei parallel to 
@@ -160,9 +160,9 @@ public:
     /// and \f$\Gamma_j\f$ its total width.
     vector<double> cs_doppler_broadened(const vector<double> &energies, const double temperature) const;
 
-private:
-    vector<ExcitedState> excited_states;
+protected:
+    vector<ExcitedState> excited_states; ///< Vector of excited states of the nucleus.
 
-    double mass; // atomic mass units u
-    unsigned int two_J;
+    double mass; ///< Nuclear mass (atomic mass units times the speed of light squared, i.e. \f$uc^2\f$).
+    unsigned int two_J; ///< Total angular momentum of the ground state times 2, in units of the reduced Planck constant.
 };

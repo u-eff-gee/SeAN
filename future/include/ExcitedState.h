@@ -4,11 +4,11 @@
 class ExcitedState{
 
 public:
-    /// \brief Default constructor
+    /// \brief Default constructor.
     ExcitedState() = default;
-    /// \brief Default destructor
+    /// \brief Default destructor.
     ~ExcitedState() = default;
-    /// \brief Constructor for the initialization of all members
+    /// \brief Constructor for the initialization of all members.
     /// \param exc_ene Excitation energy.
     /// \param gamma Total width.
     /// \param gamma_0 Partial decay width to the ground state.
@@ -49,13 +49,13 @@ public:
     void set_parity(const bool p) { parity = p; };
 
 protected:
-    double excitation_energy; ///< Excitation energy (eV)
-    double total_width; ///< Total width (eV)
-    double ground_state_width; ///< Partial width for the decay to the ground state (eV)
+    double excitation_energy; ///< Excitation energy (eV).
+    double total_width; ///< Total width (eV).
+    double ground_state_width; ///< Partial width for the decay to the ground state (eV).
 
     /// \brief Parity
     /// * true, 1 = positive parity
     /// * false, 0 = negative parity
     bool parity;
-    unsigned int two_J; ///< Total angular momentum times 2, in units of the reduced Planck constant
+    unsigned int two_J; ///< Total angular momentum times 2, in units of the reduced Planck constant.
 };
