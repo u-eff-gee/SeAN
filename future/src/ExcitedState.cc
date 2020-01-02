@@ -5,5 +5,5 @@ ExcitedState::ExcitedState(const double exc_ene, const double gamma,
     excitation_energy(exc_ene),
     total_width(gamma),
     ground_state_width(gamma_0),
-    two_J(tJ), parity(p)
+    parity(p), two_J(tJ)
     {};

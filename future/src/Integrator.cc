@@ -53,16 +53,16 @@ double Integrator::trapezoidal_rule_2d(const vector<double> &x, const vector<dou
 
 	double integral_sides = 0.;
 	for(size_t i = 1; i < x.size() - 1; ++i){
-		integral_sides += (z[i][0]*(y[1]-y[0]) + z[i][y.size()-1]*(y[y.size()-1]-y[y.size()-2]))*(x[i+1]-x[i]);
+		integral_sides += (z[i][0]*(y[1]-y[0]) + z[i][y.size()-1]*(y[y.size()-1]-y[y.size()-2]))*(x[i]-x[i-1]);
 	}
 	for(size_t i = 1; i < y.size() - 1; ++i){
-		integral_sides += (z[0][i]*(x[1]-x[0]) + z[x.size()-1][i]*(x[x.size()-1]-x[x.size()-2]))*(y[i+1]-y[i]);
+		integral_sides += (z[0][i]*(x[1]-x[0]) + z[x.size()-1][i]*(x[x.size()-1]-x[x.size()-2]))*(y[i]-y[i-1]);
 	}
 
 	double integral_area = 0.;
 	for(size_t i = 1; i < x.size() - 1; ++i){
 		for(size_t j = 1; j < y.size() - 1; ++j){
-			integral_area += z[i][j]*(x[i+1]-x[i])*(y[i+1]-y[i]);
+			integral_area += z[i][j]*(x[i]-x[i-1])*(y[j]-y[j-1]);
 		}
 	}
 
