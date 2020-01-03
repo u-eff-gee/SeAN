@@ -71,7 +71,6 @@ public:
     /// \param sigma Standard deviation.
     /// \param x_min Start point of the grid.
     /// \param x_max End point of the grid.
-    /// \param n Number of grid points.
     double normal_coverage(const double mu, const double sigma,
         const double x_min, const double x_max) const;
 

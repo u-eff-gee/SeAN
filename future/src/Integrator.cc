@@ -44,7 +44,7 @@ pair<double, double> Integrator::darboux(const vector<double> &x, const vector<d
 	return pair<double, double>(lower_sum, upper_sum);
 }
 
-double Integrator::trapezoidal_rule_2d(const vector<double> &x, const vector<double> &y, const vector<vector<double>> &z) const {
+double Integrator::riemann_2d(const vector<double> &x, const vector<double> &y, const vector<vector<double>> &z) const {
 	
 	double integral_corners = 	  (x[1]-x[0])*(y[1]-y[0])*z[0][0]
 								+ (x[1]-x[0])*(y[y.size()-1] - y[y.size()-2])*z[0][y.size()-1]

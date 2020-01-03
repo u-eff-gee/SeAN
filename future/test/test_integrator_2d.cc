@@ -42,7 +42,7 @@ int main(){
         }
     }
 
-    double inte_result = inte.trapezoidal_rule_2d(x, y, z);
+    double inte_result = inte.riemann_2d(x, y, z);
 
     test.test_closeness(inte_result, 1., test.num_tol_rel_int);
 }
