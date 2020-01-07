@@ -119,7 +119,8 @@ All output will be saved to the directory `output/`. Several other directories w
    * `VERBOSITY == 0`: Print nothing
    * `VERBOSITY == 1`: Print results
    * `VERBOSITY == 2`: (default) Print input and results 
- * `-w`, `--write`: Create text files of all calculated intermediate quantities that can be shown in a histogram or graph. Note that this may take a lot of time and create very large files depending on the values of `NBINS_ENERGY` and `NBINS_Z`. This option can be used to avoid calculating the same thing (for example, an absorption cross section) over and over again, because the output can be read as input by the next calculation.
+ * `-w`, `--write`: Create text files of calculated intermediate quantities that can be shown in a 1D histogram or graph. This option can be used to avoid calculating the same thing (for example, an absorption cross section) over and over again, because the output can be read as input by the next calculation.
+ * `-W`, `--write_all`: Compared to the `-w` option, this one also creates text files of every single cross section at rest and 2D histograms. Note that this may take a lot of time and create very large files depending on the values of `NBINS_ENERGY` and `NBINS_Z`.
  * `-h`, `--help`: Print help to command line
 
 #### 3.2 Input file overview <a name="input_file_overview"></a>
@@ -205,9 +206,9 @@ TODO
 
 ### 4. License <a name="license"></a>
 
-Copyright (C) 2019
+Copyright (C) 2019-2020
 
-U. Friman-Gayer (gayer.udo@gmail.com)
+U. Friman-Gayer (ufrimangayer@gmail.com)
 
 This code is distributed under the terms of the GNU General Public License. See the COPYING file for more information.
 

@@ -316,9 +316,11 @@ double CrossSection::integrated_crosssection_analytical(vector<double> energy_bo
 	return cs_int;
 }
 	
-void CrossSection::check_crosssection_normalization(const vector<double> &energy_bins, const vector<double> &crosssection_histogram, const vector<double> energy_boosted, const unsigned int target_number, double &crosssection_integral_analytical, double &crosssection_integral_numerical, pair<double, double> &crosssection_integral_numerical_limits){
+void CrossSection::check_crosssection_normalization(const vector<double> &energy_bins, const vector<double> &crosssection_histogram, const vector<double> energy_boosted, const unsigned int target_number,
+double &crosssection_integral_analytical, double &crosssection_integral_numerical, pair<double, double> &crosssection_integral_numerical_limits){
 
 	crosssection_integral_analytical = integrated_crosssection_analytical(energy_boosted, target_number);
 	crosssection_integral_numerical = integrator->trapezoidal_rule(energy_bins, crosssection_histogram);
 	crosssection_integral_numerical_limits = integrator->darboux(energy_bins, crosssection_histogram);
+
 }

@@ -49,7 +49,7 @@ enum class incidentBeamModel{constant, gauss, arb};
 struct Settings{
 	
 	// Command-line options
-        string inputfile = "";
+    string inputfile = "";
 	string outputfile = "out";
 	int verbosity = 2;
 	bool recoil = false;
@@ -57,6 +57,7 @@ struct Settings{
 	bool exact = false;
 	bool plot = false;
 	bool write = false;
+	bool write_all = false;
 	bool uncertainty = false;
 	bool multi = false;
 
@@ -98,6 +99,7 @@ struct Settings{
 	vector<double> velocity;
 
 	// Methods to create output strings
+	string bool_string(const bool b) const;
 	string option_string() const;
 	string experiment_string() const;
 	string target_string(unsigned int i) const;

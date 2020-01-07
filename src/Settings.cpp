@@ -33,6 +33,10 @@ using std::setprecision;
 using std::stringstream;
 using std::ofstream;
 
+string Settings::bool_string(const bool b) const {
+	if(b) return "true"; else return "false";
+}
+
 void Settings::print(){
 
 	printOptions();
@@ -54,43 +58,17 @@ string Settings::option_string() const {
 		opss << "FILE:\tnot set\n" ;
 	}
 	opss << "COMMAND LINE OPTIONS: \n" ;
-	opss << "\tEXACT:\t" << exact << "\n";
-	opss << "\tPLOT :\t" << plot << "\n";
-	if(multi){
-		opss << "\tMULTI:\t" << "true\n" ;
-	}
-	else{
-		opss << "\tMULTI:\t" << "false\n" ;
-	}
-	if(write){
-		opss << "\tWRITE:\t" << "true\n" ;
-	}
-	else{
-		opss << "\tWRITE:\t" << "false\n" ;
-	}
-	if(recoil){
-		opss << "\tRECOIL:\t" << "true\n" ;
-	}
-	else{
-		opss << "\tRECOIL:\t" << "false\n" ;
-	}
-	opss << "\tUNCERTAINTY:\t";
-       	if(uncertainty){
-		opss << "true\n" ;
-	} else{
-		opss << "false\n" ;
-	}
-	opss << "\tVERBOSITY:\t" << verbosity << "\n";
-	if(output){
-		if(outputfile != ""){
-			opss << "\tOUTPUT:\t" << outputfile << "\n";
-		}
-		else{
-			opss << "\tOUTPUT:\ttrue\n" ;
-		}
-	}
-	else
-		opss << "\tOUTPUT:\t" << "false\n" ;
+	opss << "\tEXACT       :\t" << exact << "\n";
+	opss << "\tPLOT        :\t" << plot << "\n";
+	opss << "\tMULTI       :\t" << bool_string(multi) << "\n";
+	opss << "\tWRITE       :\t" << bool_string(write);
+	if(write_all) opss << " ( ALL )" << "\n"; else opss << "\n";
+	opss << "\tRECOIL      :\t" << bool_string(recoil) << "\n" ;
+	opss << "\tUNCERTAINTY :\t" << bool_string(uncertainty) << "\n" ;
+	opss << "\tVERBOSITY   :\t" << verbosity << "\n";
+	opss << "\tOUTPUT      :\t" << bool_string(output);
+	if(output) opss << " ( " << outputfile << " )";
+	opss << "\n"; 
 
 	return opss.str();
 };
@@ -274,7 +252,7 @@ void Settings::writeOptions(unsigned int n_setting) const{
 
         if(!ofile.is_open()){
                 cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
-		cout << " write_input(): File '" << outputfile << "' could not be opened." << endl;
+		cout << " writeOptions(): File '" << outputfile << "' could not be opened." << endl;
 		abort();
 	}
 

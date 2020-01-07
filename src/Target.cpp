@@ -327,16 +327,18 @@ void Target::write(const vector<double> &energy_bins, const unsigned int n_setti
 	filename << settings.targetNames[target_number] << "_energy_bins_" << n_setting;
 	writer.write1DHistogram(energy_bins, filename.str(), "Energy / eV");
 	
-	// Write cross section at rest
+	// Write cross section at rest if writing of all calculated quantities is requested.
 	
-	for(unsigned int i = 0; i < energy_boosted.size(); ++i){
-		filename.str("");
-		filename.clear();
+	if(settings.write_all){
+		for(unsigned int i = 0; i < energy_boosted.size(); ++i){
+			filename.str("");
+			filename.clear();
 
-		filename << settings.targetNames[target_number] << "_crosssection_at_rest_"  << n_setting << "_" << i;
+			filename << settings.targetNames[target_number] << "_crosssection_at_rest_"  << n_setting << "_" << i;
 
-		writer.write1DHistogram(crosssection_at_rest_histogram[i], filename.str(), "Cross section / fm^2");
-		writer.write1DCalibration(energy_bins, CAL_FILE_NAME, filename.str());
+			writer.write1DHistogram(crosssection_at_rest_histogram[i], filename.str(), "Cross section / fm^2");
+			writer.write1DCalibration(energy_bins, CAL_FILE_NAME, filename.str());
+		}
 	}
 
 	// Write cross section
@@ -381,19 +383,21 @@ void Target::write(const vector<double> &energy_bins, const unsigned int n_setti
 	writer.write1DHistogram(mass_attenuation_histogram, filename.str(), "Mass attenuation / fm^2 / atom");
 	writer.write1DCalibration(energy_bins, CAL_FILE_NAME, filename.str());
 	
-	// Write photon flux density
-	filename.str("");
-	filename.clear();
+	if(settings.write_all){
+		// Write photon flux density if writing of all calculated quantities is requested.
+		filename.str("");
+		filename.clear();
 
-	filename << settings.targetNames[target_number] << "_photon_flux_density_" << n_setting;
-	writer.write2DHistogram(photon_flux_density_histogram, filename.str(), "Phi (z, E = const)", "Phi (z = const, E)");
-	
-	// Write resonance absorption density
-	filename.str("");
-	filename.clear();
+		filename << settings.targetNames[target_number] << "_photon_flux_density_" << n_setting;
+		writer.write2DHistogram(photon_flux_density_histogram, filename.str(), "Phi (z, E = const)", "Phi (z = const, E)");
+		
+		// Write resonance absorption density if writing of all calculated quantities is requested.
+		filename.str("");
+		filename.clear();
 
-	filename << settings.targetNames[target_number] << "_resonance_absorption_density_" << n_setting;
-	writer.write2DHistogram(resonance_absorption_density_histogram, filename.str(), "Alpha (z, E = const) / fm^2", "Alpha (z = const, E) / fm^2");
+		filename << settings.targetNames[target_number] << "_resonance_absorption_density_" << n_setting;
+		writer.write2DHistogram(resonance_absorption_density_histogram, filename.str(), "Alpha (z, E = const) / fm^2", "Alpha (z = const, E) / fm^2");
+	}
 }
 
 string Target::result_string() const{
