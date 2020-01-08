@@ -42,7 +42,7 @@ static char args_doc[] = "INPUTFILE";
 static struct argp_option options[] = {
   { "exact", 'e', 0, 0, "Do not use convolution approximation (increased computing time, default: false)", 0 },
   { "multi", 'm', 0, 0, "Compute multidimensional integrals (increased computing time, default: false)", 0 },
-  { "output", 'o', "OUTPUTFILENAME", 0, "Write input and results to a file called OUTPUTFILENAME (default: no output writing)", 0 },
+  { "output", 'o', "OUTPUTFILENAME", 0, "Write input and results to a file called OUTPUTFILENAME (default: no output writing). If OUTPUTFILENAME already exists, it will be overwritten.", 0 },
   { "plot", 'p', 0, 0, "Create plots of all calculated quantities (default: false).", 0 },
   { "recoil", 'r', 0, 0, "Include nuclear recoil in the calculation of the cross section maximum (default: false).", 0 },
   { "uncertainty", 'u', 0, 0, "Estimate the uncertainty of the numerical evaluations (default: false). Note that this causes SeAN to perform more calculations.", 0 },
@@ -81,11 +81,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
         	break;
     	default: return ARGP_ERR_UNKNOWN;
     	}
-    	return 0;
-}
-
-static struct argp argp = { options, parse_opt, args_doc, doc, 0, 0, 0 };
-
+    	return 0;https://stackoverflow.com/questions/15684052/how-do-i-operate-on-file-using-fstream-pointers
 int main(int argc, char* argv[]){
 
 	vector <Settings> settings;

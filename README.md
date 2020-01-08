@@ -112,7 +112,7 @@ All output will be saved to the directory `output/`. Several other directories w
 `SeAN` accepts the following command line options:
 
  * `-e`, `--exact`: Instead of using the FFT approximation to calculate the broadening of the Breit-Wigner cross section, evaluate the integral exactly. The speed advantage of using FFT is enormous, but the user is advised to check with this option whether it is applicable.
- * `-o`, `--output=OUTPUTFILENAME`: Write the input from `INPUTFILE` and the results of the calculation (the amount of resonant scattering on each of the targets) to a file called OUTPUTFILENAME.
+ * `-o`, `--output=OUTPUTFILENAME`: Write the input from `INPUTFILE` and the results of the calculation (the amount of resonant scattering on each of the targets) to a file called OUTPUTFILENAME. If this file already exists, it is overwritten.
  * `-p`, `--plot`: Create plots of all calculated intermediate quantities that can be shown in a histogram or graph. Note that this may take a lot of time and create very large files depending on the values of `NBINS_E` and `NBINS_Z`.
  * `-r`, `--recoil`: Consider the recoil of the nucleus when the absorption is calculated. This is a little tricky, because the absorption line is very narrow in the sub-eV range, but depending on the nucleus the recoil may shift the absorption line by up to several keV. This has to be considered when setting the integration range. The resulting resonant scattering is actually independent of the recoil, therefore it is left to the user to include this effect if strictly realistic results are desired.
  * `-v`, `--verbosity=VERBOSITY`: Set the verbosity on the command line.

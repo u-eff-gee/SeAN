@@ -245,10 +245,8 @@ void Settings::write_output(unsigned int n_setting) const {
 
 void Settings::writeOptions(unsigned int n_setting) const{
 
-	stringstream filename;
-
 	ofstream ofile;
-	ofile.open(outputfile, std::ios_base::out | std::ios_base::app);
+	ofile.open(outputfile, std::ios_base::out);
 
         if(!ofile.is_open()){
                 cout << "Error: " << __FILE__ << ":" << __LINE__ << ": "; 
@@ -261,8 +259,6 @@ void Settings::writeOptions(unsigned int n_setting) const{
 }
 
 void Settings::writeExperiment() const{
-
-	stringstream filename; 
 
 	ofstream ofile;
 	ofile.open(outputfile, std::ios_base::out | std::ios_base::app);
@@ -278,8 +274,6 @@ void Settings::writeExperiment() const{
 }
 
 void Settings::writeTarget(unsigned int i) const{
-
-	stringstream filename; 
 
 	ofstream ofile;
 	ofile.open(outputfile, std::ios_base::out | std::ios_base::app);
