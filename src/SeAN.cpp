@@ -81,7 +81,12 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
         	break;
     	default: return ARGP_ERR_UNKNOWN;
     	}
-    	return 0;https://stackoverflow.com/questions/15684052/how-do-i-operate-on-file-using-fstream-pointers
+    	return 0;
+}
+
+static struct argp argp = { options, parse_opt, args_doc, doc, 0, 0, 0 };
+
+
 int main(int argc, char* argv[]){
 
 	vector <Settings> settings;
