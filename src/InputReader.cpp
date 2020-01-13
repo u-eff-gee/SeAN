@@ -1100,6 +1100,7 @@ void InputReader::readMassAttenuation(istringstream &stream, vector<Settings> &s
 			
 		for(unsigned int i = 0; i < n_settings; ++i){
 			settings[i].mAttFile.push_back(regex_replace(value_string, regex("\\s+"), ""));
+			settings[i].mAttParams.push_back(vector<double>());
 		}
 	} else{
 
@@ -1107,13 +1108,12 @@ void InputReader::readMassAttenuation(istringstream &stream, vector<Settings> &s
 			flag = readDoubles(values, value_string);
 
 			if(flag == 0){
-				n_settings = settings.size();
 				for(unsigned int i = 0; i < n_settings; ++i){
 					settings[i].mAttParams[ntarget].push_back(values[0]);
+					settings[i].mAttFile.push_back("");
 				}
 			}
 			if(flag == 1){
-				n_settings = settings.size();
 				for(unsigned int i = 0; i < values.size(); ++i){
 					if(i > 0){
 						for(unsigned int j = 0; j < n_settings; ++j){
@@ -1124,20 +1124,20 @@ void InputReader::readMassAttenuation(istringstream &stream, vector<Settings> &s
 				for(unsigned int i = 0; i < values.size(); ++i){
 					for(unsigned int j = 0; j < n_settings; ++j){
 						settings[i*n_settings + j].mAttParams[ntarget].push_back(values[i]);
+						settings[i*n_settings + j].mAttFile.push_back("");
 					}
 				}
 			}
 			if(flag == 2){
-				n_values = values.size();
-
 				if(n_settings == 1){
-					for(unsigned int i = 0; i < n_values - 1; ++i){
+					for(unsigned int i = 0; i < values.size() - 1; ++i){
 						settings.push_back(settings[0]);
 					}
 				}
 
-				for(unsigned int i = 0; i < n_values; ++i){
+				for(unsigned int i = 0; i < values.size(); ++i){
 					settings[i].mAttParams[ntarget].push_back(values[i]);
+					settings[i].mAttFile.push_back("");
 				}
 			}
 
