@@ -233,9 +233,9 @@ void Settings::printTarget(unsigned int i){
 	cout << target_string(i);
 }
 
-void Settings::write_output(unsigned int n_setting) const {
+void Settings::write_output() const {
 
-	writeOptions(n_setting);
+	writeOptions();
 	writeExperiment();
 	unsigned int ntargets = (unsigned int) targetNames.size();
 	for(unsigned int i = 0; i < ntargets; ++i)
@@ -243,7 +243,7 @@ void Settings::write_output(unsigned int n_setting) const {
 
 }
 
-void Settings::writeOptions(unsigned int n_setting) const{
+void Settings::writeOptions() const{
 
 	ofstream ofile;
 	ofile.open(outputfile, std::ios_base::out);

@@ -155,7 +155,7 @@ void InputReader::readFile(vector<Settings> &settings){
 
 			// Read J0
 			case 4:
-				readJ0(stream, settings, ntarget);
+				readJ0(stream, settings);
 				++nline;
 				break;
 				
@@ -739,7 +739,7 @@ void InputReader::readGamma(istringstream &stream, vector<Settings> &settings, u
 }
 
 
-void InputReader::readJ0(istringstream &stream, vector<Settings> &settings, unsigned int ntarget){
+void InputReader::readJ0(istringstream &stream, vector<Settings> &settings){
 
 	vector<double> values;
 	string value_string = "";
@@ -1064,7 +1064,6 @@ void InputReader::readMassAttenuation(istringstream &stream, vector<Settings> &s
 	string value_string = "";
 	int flag = 0;
 	long unsigned int n_settings = settings.size();
-	long unsigned int n_values = 0;
 	bool file = false;
 
 	// Read velocity distribution model

@@ -80,10 +80,10 @@ void Experiment::transmission(){
 		// The incident beam on the first target is user-defined, the rest is determined by the transmission of the previous target
 		if(i == 0){
 			targets[0].calculateIncidentBeam(energy_bins);
-			targets[0].calculateTransmission(energy_bins);
+			targets[0].calculateTransmission();
 		} else{
 			targets[i].calculateIncidentBeam(targets[i-1].getPhotonFluxDensity());
-			targets[i].calculateTransmission(energy_bins);
+			targets[i].calculateTransmission();
 		}
 	}
 }
@@ -95,8 +95,7 @@ void Experiment::resonant_scattering(){
 	for(unsigned int i = 0; i < ntargets; ++i){
 		targets[i].calculateResonantScattering(energy_bins);
 		if(settings.uncertainty){
-			targets[i].calculateTransmission(energy_bins,
-					targets[i].get_ana_num_ratio());
+			targets[i].calculateTransmission(targets[i].get_ana_num_ratio());
 			targets[i].calculateResonantScattering(energy_bins);
 		}
 	}

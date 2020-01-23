@@ -49,7 +49,7 @@ void CrossSection::breit_wigner(const vector<double> &energy_bins, vector<vector
 	}
 }
 
-void CrossSection::calculateVelocityBins(const vector<double> &energy_bins, vector< vector<double> > &velocity_distribution_bins, vector<double> &energy_boosted, unsigned int target_number){
+void CrossSection::calculateVelocityBins(const vector<double> &energy_bins, vector< vector<double> > &velocity_distribution_bins, vector<double> &energy_boosted){
 
 	// SeAN uses non-equidistant velocity bins. Here, velocity_bins[i] is the velocity that is needed to shift energy_bins[j] to energy_bins[i].
 	double energy_ratio = 1.;
@@ -66,7 +66,7 @@ void CrossSection::calculateVelocityBins(const vector<double> &energy_bins, vect
 	}
 }
 
-void CrossSection::absolute_zero(const vector< vector<double> > velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, const unsigned int target_number){
+void CrossSection::absolute_zero(const vector< vector<double> > velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram){
 	// At absolute zero (in the classical sense), the nucleus is completely at rest.
 	// I.e., the velocity distribution represents a Dirac delta function.
 	// Find the velocity distribution bin that corresponds to zero, and fill only that histogram bin.
@@ -127,7 +127,7 @@ void CrossSection::maxwell_boltzmann_debye(const vector< vector<double> > &veloc
 	}
 }
 
-void CrossSection::arbitrary_velocity_distribution(const vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, const vector<double> &velocity_bins_file, const vector<double> &velocity_distribution_file, const vector<double> &energy_boosted, const unsigned int target_number){
+void CrossSection::arbitrary_velocity_distribution(const vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, const vector<double> &velocity_bins_file, const vector<double> &velocity_distribution_file){
 	// Interpolate data from file	
 	ROOT::Math::Interpolator inter((unsigned int) velocity_bins_file.size(), ROOT::Math::Interpolation::kCSPLINE);
 	inter.SetData((unsigned int) velocity_bins_file.size(), &velocity_bins_file[0], &velocity_distribution_file[0]);
@@ -152,7 +152,7 @@ void CrossSection::arbitrary_cross_section(const vector<double> &energy_bins, ve
 	}
 }
 
-void CrossSection::integration_input(const vector< vector<double> > &crosssection_histogram, const vector< vector<double> > &vdist_bins){
+void CrossSection::integration_input(const vector< vector<double> > &crosssection_histogram){
 	// Zero-pad the cross section array with nbins_e bins on both sides, to get an array of size 3*nbins_e. This is necessary, because the integration works by shifting the two arrays against each other.
 	for(unsigned int i = 0; i < crosssection_histogram.size(); ++i){
 		pconv_crosssection_histogram.push_back(vector<double>(3*settings.nbins_e, 0.));
@@ -163,7 +163,7 @@ void CrossSection::integration_input(const vector< vector<double> > &crosssectio
 	}
 }
 
-void CrossSection::dopplershift(const vector<double> &energy_bins, vector<double> &crosssection_histogram, vector< vector <double> > &crosssection_bins, vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, vector<double> &vdist_norm, vector<double> &energy_boosted){
+void CrossSection::dopplershift(const vector<double> &energy_bins, vector<double> &crosssection_histogram, vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, vector<double> &energy_boosted){
 
 	// Integrate using trapezoidal rule
 	
@@ -216,7 +216,7 @@ void CrossSection::fft_input(const vector<double> &energy_bins, vector< vector<d
 	}
 }
 
-void CrossSection::dopplershiftFFT(const vector<double> &energy_bins, vector<double> &crosssection_histogram, vector< vector <double> > &crosssection_at_rest_histogram, vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, vector<double> &vdist_norm, vector<unsigned int> &vdist_centroid){
+void CrossSection::dopplershiftFFT(vector<double> &crosssection_histogram, vector< vector <double> > &crosssection_at_rest_histogram, vector<double> &vdist_norm, vector<unsigned int> &vdist_centroid){
 
 	fftw_plan vdist_plan, crosssection_plan, product_fft_plan;
 	vector<fftw_complex> vdist_fft(settings.nbins_e/2 + 1);

@@ -121,9 +121,8 @@ public:
 	void calculateCrossSection(const vector<double> &energy_bins);
 	void calculateIncidentBeam(const vector<double> &energy_bins);
 	void calculateIncidentBeam(const vector<vector<double> > &photon_flux_density_histogram);
-	void calculateTransmission(const vector<double> energy_bins);
-	void calculateTransmission(const vector<double> energy_bins,
-			const double cs_enhancement_factor);
+	void calculateTransmission();
+	void calculateTransmission(const double cs_enhancement_factor);
 	void calculateResonantScattering(const vector<double> energy_bins);
 
 	// Function to print information to the command line

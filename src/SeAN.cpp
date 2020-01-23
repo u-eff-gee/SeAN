@@ -48,7 +48,7 @@ static struct argp_option options[] = {
   { "uncertainty", 'u', 0, 0, "Estimate the uncertainty of the numerical evaluations (default: false). Note that this causes SeAN to perform more calculations.", 0 },
   { "verbosity", 'v', "VERBOSITY", 0, "Set command line verbosity (0 = print nothing, 1 = print results, 2 [default] = print input and results)", 0 },
   { "write", 'w', 0, 0, "Write text output files for all calculated quantities except cross sections at rest and 2D functions (default: false).", 0 },
-  { "write_all", 'W', 0, 0, "Write text output files for all calculated quantities (default: false). Overrides the '-w' option."},
+  { "write_all", 'W', 0, 0, "Write text output files for all calculated quantities (default: false). Overrides the '-w' option.", 0 },
   { 0, 0, 0, 0, 0, 0 }
 };
 
@@ -122,7 +122,7 @@ int main(int argc, char* argv[]){
 		}
 
 		if(settings[0].output){
-			settings[i].write_output(i);
+			settings[i].write_output();
 			experiment.write_results(settings[0].outputfile, i);
 		}
 	}
