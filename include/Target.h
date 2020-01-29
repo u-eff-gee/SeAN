@@ -119,6 +119,7 @@ public:
 		void calculateVelocityDistribution(const vector<double> &energy_bins);
 		void calculateMassAttenuation(const vector<double> &energy_bins);
 	void calculateCrossSection(const vector<double> &energy_bins);
+	void calculateCrossSectionDirectly(const vector<double> &energy_bins);
 	void calculateIncidentBeam(const vector<double> &energy_bins);
 	void calculateIncidentBeam(const vector<vector<double> > &photon_flux_density_histogram);
 	void calculateTransmission(const vector<double> energy_bins);

@@ -54,8 +54,21 @@ string Settings::option_string() const {
 		opss << "FILE:\tnot set\n" ;
 	}
 	opss << "COMMAND LINE OPTIONS: \n" ;
-	opss << "\tEXACT:\t" << exact << "\n";
-	opss << "\tPLOT :\t" << plot << "\n";
+	if(direct){
+		opss << "\tDIRECT:\t" << "true" << "\n";
+	} else{
+		opss << "\tDIRECT:\t" << "false" << "\n";
+	}
+	if(exact){
+		opss << "\tEXACT:\t" << "true" << "\n";
+	} else{
+		opss << "\tEXACT:\t" << "false" << "\n";
+	}
+	if(plot){
+		opss << "\tPLOT:\t" << "true" << "\n";
+	} else{
+		opss << "\tPLOT:\t" << "false" << "\n";
+	}
 	if(multi){
 		opss << "\tMULTI:\t" << "true\n" ;
 	}

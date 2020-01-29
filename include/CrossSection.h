@@ -51,24 +51,24 @@ public:
 	~CrossSection(){};
 
 	// Cross section at rest calculators
-	void breit_wigner(const vector<double> &energy_bins, vector< vector<double> > (&crosssection_at_rest_histogram), const vector<double> &energy_boosted, const unsigned int target_number);
+	void breit_wigner(const vector<double> &energy_bins, vector<double> &crosssection_at_rest_histogram, const vector<double> &energy_boosted, const unsigned int target_number, const unsigned int resonance_number);
 
 	// Velocity distribution calculators
 	// Calculator for the velocity bins that correspond to the energy bins
-	void calculateVelocityBins(const vector<double> &energy_bins, vector< vector<double> > &velocity_distribution_bins, vector<double> &energy_boosted, unsigned int target_number);
+	void calculateVelocityBins(const vector<double> &energy_bins, vector<double> &velocity_distribution_bins, vector<double> &energy_boosted, const unsigned int target_number, const unsigned int resonance_number);
 
-	void absolute_zero(const vector< vector<double> > velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, const unsigned int target_number);
+	void absolute_zero(const vector<double> velocity_distribution_bins, vector<double> &velocity_distribution_histogram, const unsigned int target_number, const unsigned int resonance_number);
 
-	void maxwell_boltzmann(const vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, const unsigned int target_number);
+	void maxwell_boltzmann(const vector<double> &velocity_distribution_bins, vector<double> &velocity_distribution_histogram, const unsigned int target_number);
 
-	void maxwell_boltzmann_approximation(const vector<double> &energy_bins, vector<double> &crosssection_histogram, const vector<double> &energy_boosted, const unsigned int target_number);
-	void maxwell_boltzmann_approximation_debye(const vector<double> &energy_bins, vector<double> &crosssection_histogram, const vector<double> &energy_boosted, const unsigned int target_number);
+	void maxwell_boltzmann_approximation(const vector<double> &energy_bins, vector<double> &crosssection_histogram, const vector<double> &energy_boosted, const unsigned int target_number, const unsigned int resonance_number);
+	void maxwell_boltzmann_approximation_debye(const vector<double> &energy_bins, vector<double> &crosssection_histogram, const vector<double> &energy_boosted, const unsigned int target_number, const unsigned int resonance_number);
 	const double APPROXIMATION_LIMIT = 0.1;
 
 	double tEff(const double t, const double tD);
-	void maxwell_boltzmann_debye(const vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, const unsigned int target_number);
+	void maxwell_boltzmann_debye(const vector<double> &velocity_distribution_bins, vector<double> &velocity_distribution_histogram, const unsigned int target_number);
 
-	void arbitrary_velocity_distribution(const vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, const vector<double> &velocity_bins_file, const vector<double> &velocity_distribution_file, const vector<double> &energy_boosted, const unsigned int target_number);
+	void arbitrary_velocity_distribution(const vector<double> &velocity_distribution_bins, vector<double> &velocity_distribution_histogram, const vector<double> &velocity_bins_file, const vector<double> &velocity_distribution_file);
 
 	// Cross section calculators
 	// Using FFT
@@ -82,7 +82,7 @@ public:
 	void dopplershift(const vector<double> &energy_bins, vector<double> &crosssection_histogram, vector< vector <double> > &crosssection_bins, vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, vector<double> &vdist_norm, vector<double> &energy_boosted);
 
 	// Special cases
-	void no_dopplershift(const vector< vector<double> > &crosssection_at_rest_histogram, vector<double> &crosssection_histogram);
+	void no_dopplershift(const vector<double> &crosssection_at_rest_histogram, vector<double> &crosssection_histogram);
 
 	void arbitrary_cross_section(const vector<double> &energy_bins, vector<double> &crosssection_histogram, const vector<double> &energy_bins_file, const vector<double> &cross_section_file);
 

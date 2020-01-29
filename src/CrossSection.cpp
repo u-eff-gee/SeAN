@@ -38,67 +38,55 @@ using std::max;
 using std::max_element;
 using std::upper_bound;
 
-void CrossSection::breit_wigner(const vector<double> &energy_bins, vector<vector<double> > &crosssection_at_rest_bins, const vector<double> &energy_boosted, const unsigned int target_number){
+void CrossSection::breit_wigner(const vector<double> &energy_bins, vector<double> &crosssection_at_rest_bins, const vector<double> &energy_boosted, const unsigned int target_number, const unsigned int resonance_number){
 
-	for(unsigned int i = 0; i < energy_boosted.size(); ++i){
-		double cs_max = PI*0.5*HBARC2/(energy_boosted[i]*energy_boosted[i])*(2.*settings.jj[target_number][i] + 1.)/(2.*settings.ji[target_number] + 1.)*settings.gamma0[target_number][i]*settings.gamma[target_number][i];
-		
-		for(unsigned int j = 0; j < settings.nbins_e; ++j){
-			crosssection_at_rest_bins[i][j] += cs_max / ((energy_bins[j] - energy_boosted[i])*(energy_bins[j] - energy_boosted[i]) + 0.25*settings.gamma[target_number][i]*settings.gamma[target_number][i]);
-		}
+	double cs_max = PI*0.5*HBARC2/(energy_boosted[resonance_number]*energy_boosted[resonance_number])*(2.*settings.jj[target_number][resonance_number] + 1.)/(2.*settings.ji[target_number] + 1.)*settings.gamma0[target_number][resonance_number]*settings.gamma[target_number][resonance_number];
+	
+	for(unsigned int i = 0; i < settings.nbins_e; ++i){
+		crosssection_at_rest_bins[i] += cs_max / ((energy_bins[i] - energy_boosted[resonance_number])*(energy_bins[i] - energy_boosted[resonance_number]) + 0.25*settings.gamma[target_number][resonance_number]*settings.gamma[target_number][resonance_number]);
 	}
 }
 
-void CrossSection::calculateVelocityBins(const vector<double> &energy_bins, vector< vector<double> > &velocity_distribution_bins, vector<double> &energy_boosted, unsigned int target_number){
+void CrossSection::calculateVelocityBins(const vector<double> &energy_bins, vector<double> &velocity_distribution_bins, vector<double> &energy_boosted, const unsigned int target_number, const unsigned int resonance_number){
 
 	// SeAN uses non-equidistant velocity bins. Here, velocity_bins[i] is the velocity that is needed to shift energy_bins[j] to energy_bins[i].
 	double energy_ratio = 1.;
 
-	// Find bin of resonance energy
-//	long int resonance_position = upper_bound(energy_bins, energy_bins + NBINS, e0) - energy_bins;
-//	double resonance_energy = energy_bins[resonance_position];
-
-	for(unsigned int i = 0; i < energy_boosted.size(); ++i){
-		for(unsigned int j = 0; j < settings.nbins_e; ++j){
-			energy_ratio = energy_bins[j]/energy_boosted[i];
-			velocity_distribution_bins[i][j] = (1. - energy_ratio*energy_ratio)/(1. + energy_ratio*energy_ratio);
-		}
+	for(unsigned int i = 0; i < settings.nbins_e; ++i){
+		energy_ratio = energy_bins[i]/energy_boosted[resonance_number];
+		velocity_distribution_bins[i] = (1. - energy_ratio*energy_ratio)/(1. + energy_ratio*energy_ratio);
 	}
 }
 
-void CrossSection::absolute_zero(const vector< vector<double> > velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, const unsigned int target_number){
+void CrossSection::absolute_zero(const vector<double> velocity_distribution_bins, vector<double> &velocity_distribution_histogram, const unsigned int target_number, const unsigned int resonance_number){
 	// At absolute zero (in the classical sense), the nucleus is completely at rest.
 	// I.e., the velocity distribution represents a Dirac delta function.
 	// Find the velocity distribution bin that corresponds to zero, and fill only that histogram bin.
-	
+
 	// Inefficient search algorithm! Use std::algorithm::upper_bound or similar algorithm!
 
 	unsigned int zero_bin = (unsigned int) settings.nbins_e/2;
 	double absolute_value = 0.;
 
-	for(unsigned int i = 0; i < velocity_distribution_bins.size(); ++i){
-		absolute_value = fabs(velocity_distribution_bins[i][0]);
+		absolute_value = fabs(velocity_distribution_bins[0]);
 		zero_bin = 0;
-		for(unsigned int j = 0; j < velocity_distribution_bins[i].size(); ++j){
-			if(fabs(velocity_distribution_bins[i][j]) < absolute_value){
-				absolute_value = fabs(velocity_distribution_bins[i][j]);
-				zero_bin = j;
+		for(unsigned int i = 0; i < velocity_distribution_bins.size(); ++i){
+			if(fabs(velocity_distribution_bins[i]) < absolute_value){
+				absolute_value = fabs(velocity_distribution_bins[i]);
+				zero_bin = i;
 			}
 		}
 
-		velocity_distribution_histogram[i][zero_bin] = 1./fabs(velocity_distribution_bins[i][zero_bin + 1] - velocity_distribution_bins[i][zero_bin]);
-	}
+		velocity_distribution_histogram[zero_bin] = 1./fabs(velocity_distribution_bins[zero_bin + 1] - velocity_distribution_bins[zero_bin]);
 }
 
-void CrossSection::maxwell_boltzmann(const vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, const unsigned int target_number){
+void CrossSection::maxwell_boltzmann(const vector<double> &velocity_distribution_bins, vector<double> &velocity_distribution_histogram, const unsigned int target_number){
 
 	double c1 = sqrt(settings.mass[target_number]*AtomicMassUnit/(2*PI*kB*settings.dopplerParams[target_number][0]));
-      	double c2 = -1./pow(delta(settings.dopplerParams[target_number][0], settings.mass[target_number]), 2);
+    double c2 = -1./pow(delta(settings.dopplerParams[target_number][0], settings.mass[target_number]), 2);
 
-      	for(unsigned int i = 0; i < velocity_distribution_bins.size(); ++i){
-		for(unsigned int j = 0; j < settings.nbins_e; ++j){
-			velocity_distribution_histogram[i][j] = c1*exp(c2*velocity_distribution_bins[i][j]*velocity_distribution_bins[i][j]);
-		}
+	for(unsigned int i = 0; i < settings.nbins_e; ++i){
+		velocity_distribution_histogram[i] = c1*exp(c2*velocity_distribution_bins[i]*velocity_distribution_bins[i]);
 	}
 }
 
@@ -112,31 +100,27 @@ double CrossSection::tEff(const double t, const double tD){
 	return 3.*pow(t, 4)/pow(tD, 3)*ig.Integral(0, tD/t);
 }
 
-void CrossSection::maxwell_boltzmann_debye(const vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, const unsigned int target_number){
+void CrossSection::maxwell_boltzmann_debye(const vector<double> &velocity_distribution_bins, vector<double> &velocity_distribution_histogram, const unsigned int target_number){
 
-// Calculate effective temperature in debye approximation
+	// Calculate effective temperature in debye approximation
 	double teff = tEff(settings.dopplerParams[target_number][0], settings.dopplerParams[target_number][1]);
 
 	double c1 = sqrt(settings.mass[target_number]*AtomicMassUnit/(2*PI*kB*teff));
-      	double c2 = -1./pow(delta(teff, settings.mass[target_number]), 2);
+    double c2 = -1./pow(delta(teff, settings.mass[target_number]), 2);
 
-      	for(unsigned int i = 0; i < velocity_distribution_bins.size(); ++i){
-		for(unsigned int j = 0; j < settings.nbins_e; ++j){
-			velocity_distribution_histogram[i][j] = c1*exp(c2*velocity_distribution_bins[i][j]*velocity_distribution_bins[i][j]);
-		}
+	for(unsigned int i = 0; i < settings.nbins_e; ++i){
+		velocity_distribution_histogram[i] = c1*exp(c2*velocity_distribution_bins[i]*velocity_distribution_bins[i]);
 	}
 }
 
-void CrossSection::arbitrary_velocity_distribution(const vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, const vector<double> &velocity_bins_file, const vector<double> &velocity_distribution_file, const vector<double> &energy_boosted, const unsigned int target_number){
+void CrossSection::arbitrary_velocity_distribution(const vector<double> &velocity_distribution_bins, vector<double> &velocity_distribution_histogram, const vector<double> &velocity_bins_file, const vector<double> &velocity_distribution_file){
 	// Interpolate data from file	
 	ROOT::Math::Interpolator inter((unsigned int) velocity_bins_file.size(), ROOT::Math::Interpolation::kCSPLINE);
 	inter.SetData((unsigned int) velocity_bins_file.size(), &velocity_bins_file[0], &velocity_distribution_file[0]);
 
 	// Evaluate at the given velocity bins
-	for(unsigned int i = 0; i < velocity_distribution_bins.size(); ++i){
-		for(unsigned int j = 0; j < settings.nbins_e; ++j){
-			velocity_distribution_histogram[i][j] = inter.Eval(velocity_distribution_bins[i][j]);		
-		}
+	for(unsigned int i = 0; i < settings.nbins_e; ++i){
+		velocity_distribution_histogram[i] = inter.Eval(velocity_distribution_bins[i]);		
 	}
 }
 
@@ -185,13 +169,10 @@ void CrossSection::dopplershift(const vector<double> &energy_bins, vector<double
 	}
 }
 
-void CrossSection::no_dopplershift(const vector< vector<double> > &crosssection_at_rest_histogram, vector<double> &crosssection_histogram){
+void CrossSection::no_dopplershift(const vector<double> &crosssection_at_rest_histogram, vector<double> &crosssection_histogram){
 
-	// Simply sum up the cross sections of the single resonances without changing their shape
-	for(unsigned int i = 0; i < crosssection_at_rest_histogram.size(); ++i){
-		for(unsigned int j = 0; j < crosssection_at_rest_histogram[i].size(); ++j){
-			crosssection_histogram[j] += crosssection_at_rest_histogram[i][j];
-		}
+	for(unsigned int j = 0; j < crosssection_at_rest_histogram.size(); ++j){
+		crosssection_histogram[j] += crosssection_at_rest_histogram[j];
 	}
 }
 
@@ -257,52 +238,48 @@ void CrossSection::dopplershiftFFT(const vector<double> &energy_bins, vector<dou
 	}
 }
 
-void CrossSection::maxwell_boltzmann_approximation(const vector<double> &energy_bins, vector<double> &crosssection_histogram, const vector<double> &energy_boosted, const unsigned int target_number){
+void CrossSection::maxwell_boltzmann_approximation(const vector<double> &energy_bins, vector<double> &crosssection_histogram, const vector<double> &energy_boosted, const unsigned int target_number, const unsigned int resonance_number){
 
- // Calculate doppler-shifted cross section directly
-	for(unsigned int i = 0; i < energy_boosted.size(); ++i){
-		double doppler_width = sqrt(2.*kB*settings.dopplerParams[target_number][0]/(settings.mass[target_number]*AtomicMassUnit))*energy_boosted[i];
+	// Calculate doppler-shifted cross section directly
+		double doppler_width = sqrt(2.*kB*settings.dopplerParams[target_number][0]/(settings.mass[target_number]*AtomicMassUnit))*energy_boosted[resonance_number];
 
-		if(settings.gamma[target_number][i]/doppler_width > APPROXIMATION_LIMIT){
+		if(settings.gamma[target_number][resonance_number]/doppler_width > APPROXIMATION_LIMIT){
 			cout << "Warning: " << __FILE__ << ":" << __LINE__ << ": "; 
-			cout << "maxwell_boltzmann_approximation(): Gamma/Delta = " << settings.gamma[target_number][i]/doppler_width << " > " << APPROXIMATION_LIMIT << ", the approximation of the doppler-shifted cross section may not be good." << endl;
-			cout << "\tE0 = " << energy_boosted[i] << " eV" << endl;
-			cout << "\tGAMMA = " << settings.gamma[target_number][i] << " eV" << endl;
+			cout << "maxwell_boltzmann_approximation(): Gamma/Delta = " << settings.gamma[target_number][resonance_number]/doppler_width << " > " << APPROXIMATION_LIMIT << ", the approximation of the doppler-shifted cross section may not be good." << endl;
+			cout << "\tE0 = " << energy_boosted[resonance_number] << " eV" << endl;
+			cout << "\tGAMMA = " << settings.gamma[target_number][resonance_number] << " eV" << endl;
 			cout << "\tMASS = " << settings.mass[target_number] << " u" << endl;
 			cout << "\tTEFF= " << settings.dopplerParams[target_number][0] << " K" << endl;
 		}
 
-		double cs_max = 2.*PI*HBARC2/(energy_boosted[i]*energy_boosted[i])*(2.*settings.jj[target_number][i] + 1.)/(2. * settings.ji[target_number] + 1.)*settings.gamma0[target_number][i]/settings.gamma[target_number][i]*sqrt(PI)/(2.*doppler_width/settings.gamma[target_number][i]);
+		double cs_max = 2.*PI*HBARC2/(energy_boosted[resonance_number]*energy_boosted[resonance_number])*(2.*settings.jj[target_number][resonance_number] + 1.)/(2. * settings.ji[target_number] + 1.)*settings.gamma0[target_number][resonance_number]/settings.gamma[target_number][resonance_number]*sqrt(PI)/(2.*doppler_width/settings.gamma[target_number][resonance_number]);
 		
-		for(unsigned int j = 0; j < settings.nbins_e; ++j){
-			crosssection_histogram[j] += cs_max*exp(-(energy_bins[j] - energy_boosted[i])*(energy_bins[j] - energy_boosted[i])/(doppler_width*doppler_width));
+		for(unsigned int i = 0; i < settings.nbins_e; ++i){
+			crosssection_histogram[i] += cs_max*exp(-(energy_bins[i] - energy_boosted[resonance_number])*(energy_bins[i] - energy_boosted[resonance_number])/(doppler_width*doppler_width));
 		}
-	}
 }
 
-void CrossSection::maxwell_boltzmann_approximation_debye(const vector<double> &energy_bins, vector<double> &crosssection_histogram, const vector<double> &energy_boosted, const unsigned int target_number){
+void CrossSection::maxwell_boltzmann_approximation_debye(const vector<double> &energy_bins, vector<double> &crosssection_histogram, const vector<double> &energy_boosted, const unsigned int target_number, const unsigned int resonance_number){
 
-// Calculate effective temperature in debye approximation
+	// Calculate effective temperature in debye approximation
 	double teff = tEff(settings.dopplerParams[target_number][0], settings.dopplerParams[target_number][1]);
 
- // Calculate doppler-shifted cross section directly
-	for(unsigned int i = 0; i < energy_boosted.size(); ++i){
-		double doppler_width = sqrt(2.*kB*teff/(settings.mass[target_number]*AtomicMassUnit))*energy_boosted[i];
+ 	// Calculate doppler-shifted cross section directly
+	double doppler_width = sqrt(2.*kB*teff/(settings.mass[target_number]*AtomicMassUnit))*energy_boosted[resonance_number];
 
-		if(settings.gamma[target_number][i]/doppler_width > APPROXIMATION_LIMIT){
-			cout << "Warning: " << __FILE__ << ":" << __LINE__ << ": "; 
-			cout << "maxwell_boltzmann_approximation(): Gamma/Delta = " << settings.gamma[target_number][i]/doppler_width << " > " << APPROXIMATION_LIMIT << ", the approximation of the doppler-shifted cross section may not be good." << endl;
-			cout << "\tE0 = " << energy_boosted[i] << " eV" << endl;
-			cout << "\tGAMMA = " << settings.gamma[target_number][i] << " eV" << endl;
-			cout << "\tMASS = " << settings.mass[target_number] << " u" << endl;
-			cout << "\tTEFF= " << teff << " K" << endl;
-		}
+	if(settings.gamma[target_number][resonance_number]/doppler_width > APPROXIMATION_LIMIT){
+		cout << "Warning: " << __FILE__ << ":" << __LINE__ << ": "; 
+		cout << "maxwell_boltzmann_approximation(): Gamma/Delta = " << settings.gamma[target_number][resonance_number]/doppler_width << " > " << APPROXIMATION_LIMIT << ", the approximation of the doppler-shifted cross section may not be good." << endl;
+		cout << "\tE0 = " << energy_boosted[resonance_number] << " eV" << endl;
+		cout << "\tGAMMA = " << settings.gamma[target_number][resonance_number] << " eV" << endl;
+		cout << "\tMASS = " << settings.mass[target_number] << " u" << endl;
+		cout << "\tTEFF= " << teff << " K" << endl;
+	}
 
-		double cs_max = 2.*PI*HBARC2/(energy_boosted[i]*energy_boosted[i])*(2.*settings.jj[target_number][i] + 1.)/(2. * settings.ji[target_number] + 1.)*settings.gamma0[target_number][i]/settings.gamma[target_number][i]*sqrt(PI)/(2.*doppler_width/settings.gamma[target_number][i]);
-		
-		for(unsigned int j = 0; j < settings.nbins_e; ++j){
-			crosssection_histogram[j] += cs_max*exp(-(energy_bins[j] - energy_boosted[i])*(energy_bins[j] - energy_boosted[i])/(doppler_width*doppler_width));
-		}
+	double cs_max = 2.*PI*HBARC2/(energy_boosted[resonance_number]*energy_boosted[resonance_number])*(2.*settings.jj[target_number][resonance_number] + 1.)/(2. * settings.ji[target_number] + 1.)*settings.gamma0[target_number][resonance_number]/settings.gamma[target_number][resonance_number]*sqrt(PI)/(2.*doppler_width/settings.gamma[target_number][resonance_number]);
+
+	for(unsigned int i = 0; i < settings.nbins_e; ++i){
+		crosssection_histogram[i] += cs_max*exp(-(energy_bins[i] - energy_boosted[resonance_number])*(energy_bins[i] - energy_boosted[resonance_number])/(doppler_width*doppler_width));
 	}
 }
 

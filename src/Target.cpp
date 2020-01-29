@@ -38,7 +38,11 @@ void Target::initialize(const vector<double> &energy_bins){
 	unsigned int nenergies = (unsigned int) settings.energy[target_number].size();
 
 	// Reserve space for the histograms
-	for(unsigned int i = 0; i < nenergies; ++i){
+	int n_crosssection_histograms = nenergies;
+	if(settings.direct)
+		n_crosssection_histograms = 1;
+
+	for(unsigned int i = 0; i < n_crosssection_histograms; ++i){
 		crosssection_at_rest_histogram.push_back(vector<double>(settings.nbins_e, 0.));
 		velocity_distribution_bins.push_back(vector<double>(settings.nbins_e, 0.));
 		velocity_distribution_histogram.push_back(vector<double>(settings.nbins_e, 0.));
@@ -63,10 +67,12 @@ void Target::initialize(const vector<double> &energy_bins){
 	boost_and_recoil();
 	// Calculate z bins
 	calculateZBins();
-	// Calculate cross section
-	calculateCrossSectionAtRest(energy_bins);
-	// Calculate velocity distribution
-	calculateVelocityDistribution(energy_bins);
+	if(!settings.direct){
+		// Calculate cross section
+		calculateCrossSectionAtRest(energy_bins);
+		// Calculate velocity distribution
+		calculateVelocityDistribution(energy_bins);
+	}
 	// Calculate mass attenuation
 	calculateMassAttenuation(energy_bins);
 
@@ -81,20 +87,27 @@ void Target::calculateCrossSection(const vector<double> &energy_bins){
 	// 4. Phonon density distribution
 	// separately, because it is possible to calculate the doppler-shifted cross section without the expensive double integral 
 	if(settings.dopplerBroadening[target_number] == dopplerModel::zero){
-		crossSection.no_dopplershift(crosssection_at_rest_histogram, crosssection_histogram);
+		for(unsigned int i = 0; i < crosssection_at_rest_histogram.size(); ++i){
+			crossSection.no_dopplershift(crosssection_at_rest_histogram[i], crosssection_histogram);
+		}
 	}
 
 	else if(settings.dopplerBroadening[target_number] == dopplerModel::mba){
-		crossSection.maxwell_boltzmann_approximation(energy_bins, crosssection_histogram, energy_boosted, target_number);
+		for(unsigned int i = 0; i < crosssection_at_rest_histogram.size(); ++i){
+			crossSection.maxwell_boltzmann_approximation(energy_bins, crosssection_histogram, energy_boosted, target_number, i);
+		}
 	}
 
 	else if(settings.dopplerBroadening[target_number] == dopplerModel::mbad){
-		crossSection.maxwell_boltzmann_approximation_debye(energy_bins, crosssection_histogram, energy_boosted, target_number);
+		for(unsigned int i = 0; i < crosssection_at_rest_histogram.size(); ++i){
+			crossSection.maxwell_boltzmann_approximation_debye(energy_bins, crosssection_histogram, energy_boosted, target_number, i);
+		}
 	}
 
 	else if(settings.dopplerBroadening[target_number] == dopplerModel::arb_cs){
 		crossSection.arbitrary_cross_section(energy_bins, crosssection_histogram, energy_bins_file, cross_section_file);
 	}
+
 	else if(settings.dopplerBroadening[target_number] == dopplerModel::phdos){
 		phononDensity.calculateCrossSection(energy_bins, energy_boosted, crosssection_histogram, omega_s_file, target_number);
 	}
@@ -109,6 +122,64 @@ void Target::calculateCrossSection(const vector<double> &energy_bins){
 
 	if(settings.uncertainty){
 		crossSection.check_crosssection_normalization(energy_bins, crosssection_histogram, energy_boosted, target_number, crosssection_integral_analytical, crosssection_integral_numerical, crosssection_integral_numerical_limits);
+	}
+}
+
+void Target::calculateCrossSectionDirectly(const vector<double> &energy_bins){
+	for(unsigned int i = 0; i < energy_boosted.size(); ++i){
+		
+		crossSection.breit_wigner(energy_bins, crosssection_at_rest_histogram[0], energy_boosted, target_number, i);
+		crossSection.calculateVelocityBins(energy_bins, velocity_distribution_bins[0], energy_boosted, target_number, i);
+
+		stringstream filename;
+
+		switch(settings.dopplerBroadening[target_number]){
+			case dopplerModel::zero:
+				crossSection.absolute_zero(velocity_distribution_bins[0], velocity_distribution_histogram[0], target_number, i);
+				crossSection.no_dopplershift(crosssection_at_rest_histogram[0], crosssection_histogram);
+				break;
+
+			case dopplerModel::mb:
+			case dopplerModel::mba:
+				crossSection.maxwell_boltzmann(velocity_distribution_bins[0], velocity_distribution_histogram[0], target_number);
+				crossSection.maxwell_boltzmann_approximation(energy_bins, crosssection_histogram, energy_boosted, target_number, i);
+				break;
+			case dopplerModel::mbad:
+				crossSection.maxwell_boltzmann(velocity_distribution_bins[0], velocity_distribution_histogram[0], target_number);
+				crossSection.maxwell_boltzmann_approximation_debye(energy_bins, crosssection_histogram, energy_boosted, target_number, i);
+				break;
+
+			case dopplerModel::mbd:
+				crossSection.maxwell_boltzmann_debye(velocity_distribution_bins[0], velocity_distribution_histogram[0], target_number);
+				// Calculate FFT
+				break;
+
+			case dopplerModel::arb_vdist:
+				filename << VELOCITY_DISTRIBUTION_DIR << settings.velocityBinFile[target_number];
+				inputReader.read1ColumnFile(velocity_bins_file, filename.str());
+
+				filename.str("");
+				filename.clear();
+				filename << VELOCITY_DISTRIBUTION_DIR << settings.vDistFile[target_number];
+				inputReader.read1ColumnFile(velocity_distribution_file, filename.str());
+
+				crossSection.arbitrary_velocity_distribution(velocity_distribution_bins[0], velocity_distribution_histogram[0], velocity_bins_file, velocity_distribution_file);
+				break;
+
+			case dopplerModel::arb_cs:
+				filename << CROSS_SECTION_DIR << settings.energyBinFile[target_number];
+				inputReader.read1ColumnFile(energy_bins_file, filename.str());
+
+				filename.str("");
+				filename.clear();
+				filename << CROSS_SECTION_DIR << settings.crosssectionFile[target_number];
+				inputReader.read1ColumnFile(cross_section_file, filename.str());
+				break;
+
+			case dopplerModel::phdos:
+				filename << PHONON_DIR << settings.omegaFile[target_number];
+				inputReader.read1ColumnFile(omega_s_file, filename.str());
+		}
 	}
 }
 
@@ -131,30 +202,40 @@ void Target::boost_and_recoil(){
 }
 
 void Target::calculateCrossSectionAtRest(const vector<double> &energy_bins){
-	crossSection.breit_wigner(energy_bins, crosssection_at_rest_histogram, energy_boosted, target_number);
+	for(unsigned int i = 0; i < energy_boosted.size(); ++i){
+		crossSection.breit_wigner(energy_bins, crosssection_at_rest_histogram[i], energy_boosted, target_number, i);
+	}
 }
 
 void Target::calculateVelocityDistribution(const vector<double> &energy_bins){
 
 	if(settings.dopplerBroadening[target_number] != dopplerModel::arb_cs){
-		crossSection.calculateVelocityBins(energy_bins, velocity_distribution_bins, energy_boosted, target_number);
+		for(unsigned int i = 0; i < energy_boosted.size(); ++i){
+			crossSection.calculateVelocityBins(energy_bins, velocity_distribution_bins[i], energy_boosted, target_number, i);
+		}
 	}
 
 	stringstream filename;
 
 	switch(settings.dopplerBroadening[target_number]){
 		case dopplerModel::zero:
-			crossSection.absolute_zero(velocity_distribution_bins, velocity_distribution_histogram, target_number);
+			for(unsigned int i = 0; i < velocity_distribution_bins.size(); ++i){
+				crossSection.absolute_zero(velocity_distribution_bins[i], velocity_distribution_histogram[i], target_number, i);
+			}
 			break;
 
 		case dopplerModel::mb:
 		case dopplerModel::mba:
 		case dopplerModel::mbad:
-			crossSection.maxwell_boltzmann(velocity_distribution_bins, velocity_distribution_histogram, target_number);
+			for(unsigned int i = 0; i < velocity_distribution_bins.size(); ++i){
+				crossSection.maxwell_boltzmann(velocity_distribution_bins[i], velocity_distribution_histogram[i], target_number);
+			}
 			break;
 
 		case dopplerModel::mbd:
-			crossSection.maxwell_boltzmann_debye(velocity_distribution_bins, velocity_distribution_histogram, target_number);
+			for(unsigned int i = 0; i < velocity_distribution_bins.size(); ++i){
+				crossSection.maxwell_boltzmann_debye(velocity_distribution_bins[i], velocity_distribution_histogram[i], target_number);
+			}
 			break;
 
 		case dopplerModel::arb_vdist:
@@ -165,8 +246,9 @@ void Target::calculateVelocityDistribution(const vector<double> &energy_bins){
 			filename.clear();
 			filename << VELOCITY_DISTRIBUTION_DIR << settings.vDistFile[target_number];
 			inputReader.read1ColumnFile(velocity_distribution_file, filename.str());
-
-			crossSection.arbitrary_velocity_distribution(velocity_distribution_bins, velocity_distribution_histogram, velocity_bins_file, velocity_distribution_file, energy_boosted, target_number);
+			for(unsigned int i = 0; i < velocity_distribution_bins.size(); ++i){
+				crossSection.arbitrary_velocity_distribution(velocity_distribution_bins[i], velocity_distribution_histogram[i], velocity_bins_file, velocity_distribution_file);
+			}
 			break;
 
 		case dopplerModel::arb_cs:
@@ -183,15 +265,15 @@ void Target::calculateVelocityDistribution(const vector<double> &energy_bins){
 			filename << PHONON_DIR << settings.omegaFile[target_number];
 			inputReader.read1ColumnFile(omega_s_file, filename.str());
 
-		//	filename.str("");
-		//	filename.clear();
-		//	filename << PHONON_DIR << settings.polarizationFile[target_number];
-		//	inputReader.read3ColumnFile(e_s_file, filename.str());
+			// filename.str("");
+			// filename.clear();
+			// filename << PHONON_DIR << settings.polarizationFile[target_number];
+			// inputReader.read3ColumnFile(e_s_file, filename.str());
 
-		//	filename.str("");
-		//	filename.clear();
-		//	filename << PHONON_DIR << settings.momentumFile[target_number];
-		//	inputReader.read3ColumnFile(p_file, filename.str());
+			// filename.str("");
+			// filename.clear();
+			// filename << PHONON_DIR << settings.momentumFile[target_number];
+			// inputReader.read3ColumnFile(p_file, filename.str());
 	}
 
 	vDistInfo();
