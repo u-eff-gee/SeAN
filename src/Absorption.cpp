@@ -31,7 +31,7 @@ using std::ifstream;
 using std::regex;
 using std::regex_replace;
 
-void Absorption::const_beam(const vector<double> &energy_bins, vector<double> &incident_beam_histogram){
+void Absorption::const_beam(vector<double> &incident_beam_histogram){
 
 	for(unsigned int i = 0; i < settings.nbins_e; ++i)
 		incident_beam_histogram[i] = settings.incidentBeamParams[0];	

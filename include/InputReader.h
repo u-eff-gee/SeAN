@@ -49,7 +49,7 @@ public:
 
 	void readGamma(istringstream &stream, vector<Settings> &settings, const unsigned int ntarget);
 
-	void readJ0(istringstream &stream, vector<Settings> &settings, const unsigned int ntarget);
+	void readJ0(istringstream &stream, vector<Settings> &settings);
 
 	void readJ(istringstream &stream, vector<Settings> &settings, const unsigned int ntarget);
 

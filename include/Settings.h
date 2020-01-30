@@ -111,8 +111,8 @@ struct Settings{
 	void printTarget(unsigned int i);
 
 	// Method to write settings to file
-	void write_output(unsigned int n_setting) const;
-	void writeOptions(unsigned int n_setting) const;
+	void write_output() const;
+	void writeOptions() const;
 	void writeExperiment() const;
 	void writeTarget(unsigned int i) const;
 };

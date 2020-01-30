@@ -45,7 +45,7 @@ public:
 	~Absorption(){};
 
 	// Incident beam calculators
-	void const_beam(const vector<double> &energy_bins, vector<double> &incident_beam_histogram);
+	void const_beam(vector<double> &incident_beam_histogram);
 
 	void gauss_beam(const vector<double> &energy_bins, vector<double> &incident_beam_histogram);
 

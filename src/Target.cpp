@@ -100,11 +100,11 @@ void Target::calculateCrossSection(const vector<double> &energy_bins){
 	}
 
 	else if(settings.exact){
-		crossSection.integration_input(crosssection_at_rest_histogram, velocity_distribution_histogram);
-		crossSection.dopplershift(energy_bins, crosssection_histogram, crosssection_at_rest_histogram, velocity_distribution_bins, velocity_distribution_histogram, vdist_norm, energy_boosted);
+		crossSection.integration_input(crosssection_at_rest_histogram);
+		crossSection.dopplershift(energy_bins, crosssection_histogram, velocity_distribution_bins, velocity_distribution_histogram, energy_boosted);
 	} else{
 		crossSection.fft_input(energy_bins, crosssection_at_rest_histogram, velocity_distribution_histogram, energy_boosted);
-		crossSection.dopplershiftFFT(energy_bins, crosssection_histogram, crosssection_at_rest_histogram, velocity_distribution_bins, velocity_distribution_histogram, vdist_norm, vdist_centroid);
+		crossSection.dopplershiftFFT(crosssection_histogram, crosssection_at_rest_histogram, vdist_norm, vdist_centroid);
 	}
 
 	if(settings.uncertainty){
@@ -137,14 +137,14 @@ void Target::calculateCrossSectionAtRest(const vector<double> &energy_bins){
 void Target::calculateVelocityDistribution(const vector<double> &energy_bins){
 
 	if(settings.dopplerBroadening[target_number] != dopplerModel::arb_cs){
-		crossSection.calculateVelocityBins(energy_bins, velocity_distribution_bins, energy_boosted, target_number);
+		crossSection.calculateVelocityBins(energy_bins, velocity_distribution_bins, energy_boosted);
 	}
 
 	stringstream filename;
 
 	switch(settings.dopplerBroadening[target_number]){
 		case dopplerModel::zero:
-			crossSection.absolute_zero(velocity_distribution_bins, velocity_distribution_histogram, target_number);
+			crossSection.absolute_zero(velocity_distribution_bins, velocity_distribution_histogram);
 			break;
 
 		case dopplerModel::mb:
@@ -166,7 +166,7 @@ void Target::calculateVelocityDistribution(const vector<double> &energy_bins){
 			filename << VELOCITY_DISTRIBUTION_DIR << settings.vDistFile[target_number];
 			inputReader.read1ColumnFile(velocity_distribution_file, filename.str());
 
-			crossSection.arbitrary_velocity_distribution(velocity_distribution_bins, velocity_distribution_histogram, velocity_bins_file, velocity_distribution_file, energy_boosted, target_number);
+			crossSection.arbitrary_velocity_distribution(velocity_distribution_bins, velocity_distribution_histogram, velocity_bins_file, velocity_distribution_file);
 			break;
 
 		case dopplerModel::arb_cs:
@@ -254,7 +254,7 @@ void Target::calculateIncidentBeam(const vector<double> &energy_bins){
 	
 	switch(settings.incidentBeam){
 		case incidentBeamModel::constant:
-			absorption.const_beam(energy_bins, incident_beam_histogram);
+			absorption.const_beam(incident_beam_histogram);
 			break;
 		case incidentBeamModel::gauss:
 			absorption.gauss_beam(energy_bins, incident_beam_histogram);
@@ -305,14 +305,14 @@ void Target::calculateMassAttenuation(const vector<double> &energy_bins){
 	}
 }
 
-void Target::calculateTransmission(const vector<double> energy_bins){
+void Target::calculateTransmission(){
 	
 	absorption.photon_flux_density(crosssection_histogram, mass_attenuation_histogram, z_bins, incident_beam_histogram, photon_flux_density_histogram);
 
 	absorption.resonance_absorption_density(crosssection_histogram, photon_flux_density_histogram, resonance_absorption_density_histogram);
 }
 
-void Target::calculateTransmission(const vector<double> energy_bins, const double cs_enhancement_factor){
+void Target::calculateTransmission(const double cs_enhancement_factor){
 	
 	absorption.photon_flux_density(crosssection_histogram, mass_attenuation_histogram, z_bins, incident_beam_histogram, photon_flux_density_histogram, cs_enhancement_factor);
 
