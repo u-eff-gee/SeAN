@@ -43,7 +43,7 @@ void CrossSection::breit_wigner(const vector<double> &energy_bins, vector<double
 	double cs_max = PI*0.5*HBARC2/(energy_boosted[resonance_number]*energy_boosted[resonance_number])*(2.*settings.jj[target_number][resonance_number] + 1.)/(2.*settings.ji[target_number] + 1.)*settings.gamma0[target_number][resonance_number]*settings.gamma[target_number][resonance_number];
 	
 	for(unsigned int i = 0; i < settings.nbins_e; ++i){
-		crosssection_at_rest_bins[i] += cs_max / ((energy_bins[i] - energy_boosted[resonance_number])*(energy_bins[i] - energy_boosted[resonance_number]) + 0.25*settings.gamma[target_number][resonance_number]*settings.gamma[target_number][resonance_number]);
+		crosssection_at_rest_bins[i] = cs_max / ((energy_bins[i] - energy_boosted[resonance_number])*(energy_bins[i] - energy_boosted[resonance_number]) + 0.25*settings.gamma[target_number][resonance_number]*settings.gamma[target_number][resonance_number]);
 	}
 }
 
