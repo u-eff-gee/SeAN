@@ -49,7 +49,7 @@ void CrossSection::breit_wigner(const vector<double> &energy_bins, vector<double
 
 void CrossSection::calculateVelocityBins(const vector<double> &energy_bins, vector<double> &velocity_distribution_bins, vector<double> &energy_boosted, const unsigned int target_number, const unsigned int resonance_number){
 
-	// SeAN uses non-equidistant velocity bins. Here, velocity_bins[i] is the velocity that is needed to shift energy_bins[j] to energy_bins[i].
+	// SeAN uses non-equidistant velocity bins. Here, velocity_bins[i] is the velocity that is needed to shift energy_bins[j] to energy_bins[i].maxwell_
 	double energy_ratio = 1.;
 
 	for(unsigned int i = 0; i < settings.nbins_e; ++i){
@@ -136,35 +136,31 @@ void CrossSection::arbitrary_cross_section(const vector<double> &energy_bins, ve
 	}
 }
 
-void CrossSection::integration_input(const vector< vector<double> > &crosssection_histogram, const vector< vector<double> > &vdist_bins){
+void CrossSection::integration_input(const vector<double> &crosssection_histogram){
 	// Zero-pad the cross section array with nbins_e bins on both sides, to get an array of size 3*nbins_e. This is necessary, because the integration works by shifting the two arrays against each other.
-	for(unsigned int i = 0; i < crosssection_histogram.size(); ++i){
-		pconv_crosssection_histogram.push_back(vector<double>(3*settings.nbins_e, 0.));
+		pconv_crosssection_histogram = vector<double>(3*settings.nbins_e, 0.);
 
 		for(unsigned int j = 0; j < settings.nbins_e; ++j){
-			pconv_crosssection_histogram[i][j + settings.nbins_e] = crosssection_histogram[i][j];
+			pconv_crosssection_histogram[j + settings.nbins_e] = crosssection_histogram[j];
 		}
-	}
 }
 
-void CrossSection::dopplershift(const vector<double> &energy_bins, vector<double> &crosssection_histogram, vector< vector <double> > &crosssection_bins, vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, vector<double> &vdist_norm, vector<double> &energy_boosted){
+void CrossSection::dopplershift(const vector<double> &energy_bins, vector<double> &crosssection_histogram, vector<double> &velocity_distribution_bins, vector<double> &velocity_distribution_histogram, vector<double> &energy_boosted, const unsigned int resonance_number){
 
 	// Integrate using trapezoidal rule
 	
 	double resonance_energy_squared = 1.;
 	
-	for(unsigned int n = 0; n < pconv_crosssection_histogram.size(); ++n){
-		long unsigned int resonance_position = (unsigned long int) (upper_bound(energy_bins.begin(), energy_bins.end(), energy_boosted[n]) - energy_bins.begin());
-		resonance_energy_squared = energy_boosted[n]*energy_boosted[n];
+	long unsigned int resonance_position = (unsigned long int) (upper_bound(energy_bins.begin(), energy_bins.end(), energy_boosted[resonance_number]) - energy_bins.begin());
+	resonance_energy_squared = energy_boosted[resonance_number]*energy_boosted[resonance_number];
 
-		#pragma omp parallel for
-		for(unsigned int i = 0; i < settings.nbins_e; ++i){
-			for(unsigned int j = 0; j < settings.nbins_e - 1; ++j){
-				crosssection_histogram[i] += 0.5*(
-						velocity_distribution_histogram[n][j]*pconv_crosssection_histogram[n][settings.nbins_e + i + resonance_position - j]*resonance_energy_squared/(energy_bins[j]*energy_bins[j]) 
-						+ velocity_distribution_histogram[n][j + 1]*pconv_crosssection_histogram[n][settings.nbins_e + i + resonance_position - (j + 1)]*resonance_energy_squared/(energy_bins[j + 1]*energy_bins[j + 1]))
-					*(velocity_distribution_bins[n][j] - velocity_distribution_bins[n][j + 1]); 
-			}
+	#pragma omp parallel for
+	for(unsigned int i = 0; i < settings.nbins_e; ++i){
+		for(unsigned int j = 0; j < settings.nbins_e - 1; ++j){
+			crosssection_histogram[i] += 0.5*(
+					velocity_distribution_histogram[j]*pconv_crosssection_histogram[settings.nbins_e + i + resonance_position - j]*resonance_energy_squared/(energy_bins[j]*energy_bins[j]) 
+					+ velocity_distribution_histogram[j + 1]*pconv_crosssection_histogram[settings.nbins_e + i + resonance_position - (j + 1)]*resonance_energy_squared/(energy_bins[j + 1]*energy_bins[j + 1]))
+				*(velocity_distribution_bins[j] - velocity_distribution_bins[j + 1]);
 		}
 	}
 }
@@ -176,7 +172,7 @@ void CrossSection::no_dopplershift(const vector<double> &crosssection_at_rest_hi
 	}
 }
 
-void CrossSection::fft_input(const vector<double> &energy_bins, vector< vector<double> > &crosssection_at_rest_histogram, vector< vector<double> > &velocity_distribution_histogram, vector<double> energy_boosted){
+void CrossSection::fft_input(const vector<double> &energy_bins, const vector<double> &crosssection_at_rest_histogram, const vector<double> &velocity_distribution_histogram, vector<double> energy_boosted, const unsigned int resonance_number){
 	// Preparatory work for the FFT convolution:
 	// Convert the velocity distribution w(v) to w(E)*dv/dE so that both the cross section and w depend on the energy and the integral can be calculated
 	// Multiply the infinitesimal integration interval dE to the cross section bin
@@ -184,20 +180,18 @@ void CrossSection::fft_input(const vector<double> &energy_bins, vector< vector<d
 	double de = energy_bins[1] - energy_bins[0];
 	double energy_ratio_squared = 1.;
 
-	for(unsigned int i = 0; i < energy_boosted.size(); ++i){
-		pconv_crosssection_histogram.push_back(vector<double>(settings.nbins_e, 0.));
-		pconv_velocity_distribution_histogram.push_back(vector<double>(settings.nbins_e, 0.));
+	pconv_crosssection_histogram = vector<double>(settings.nbins_e, 0.);
+	pconv_velocity_distribution_histogram = vector<double>(settings.nbins_e, 0.);
 
-		for(unsigned int j = 0; j < settings.nbins_e; ++j){
-			pconv_crosssection_histogram[i][j] = crosssection_at_rest_histogram[i][j]*de;
+	for(unsigned int j = 0; j < settings.nbins_e; ++j){
+		pconv_crosssection_histogram[j] = crosssection_at_rest_histogram[j]*de;
 
-			energy_ratio_squared = energy_bins[j]*energy_bins[j]/(energy_boosted[i]*energy_boosted[i]);	
-			pconv_velocity_distribution_histogram[i][j] = -velocity_distribution_histogram[i][j]*(-4.*energy_ratio_squared/energy_boosted[i])/((1. + energy_ratio_squared)*(1. + energy_ratio_squared));
-		}
+		energy_ratio_squared = energy_bins[j]*energy_bins[j]/(energy_boosted[resonance_number]*energy_boosted[resonance_number]);	
+		pconv_velocity_distribution_histogram[j] = -velocity_distribution_histogram[j]*(-4.*energy_ratio_squared/energy_boosted[resonance_number])/((1. + energy_ratio_squared)*(1. + energy_ratio_squared));
 	}
 }
 
-void CrossSection::dopplershiftFFT(const vector<double> &energy_bins, vector<double> &crosssection_histogram, vector< vector <double> > &crosssection_at_rest_histogram, vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, vector<double> &vdist_norm, vector<unsigned int> &vdist_centroid){
+void CrossSection::dopplershiftFFT(const vector<double> &energy_bins, vector<double> &crosssection_histogram, const vector <double> &crosssection_at_rest_histogram, const vector<double> &velocity_distribution_bins, const vector<double> &velocity_distribution_histogram, const double vdist_norm, const unsigned int vdist_centroid, const unsigned int resonance_number){
 
 	fftw_plan vdist_plan, crosssection_plan, product_fft_plan;
 	vector<fftw_complex> vdist_fft(settings.nbins_e/2 + 1);
@@ -205,35 +199,32 @@ void CrossSection::dopplershiftFFT(const vector<double> &energy_bins, vector<dou
 	vector<fftw_complex> product_fft(settings.nbins_e/2 + 1);
 	vector<double> convolution(settings.nbins_e, 0.);
 
-	for(unsigned int i = 0; i < crosssection_at_rest_histogram.size(); ++i){
+	vdist_plan = fftw_plan_dft_r2c_1d((int) settings.nbins_e, &pconv_velocity_distribution_histogram[0], &vdist_fft[0], FFTW_ESTIMATE);
+	crosssection_plan = fftw_plan_dft_r2c_1d((int) settings.nbins_e, &pconv_crosssection_histogram[0], &crosssection_fft[0], FFTW_ESTIMATE);
 
-		vdist_plan = fftw_plan_dft_r2c_1d((int) settings.nbins_e, &pconv_velocity_distribution_histogram[i][0], &vdist_fft[0], FFTW_ESTIMATE);
-		crosssection_plan = fftw_plan_dft_r2c_1d((int) settings.nbins_e, &pconv_crosssection_histogram[i][0], &crosssection_fft[0], FFTW_ESTIMATE);
+	// Calculate Fourier transform of both arrays
+	fftw_execute(vdist_plan);
+	fftw_execute(crosssection_plan);
 
-		// Calculate Fourier transform of both arrays
-		fftw_execute(vdist_plan);
-		fftw_execute(crosssection_plan);
+	// Multiply the (complex) Fourier - transformed arrays
+	for(unsigned int j = 0; j < settings.nbins_e / 2 + 1; ++j){
+		product_fft[j][0] = crosssection_fft[j][0]*vdist_fft[j][0] - crosssection_fft[j][1]*vdist_fft[j][1];
+		product_fft[j][1] = crosssection_fft[j][0]*vdist_fft[j][1] + crosssection_fft[j][1]*vdist_fft[j][0];
+	}
 
-		// Multiply the (complex) Fourier - transformed arrays
-		for(unsigned int j = 0; j < settings.nbins_e / 2 + 1; ++j){
-			product_fft[j][0] = crosssection_fft[j][0]*vdist_fft[j][0] - crosssection_fft[j][1]*vdist_fft[j][1];
-			product_fft[j][1] = crosssection_fft[j][0]*vdist_fft[j][1] + crosssection_fft[j][1]*vdist_fft[j][0];
-		}
+	// Transform the product back
+	product_fft_plan = fftw_plan_dft_c2r_1d((int) settings.nbins_e, &product_fft[0], &convolution[0], FFTW_ESTIMATE);
+	fftw_execute(product_fft_plan);
 
-		// Transform the product back
-		product_fft_plan = fftw_plan_dft_c2r_1d((int) settings.nbins_e, &product_fft[0], &convolution[0], FFTW_ESTIMATE);
-		fftw_execute(product_fft_plan);
-
-		 // Add the i-th convoluted cross section to the total cross section, observing that the transformation back changed the order of the elements in the array and leaves them scaled by settings.nbins_e.
-		unsigned int shift = vdist_centroid[i];
-		double inverse_norm = (double) 1./(vdist_norm[i]*settings.nbins_e);
-		shift = settings.nbins_e - shift;
-		for(unsigned int j = 0; j < settings.nbins_e; ++j){
-			if(j + shift < settings.nbins_e){
-				crosssection_histogram[j + shift] += convolution[j]*inverse_norm;
-			} else{
-				crosssection_histogram[j - (settings.nbins_e - shift)] += convolution[j]*inverse_norm;
-			}
+	// Add the i-th convoluted cross section to the total cross section, observing that the transformation back changed the order of the elements in the array and leaves them scaled by settings.nbins_e.
+	unsigned int shift = vdist_centroid;
+	double inverse_norm = (double) 1./(vdist_norm*settings.nbins_e);
+	shift = settings.nbins_e - shift;
+	for(unsigned int j = 0; j < settings.nbins_e; ++j){
+		if(j + shift < settings.nbins_e){
+			crosssection_histogram[j + shift] += convolution[j]*inverse_norm;
+		} else{
+			crosssection_histogram[j - (settings.nbins_e - shift)] += convolution[j]*inverse_norm;
 		}
 	}
 }

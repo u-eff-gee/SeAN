@@ -38,11 +38,13 @@ void Target::initialize(const vector<double> &energy_bins){
 	unsigned int nenergies = (unsigned int) settings.energy[target_number].size();
 
 	// Reserve space for the histograms
-	int n_crosssection_histograms = nenergies;
+	unsigned int n_crosssection_histograms = nenergies;
 	if(settings.direct)
 		n_crosssection_histograms = 1;
 
 	for(unsigned int i = 0; i < n_crosssection_histograms; ++i){
+		vdist_norm.push_back(1.);
+		vdist_centroid.push_back(0);
 		crosssection_at_rest_histogram.push_back(vector<double>(settings.nbins_e, 0.));
 		velocity_distribution_bins.push_back(vector<double>(settings.nbins_e, 0.));
 		velocity_distribution_histogram.push_back(vector<double>(settings.nbins_e, 0.));
@@ -113,11 +115,15 @@ void Target::calculateCrossSection(const vector<double> &energy_bins){
 	}
 
 	else if(settings.exact){
-		crossSection.integration_input(crosssection_at_rest_histogram, velocity_distribution_histogram);
-		crossSection.dopplershift(energy_bins, crosssection_histogram, crosssection_at_rest_histogram, velocity_distribution_bins, velocity_distribution_histogram, vdist_norm, energy_boosted);
+		for(unsigned int i = 0; i < crosssection_at_rest_histogram.size(); ++i){
+			crossSection.integration_input(crosssection_at_rest_histogram[i]);
+			crossSection.dopplershift(energy_bins, crosssection_histogram, velocity_distribution_bins[i], velocity_distribution_histogram[i], energy_boosted, i);
+		}
 	} else{
-		crossSection.fft_input(energy_bins, crosssection_at_rest_histogram, velocity_distribution_histogram, energy_boosted);
-		crossSection.dopplershiftFFT(energy_bins, crosssection_histogram, crosssection_at_rest_histogram, velocity_distribution_bins, velocity_distribution_histogram, vdist_norm, vdist_centroid);
+		for(unsigned int i = 0; i < crosssection_at_rest_histogram.size(); ++i){
+			crossSection.fft_input(energy_bins, crosssection_at_rest_histogram[i], velocity_distribution_histogram[i], energy_boosted, i);
+			crossSection.dopplershiftFFT(energy_bins, crosssection_histogram, crosssection_at_rest_histogram[i], velocity_distribution_bins[i], velocity_distribution_histogram[i], vdist_norm[i], vdist_centroid[i], i);
+		}
 	}
 
 	if(settings.uncertainty){
@@ -139,9 +145,7 @@ void Target::calculateCrossSectionDirectly(const vector<double> &energy_bins){
 				crossSection.no_dopplershift(crosssection_at_rest_histogram[0], crosssection_histogram);
 				break;
 
-			case dopplerModel::mb:
 			case dopplerModel::mba:
-				crossSection.maxwell_boltzmann(velocity_distribution_bins[0], velocity_distribution_histogram[0], target_number);
 				crossSection.maxwell_boltzmann_approximation(energy_bins, crosssection_histogram, energy_boosted, target_number, i);
 				break;
 			case dopplerModel::mbad:
@@ -149,21 +153,35 @@ void Target::calculateCrossSectionDirectly(const vector<double> &energy_bins){
 				crossSection.maxwell_boltzmann_approximation_debye(energy_bins, crosssection_histogram, energy_boosted, target_number, i);
 				break;
 
-			case dopplerModel::mbd:
-				crossSection.maxwell_boltzmann_debye(velocity_distribution_bins[0], velocity_distribution_histogram[0], target_number);
-				// Calculate FFT
-				break;
-
+			// Handle all models that convolve a velocity distribution with a Breit-Wigner cross section
 			case dopplerModel::arb_vdist:
-				filename << VELOCITY_DISTRIBUTION_DIR << settings.velocityBinFile[target_number];
-				inputReader.read1ColumnFile(velocity_bins_file, filename.str());
+			case dopplerModel::mb:
+			case dopplerModel::mbd:
+				if(settings.dopplerBroadening[target_number] == dopplerModel::mb){
+					crossSection.maxwell_boltzmann(velocity_distribution_bins[0], velocity_distribution_histogram[0], target_number);
+				} else if(settings.dopplerBroadening[target_number] == dopplerModel::mbd){
+					crossSection.maxwell_boltzmann_debye(velocity_distribution_bins[0], velocity_distribution_histogram[0], target_number);
+				} else{
+					filename << VELOCITY_DISTRIBUTION_DIR << settings.velocityBinFile[target_number];
+					inputReader.read1ColumnFile(velocity_bins_file, filename.str());
 
-				filename.str("");
-				filename.clear();
-				filename << VELOCITY_DISTRIBUTION_DIR << settings.vDistFile[target_number];
-				inputReader.read1ColumnFile(velocity_distribution_file, filename.str());
+					filename.str("");
+					filename.clear();
+					filename << VELOCITY_DISTRIBUTION_DIR << settings.vDistFile[target_number];
+					inputReader.read1ColumnFile(velocity_distribution_file, filename.str());
 
-				crossSection.arbitrary_velocity_distribution(velocity_distribution_bins[0], velocity_distribution_histogram[0], velocity_bins_file, velocity_distribution_file);
+					crossSection.arbitrary_velocity_distribution(velocity_distribution_bins[0], velocity_distribution_histogram[0], velocity_bins_file, velocity_distribution_file);
+				}
+
+				vDistInfo(0);
+
+				if(settings.exact){
+					crossSection.integration_input(crosssection_at_rest_histogram[0]);
+					crossSection.dopplershift(energy_bins, crosssection_histogram, velocity_distribution_bins[0], velocity_distribution_histogram[0], energy_boosted, i);
+				} else{
+					crossSection.fft_input(energy_bins, crosssection_at_rest_histogram[0], velocity_distribution_histogram[0], energy_boosted, i);
+					crossSection.dopplershiftFFT(energy_bins, crosssection_histogram, crosssection_at_rest_histogram[0], velocity_distribution_bins[0], velocity_distribution_histogram[0], vdist_norm[0], vdist_centroid[0], i);
+				}
 				break;
 
 			case dopplerModel::arb_cs:
@@ -276,7 +294,9 @@ void Target::calculateVelocityDistribution(const vector<double> &energy_bins){
 			// inputReader.read3ColumnFile(p_file, filename.str());
 	}
 
-	vDistInfo();
+	for(unsigned int i = 0; i < velocity_distribution_bins.size(); ++i){
+		vDistInfo(i);
+	}
 }
 
 void Target::plot(vector<double> &energy_bins, unsigned int n_setting) {
@@ -285,7 +305,11 @@ void Target::plot(vector<double> &energy_bins, unsigned int n_setting) {
 	
 	filename << settings.targetNames[target_number] << "_crosssection_at_rest_" << n_setting;
 
-	plotter.plotMultiple1DHistogramsAndSum(energy_bins, crosssection_at_rest_histogram, filename.str(), "Energy / eV", "Cross section / fm^{2}");
+	if(settings.direct){
+		plotter.plot1DHistogram(energy_bins, crosssection_at_rest_histogram[0], filename.str(), "Energy / eV", "Cross section / fm^{2}");
+	} else{
+		plotter.plotMultiple1DHistogramsAndSum(energy_bins, crosssection_at_rest_histogram, filename.str(), "Energy / eV", "Cross section / fm^{2}");
+	}
 
 	// Plot velocity distribution
 	// In fact, each resonance has its own binning, but plot only the velocity distribution for the first one since they only differ in the binning
@@ -411,7 +435,11 @@ void Target::write(const vector<double> &energy_bins, const unsigned int n_setti
 	
 	// Write cross section at rest
 	
-	for(unsigned int i = 0; i < energy_boosted.size(); ++i){
+	unsigned int n_crosssection_histograms = energy_boosted.size();
+	if(settings.direct)
+		n_crosssection_histograms = 1;
+
+	for(unsigned int i = 0; i < n_crosssection_histograms; ++i){
 		filename.str("");
 		filename.clear();
 
@@ -528,11 +556,11 @@ void Target::write_results(string outputfile) const{
 	ofile << result_string();
 }
 
-void Target::vDistInfo(){
-	
-//	 Determine the integral of the velocity distribution and the centroid of the distribution.
-//	 The integral is needed to normalize the pseudo-convolution with the cross section, since this should conserve the area under the resonance curve.
-//	 The centroid is needed for the FFT convolution. The algorithm which is used re-orders the input array by the shift of the centroid of the velocity distribution from the array centroid.
+void Target::vDistInfo(const unsigned int resonance_number){
+
+	//	 Determine the integral of the velocity distribution and the centroid of the distribution.
+	//	 The integral is needed to normalize the pseudo-convolution with the cross section, since this should conserve the area under the resonance curve.
+	//	 The centroid is needed for the FFT convolution. The algorithm which is used re-orders the input array by the shift of the centroid of the velocity distribution from the array centroid.
 	double norm = 0.;
 	double sum = 0.;
 	double weightedsum = 0.;
@@ -540,24 +568,21 @@ void Target::vDistInfo(){
 	double velocity_bin_high = 0.;
 	double vdist = 0.;
 
-	for(unsigned int i = 0; i < velocity_distribution_bins.size(); ++i){
+	sum = 0.;
+	norm = 0.;
+	weightedsum = 0.;
 
-		sum = 0.;
-		norm = 0.;
-		weightedsum = 0.;
-
-		for(unsigned int j = 0; j < settings.nbins_e - 1; ++j){
-			vdist = velocity_distribution_histogram[i][j];
-			velocity_bin_low = velocity_distribution_bins[i][j];
-			velocity_bin_high = velocity_distribution_bins[i][j + 1];
-			norm += vdist*(velocity_bin_high - velocity_bin_low);
-			weightedsum += vdist*j;
-			sum += vdist;
-		}
-
-		vdist_norm.push_back(fabs(norm));
-		vdist_centroid.push_back((unsigned int) (weightedsum/sum));
+	for(unsigned int j = 0; j < settings.nbins_e - 1; ++j){
+		vdist = velocity_distribution_histogram[resonance_number][j];
+		velocity_bin_low = velocity_distribution_bins[resonance_number][j];
+		velocity_bin_high = velocity_distribution_bins[resonance_number][j + 1];
+		norm += vdist*(velocity_bin_high - velocity_bin_low);
+		weightedsum += vdist*j;
+		sum += vdist;
 	}
+
+	vdist_norm[resonance_number] = fabs(norm);
+	vdist_centroid[resonance_number] = weightedsum/sum;
 }
 
 void Target::calculateResonantScattering(const vector<double> energy_bins){

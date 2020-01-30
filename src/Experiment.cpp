@@ -68,7 +68,11 @@ void Experiment::crossSections(){
 	unsigned int ntargets = (unsigned int) settings.targetNames.size();	
 
 	for(unsigned int i = 0; i < ntargets; ++i){
-		targets[i].calculateCrossSection(energy_bins);
+		if(settings.direct){
+			targets[i].calculateCrossSectionDirectly(energy_bins);
+		} else{
+			targets[i].calculateCrossSection(energy_bins);
+		}
 	}
 };
 

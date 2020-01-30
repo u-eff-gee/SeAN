@@ -36,8 +36,8 @@ using std::vector;
 class CrossSection{
 
 private:
-	vector< vector<double> > pconv_crosssection_histogram;
-	vector< vector<double> > pconv_velocity_distribution_histogram;
+	vector<double> pconv_crosssection_histogram;
+	vector<double> pconv_velocity_distribution_histogram;
 
 	Settings settings;
 	Integrator* integrator;
@@ -72,14 +72,14 @@ public:
 
 	// Cross section calculators
 	// Using FFT
-	void fft_input(const vector<double> &energy_bins, vector< vector<double> > &crosssection_histogram, vector< vector<double> > &velocity_distribution_histogram, vector<double> energy_boosted);
+	void fft_input(const vector<double> &energy_bins, const vector<double> &crosssection_at_rest_histogram, const vector<double> &velocity_distribution_histogram, vector<double> energy_boosted, const unsigned int resonance_number);
 
-	void dopplershiftFFT(const vector<double> &energy_bins, vector<double> &crosssection_histogram, vector< vector <double> > &crosssection_at_rest_histogram, vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, vector<double> &vdist_norm, vector<unsigned int> &vdist_centroid);
+	void dopplershiftFFT(const vector<double> &energy_bins, vector<double> &crosssection_histogram, const vector <double> &crosssection_at_rest_histogram, const vector<double> &velocity_distribution_bins, const vector<double> &velocity_distribution_histogram, const double vdist_norm, const unsigned int vdist_centroid, const unsigned int resonance_number);
 
 	// Using trapezoidal rule
-	void integration_input(const vector< vector<double> > &crosssection_bins, const vector< vector<double> > &vdist_bins);
+	void integration_input(const vector<double> &crosssection_bins);
 
-	void dopplershift(const vector<double> &energy_bins, vector<double> &crosssection_histogram, vector< vector <double> > &crosssection_bins, vector< vector<double> > &velocity_distribution_bins, vector< vector<double> > &velocity_distribution_histogram, vector<double> &vdist_norm, vector<double> &energy_boosted);
+	void dopplershift(const vector<double> &energy_bins, vector<double> &crosssection_histogram, vector<double> &velocity_distribution_bins, vector<double> &velocity_distribution_histogram, vector<double> &energy_boosted, const unsigned int resonance_number);
 
 	// Special cases
 	void no_dopplershift(const vector<double> &crosssection_at_rest_histogram, vector<double> &crosssection_histogram);
