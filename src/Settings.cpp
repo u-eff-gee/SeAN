@@ -34,7 +34,7 @@ using std::stringstream;
 using std::ofstream;
 
 string Settings::bool_string(const bool b) const {
-	if(b) return "true"; else return "false";
+		if(b) return "true"; else return "false";
 }
 
 void Settings::print(){
@@ -58,6 +58,7 @@ string Settings::option_string() const {
 		opss << "FILE:\tnot set\n" ;
 	}
 	opss << "COMMAND LINE OPTIONS: \n" ;
+	opss << "\tDIRECT      :\t" << direct << "\n";
 	opss << "\tEXACT       :\t" << exact << "\n";
 	opss << "\tPLOT        :\t" << plot << "\n";
 	opss << "\tMULTI       :\t" << bool_string(multi) << "\n";

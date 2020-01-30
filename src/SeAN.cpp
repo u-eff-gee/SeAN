@@ -40,6 +40,7 @@ static char doc[] = "SeAN, Self-Absorption Numerical";
 static char args_doc[] = "INPUTFILE";
 
 static struct argp_option options[] = {
+	{ "direct", 'd', 0, 0, "Direct calculation of self-absorption. Avoids storing some intermediate quantities, which make SeAN less demanding on memory (default: false).", 0 },
   { "exact", 'e', 0, 0, "Do not use convolution approximation (increased computing time, default: false)", 0 },
   { "multi", 'm', 0, 0, "Compute multidimensional integrals (increased computing time, default: false)", 0 },
   { "output", 'o', "OUTPUTFILENAME", 0, "Write input and results to a file called OUTPUTFILENAME (default: no output writing). If OUTPUTFILENAME already exists, it will be overwritten.", 0 },
@@ -47,7 +48,7 @@ static struct argp_option options[] = {
   { "recoil", 'r', 0, 0, "Include nuclear recoil in the calculation of the cross section maximum (default: false).", 0 },
   { "uncertainty", 'u', 0, 0, "Estimate the uncertainty of the numerical evaluations (default: false). Note that this causes SeAN to perform more calculations.", 0 },
   { "verbosity", 'v', "VERBOSITY", 0, "Set command line verbosity (0 = print nothing, 1 = print results, 2 [default] = print input and results)", 0 },
-  { "write", 'w', 0, 0, "Write text output files for all calculated quantities except cross sections at rest and 2D functions (default: false).", 0 },
+  { "write", 'w', 0, 0, "Create text output files for all calculated quantities except cross sections at rest and 2D functions (default: false).", 0 },
   { "write_all", 'W', 0, 0, "Write text output files for all calculated quantities (default: false). Overrides the '-w' option.", 0 },
   { 0, 0, 0, 0, 0, 0 }
 };
@@ -56,16 +57,17 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     struct Settings *settings = (struct Settings*) state->input;
 
     switch (key) {
-    	case ARGP_KEY_ARG: settings->inputfile = arg; break;
-		case 'e': settings->exact = true; break;
-		case 'm': settings->multi = true; break;
-		case 'o': settings->output = true;
-		 	settings->outputfile = arg;
+    case ARGP_KEY_ARG: settings->inputfile = arg; break;
+	case 'd': settings->direct = true; break;
+	case 'e': settings->exact = true; break;
+	case 'm': settings->multi = true; break;
+	case 'o': settings->output = true;
+		  settings->outputfile = arg;
 			break;
-   		case 'p': settings->plot = true; break;
-		case 'r': settings->recoil= true; break;
-		case 'u': settings->uncertainty=true; break;
-		case 'v': settings->verbosity = atoi(arg); break;
+    	case 'p': settings->plot = true; break;
+	case 'r': settings->recoil= true; break;
+	case 'u': settings->uncertainty=true; break;
+	case 'v': settings->verbosity = atoi(arg); break;
     	case 'w': settings->write = true; break;
 		case 'W': 
 			settings->write_all = true;
@@ -73,10 +75,10 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
 			break;
     	case ARGP_KEY_END:
         	if(state->arg_num == 0) {
-         	  		argp_usage(state);
+            		argp_usage(state);
         	}
         	if(settings->inputfile == "") {
-        	   		argp_failure(state, 1, 0, "INPUTFILE not specified.");
+            		argp_failure(state, 1, 0, "INPUTFILE not specified.");
         	}
         	break;
     	default: return ARGP_ERR_UNKNOWN;
@@ -85,7 +87,6 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
 }
 
 static struct argp argp = { options, parse_opt, args_doc, doc, 0, 0, 0 };
-
 
 int main(int argc, char* argv[]){
 

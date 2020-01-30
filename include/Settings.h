@@ -52,6 +52,7 @@ struct Settings{
     string inputfile = "";
 	string outputfile = "out";
 	int verbosity = 2;
+	bool direct = false;
 	bool recoil = false;
 	bool output = false;
 	bool exact = false;

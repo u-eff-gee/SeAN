@@ -119,6 +119,7 @@ public:
 		void calculateVelocityDistribution(const vector<double> &energy_bins);
 		void calculateMassAttenuation(const vector<double> &energy_bins);
 	void calculateCrossSection(const vector<double> &energy_bins);
+	void calculateCrossSectionDirectly(const vector<double> &energy_bins);
 	void calculateIncidentBeam(const vector<double> &energy_bins);
 	void calculateIncidentBeam(const vector<vector<double> > &photon_flux_density_histogram);
 	void calculateTransmission();
@@ -155,7 +156,7 @@ public:
 	double integrateEZHistogram(vector<double> &energy_bins, vector<double> &z_bins, vector<vector<double> > &ezhist);
 	double integrateEEHistogram(vector<double> &energy_bins, vector<vector<double> > &eehist);
 
-	void vDistInfo();
+	void vDistInfo(const unsigned int resonance_number);
 
 	// Function to return the ratio of the analytical integral over the cross section
 	// and the corresponding numerical integral. This is used can be used in a second 

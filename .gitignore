@@ -1,6 +1,9 @@
 # This file
 .gitignore
 
+# Residuals from git merge
+*.orig
+
 # Scripts
 edit.sh
 
@@ -51,3 +54,8 @@ doc/*.toc
 
 # phdos directory
 phdos/*
+
+# future
+build
+!doc
+future/doc
