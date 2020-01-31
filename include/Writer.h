@@ -15,9 +15,7 @@
     along with SeAN.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-#ifndef WRITER_H
-#define WRITER_H 1
+#pragma once 
 
 #include <string>
 #include <vector>

@@ -16,8 +16,7 @@
 */
 
 
-#ifndef PHONONDENSITY_H
-#define PHONONDENSITY_H 1
+#pragma once 
 
 #include <vector>
 

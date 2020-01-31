@@ -39,6 +39,9 @@ Experiment::Experiment(Settings &s){
 }
 
 void Experiment::initialize(){
+	if(settings.status){
+		cout << STATUS_MESSAGE_PREFIX << "" << endl;
+	}
 	createEnergyBins(settings.emin, settings.emax);
 	createTargets();
 }

@@ -16,8 +16,7 @@
 */
 
 
-#ifndef SETTINGS_H
-#define SETTINGS_H 1
+#pragma once 
 
 #include <string>
 #include <vector>
@@ -57,6 +56,7 @@ struct Settings{
 	bool output = false;
 	bool exact = false;
 	bool plot = false;
+	bool status = false;
 	bool write = false;
 	bool write_all = false;
 	bool uncertainty = false;

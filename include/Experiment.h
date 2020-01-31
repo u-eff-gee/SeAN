@@ -16,8 +16,7 @@
 */
 
 
-#ifndef	EXPERIMENT_H 
-#define EXPERIMENT_H 1
+#pragma once 
 
 #include <vector>
 #include <iostream>

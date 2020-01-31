@@ -15,7 +15,6 @@
     along with SeAN.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #include "Target.h"
 
 #include <iostream>

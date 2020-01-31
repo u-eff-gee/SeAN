@@ -16,8 +16,7 @@
 */
 
 
-#ifndef INTEGRATOR_H
-#define INTEGRATOR_H 1
+#pragma once 
 
 #include <utility>
 #include <vector>

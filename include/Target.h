@@ -16,8 +16,7 @@
 */
 
 
-#ifndef TARGET_H 
-#define TARGET_H 1
+#pragma once 
 
 #include <string>
 #include <vector>

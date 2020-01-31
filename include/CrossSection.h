@@ -16,8 +16,7 @@
 */
 
 
-#ifndef CROSSSECTION_H 
-#define CROSSSECTION_H 1
+#pragma once 
 
 #include <vector>
 #include <string>

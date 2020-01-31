@@ -16,8 +16,7 @@
 */
 
 
-#ifndef INPUTREADER_H
-#define INPUTREADER_H 1
+#pragma once 
 
 #include "Settings.h"
 
@@ -71,7 +70,6 @@ public:
 	void read1ColumnFile(vector<double> &data, string filename);
 	void read2ColumnFile(vector< vector<double> > &data, string filename);
 	void read3ColumnFile(vector< vector<double> > &data, string filename);
-
 
 private:
 	// Coordinates in AME file

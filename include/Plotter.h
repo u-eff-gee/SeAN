@@ -16,8 +16,7 @@
 */
 
 
-#ifndef PLOTTER_H
-#define PLOTTER_H 1
+#pragma once 
 
 #include <string>
 #include <vector>
