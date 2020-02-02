@@ -218,3 +218,20 @@ This code is distributed under the terms of the GNU General Public License. See 
 
 <a name="ref-nist-attenuation">[2]</a> Hubbell, J.H. and Seltzer, S.M., Tables of X-Ray Mass Attenuation Coefficients
 and Mass Energy-Absorption Coefficients from 1 keV to 20 MeV for Elements Z = 1 to 92 and 48 Additional Substances of Dosimetric Interest. (https://www.nist.gov/pml/x-ray-mass-attenuation-coefficients)
+
+
+### 6. Troubleshooting
+
+#### FFTW3LibraryDepends.cmake is missing 
+Corresponding GitHub Issue: https://github.com/FFTW/fftw3/issues/130
+
+##### Workaround (Linux)
+By compiling fftw3 locally the missing file is generated and can be used to compile SeAN
+
+1. [Download the fftw3 tar.gz](http://www.fftw.org/download.html)
+2. Unpack it `tar xf fftw-3.3.8`
+3. Run `cmake .` to generate the Makefile
+4. Run `make` to compile fftw
+5. Run `make install`. This copies the relevant files to /usr/local/bin and does not interfere with the system installation at /usr/bin
+6. In *SeANs'* `CmakeLists.txt` file uncomment the line `set(FFTW3_DIR "/usr/local/lib/cmake/fftw3")`. Make sure the path corresponds to the path where the files were copied to in the previous step
+7. SeAN should now compile successfully
