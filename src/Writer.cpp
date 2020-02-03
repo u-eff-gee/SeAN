@@ -45,9 +45,9 @@ void Writer::write1DHistogram(const vector<double> &histogram, const string name
 	}
 
 	ofile.precision(8);
-	ofile << COMMENT << " " << column_name << endl;
+	ofile << COMMENT << " " << column_name << "\n";
 	for(unsigned int i = 0; i < histogram.size(); ++i){
-		ofile << scientific << histogram[i] << endl;
+		ofile << scientific << histogram[i] << "\n";
 	}
 }
 
@@ -65,8 +65,8 @@ void Writer::write2DHistogram(const vector<vector<double> > &histogram, const st
 	}
 
 	ofile.precision(8);
-	ofile << COMMENT << " Lines   : " << line_name << endl;
-	ofile << COMMENT << " Columns : " << column_name << endl;
+	ofile << COMMENT << " Lines   : " << line_name << "\n";
+	ofile << COMMENT << " Columns : " << column_name << "\n";
 
 	long unsigned int ncolumns = histogram.size();
 	long unsigned int nlines = histogram[0].size();
@@ -75,7 +75,7 @@ void Writer::write2DHistogram(const vector<vector<double> > &histogram, const st
 		for(unsigned int j = 0; j < nlines; ++j){
 			ofile << scientific << histogram[i][j] << "\t";
 		}
-		ofile << endl;
+		ofile << "\n";
 	}
 }
 
@@ -96,6 +96,6 @@ void Writer::write1DCalibration(const vector<double> &bins, const string name, c
 	}
 
 	ofile.precision(8);
-	ofile << scientific << histogram_name << TXT_SUFFIX << ":\t" << b << "\t" << a << endl;
+	ofile << scientific << histogram_name << TXT_SUFFIX << ":\t" << b << "\t" << a << "\n";
 	ofile.close();
 }

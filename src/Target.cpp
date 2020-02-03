@@ -481,6 +481,7 @@ void Target::write(const vector<double> &energy_bins, const unsigned int n_setti
 
 		writer.write1DHistogram(crosssection_at_rest_histogram[i], filename.str(), "Cross section / fm^2");
 		if(settings.status){
+			sta_str.str("");
 			sta_str << "Wrote cross section at rest for excited state #" << i+1 << " of target #" << target_number+1 << " to " << settings.outputfile << "_" << filename.str() << TXT_SUFFIX;
 			Status::print(sta_str.str(), true);
 		}

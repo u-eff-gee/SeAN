@@ -27,7 +27,7 @@ maxwell_boltzmann, 412.5
 # 7) Nuclear mass in atomic mass units
 156Gd
 # 8) Mass attenuation coefficient
-Gd
+nist, Gd.dat
 # 9) Target thickness in atoms/fm^2
 # 0.012294*target_mass/[kg] for a cylindric target of pure Gadolinium (density = 7.90 g/cm3 on Wikipedia) with a radius of 1cm
 # This value is for 10g
