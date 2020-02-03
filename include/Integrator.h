@@ -44,5 +44,3 @@ public:
 	pair<double, double> darboux(const vector<double> &bins, const vector<double> &histogram);
 	pair<double, double> darboux2D(const vector<double> &bins1, const vector<double> &bins2, const vector<vector<double> > &histogram);
 };
-
-#endif

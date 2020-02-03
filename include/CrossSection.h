@@ -113,5 +113,3 @@ public:
 		return pow(t,3)*(1./(exp(t) - 1.) + 0.5);
 	};
 };
-
-#endif

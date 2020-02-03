@@ -45,5 +45,3 @@ public:
 
 	void plot2DHistogram(const vector<double> &bins1, const vector<double> &bins2, const vector< vector<double> > &histogram, const string name, const string xaxis_label, const string yaxis_label, const string zaxis_label);
 };
-
-#endif

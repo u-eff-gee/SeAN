@@ -62,8 +62,3 @@ const string HORIZONTAL_LINE = "################################################
 const string TXT_SUFFIX = ".txt";
 const string CAL_SUFFIX = ".cal";
 const string CAL_FILE_NAME = "calibration";
-
-// Settings for status messages
-const string STATUS_MESSAGE_PREFIX = "> STATUS\t";
-
-#endif

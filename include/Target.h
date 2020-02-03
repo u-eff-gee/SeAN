@@ -163,5 +163,3 @@ public:
 	double get_ana_num_ratio() const { return crosssection_integral_analytical/
 		crosssection_integral_numerical; };
 };
-
-#endif

@@ -15,26 +15,24 @@
     along with SeAN.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #include <iostream>
 #include <argp.h>
 #include <ctime>
 #include <chrono>
 #include <sstream>
 
-#include "Experiment.h"
 #include "Config.h"
-#include "Settings.h"
+#include "Experiment.h"
 #include "InputReader.h"
+#include "Settings.h"
+#include "Status.h"
+high_resolution_clock::time_point Status::t_start = high_resolution_clock::now();
 
 using std::cout;
 using std::endl;
 using std::cin;
 using std::stringstream;
 using namespace std::chrono;
-
-//const char *sean_program_version = "SeAN 0.0.0";
-//const char *sean_program_bug_address = "<ugayer@ikp.tu-darmstadt.de>";
 
 static char doc[] = "SeAN, Self-Absorption Numerical";
 static char args_doc[] = "INPUTFILE";
@@ -96,8 +94,10 @@ int main(int argc, char* argv[]){
 	settings.push_back(Settings());
 	argp_parse(&argp, argc, argv, 0, 0, &settings[0]);
 
-	// Start the clock
-	high_resolution_clock::time_point start = high_resolution_clock::now();
+	if(settings[0].status){
+		Status::start_timer();
+		Status::print("Execution started.", false);
+	}
 
 	InputReader input;
 	input.readFile(settings);
@@ -129,16 +129,16 @@ int main(int argc, char* argv[]){
 			experiment.write_results(settings[0].outputfile, i);
 		}
 	}
-	
-	if(settings[0].verbosity > 0 && settings[0].output){
-		cout << "> Created output file '" << settings[0].outputfile << "'" << endl;
-	}
-	
-	// Stop the clock
-	high_resolution_clock::time_point stop = high_resolution_clock::now();
-	duration<double> delta_t = duration_cast< duration<double>>(stop - start);
+
+	stringstream sta_str;
 
 	if(settings[0].status){
-		cout << STATUS_MESSAGE_PREFIX << "Execution took " << delta_t.count() << " seconds" << endl;
+		sta_str.str("");
+		sta_str << "Wrote output and results to " << settings[0].outputfile;
+		Status::print(sta_str.str(), true);
+	}
+
+	if(settings[0].status){
+		Status::print("Execution finished.", true);
 	}
 }

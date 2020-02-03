@@ -16,7 +16,7 @@
 */
 
 
-#pragma once 
+#pragma once
 
 #include <vector>
 
@@ -70,5 +70,3 @@ public:
 //
 //	void calculateCrossSection(const vector<double> &energy_bins, const vector<double> &energy_boosted, vector<double> &crosssection_histogram, const vector<double> &omega_s_file, const vector< vector<double> > (&e_s_file), const vector< vector<double> > (&p_file), const unsigned int target_number);
 };
-
-#endif

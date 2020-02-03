@@ -44,5 +44,3 @@ public:
 	void write1DCalibration(const vector<double> &bins, const string name, const string histogram_name);
 	// Find out how to append to a file
 };
-
-#endif

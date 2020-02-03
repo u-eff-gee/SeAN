@@ -15,7 +15,6 @@
     along with SeAN.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #include "Config.h"
 #include "Writer.h"
 
@@ -44,7 +43,6 @@ void Writer::write1DHistogram(const vector<double> &histogram, const string name
 		cout << " write1DHistogram(): File '" << filename.str() << "' could not be opened." << endl;
 		abort();
 	}
-        cout << "> Writing output file '" << filename.str() << "'" << endl;
 
 	ofile.precision(8);
 	ofile << COMMENT << " " << column_name << endl;
@@ -65,7 +63,6 @@ void Writer::write2DHistogram(const vector<vector<double> > &histogram, const st
 		cout << " write2DHistogram(): File '" << filename.str() << "' could not be opened." << endl;
 		abort();
 	}
-        cout << "> Writing output file '" << filename.str() << "'" << endl;
 
 	ofile.precision(8);
 	ofile << COMMENT << " Lines   : " << line_name << endl;
@@ -97,7 +94,6 @@ void Writer::write1DCalibration(const vector<double> &bins, const string name, c
 		cout << " write2DHistogram(): File '" << filename.str() << "' could not be opened." << endl;
 		abort();
 	}
-        cout << "> Writing output file '" << filename.str() << "'" << endl;
 
 	ofile.precision(8);
 	ofile << scientific << histogram_name << TXT_SUFFIX << ":\t" << b << "\t" << a << endl;

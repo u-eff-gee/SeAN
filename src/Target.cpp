@@ -15,8 +15,6 @@
     along with SeAN.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "Target.h"
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -24,6 +22,9 @@
 
 #include "TCanvas.h"
 #include "TLegend.h"
+
+#include "Status.h"
+#include "Target.h"
 
 using std::cout;
 using std::endl;
@@ -77,6 +78,12 @@ void Target::initialize(const vector<double> &energy_bins){
 	// Calculate mass attenuation
 	calculateMassAttenuation(energy_bins);
 
+	if(settings.status){
+		stringstream sta_str;
+		sta_str << "Initialization of target #" << target_number+1 << " finished";
+		Status::print(sta_str.str(), true);
+	}
+
 }
 
 void Target::calculateCrossSection(const vector<double> &energy_bins){
@@ -90,18 +97,33 @@ void Target::calculateCrossSection(const vector<double> &energy_bins){
 	if(settings.dopplerBroadening[target_number] == dopplerModel::zero){
 		for(unsigned int i = 0; i < crosssection_at_rest_histogram.size(); ++i){
 			crossSection.no_dopplershift(crosssection_at_rest_histogram[i], crosssection_histogram);
+			if(settings.status){
+				stringstream sta_str;
+				sta_str << "Calculation of cross section for excited state #" << i+1 << " of target #" << target_number+1 << " finished";
+				Status::print(sta_str.str(), true);
+			}
 		}
 	}
 
 	else if(settings.dopplerBroadening[target_number] == dopplerModel::mba){
 		for(unsigned int i = 0; i < crosssection_at_rest_histogram.size(); ++i){
 			crossSection.maxwell_boltzmann_approximation(energy_bins, crosssection_histogram, energy_boosted, target_number, i);
+			if(settings.status){
+				stringstream sta_str;
+				sta_str << "Calculation of cross section for excited state #" << i+1 << " of target #" << target_number+1 << " finished";
+				Status::print(sta_str.str(), true);
+			}
 		}
 	}
 
 	else if(settings.dopplerBroadening[target_number] == dopplerModel::mbad){
 		for(unsigned int i = 0; i < crosssection_at_rest_histogram.size(); ++i){
 			crossSection.maxwell_boltzmann_approximation_debye(energy_bins, crosssection_histogram, energy_boosted, target_number, i);
+			if(settings.status){
+				stringstream sta_str;
+				sta_str << "Calculation of cross section for excited state #" << i+1 << " of target #" << target_number+1 << " finished";
+				Status::print(sta_str.str(), true);
+			}
 		}
 	}
 
@@ -117,11 +139,21 @@ void Target::calculateCrossSection(const vector<double> &energy_bins){
 		for(unsigned int i = 0; i < crosssection_at_rest_histogram.size(); ++i){
 			crossSection.integration_input(crosssection_at_rest_histogram[i]);
 			crossSection.dopplershift(energy_bins, crosssection_histogram, velocity_distribution_bins[i], velocity_distribution_histogram[i], energy_boosted, i);
+			if(settings.status){
+				stringstream sta_str;
+				sta_str << "Calculation of cross section for excited state #" << i+1 << " of target #" << target_number+1 << " finished";
+				Status::print(sta_str.str(), true);
+			}
 		}
 	} else{
 		for(unsigned int i = 0; i < crosssection_at_rest_histogram.size(); ++i){
 			crossSection.fft_input(energy_bins, crosssection_at_rest_histogram[i], velocity_distribution_histogram[i], energy_boosted, i);
 			crossSection.dopplershiftFFT(energy_bins, crosssection_histogram, crosssection_at_rest_histogram[i], velocity_distribution_bins[i], velocity_distribution_histogram[i], vdist_norm[i], vdist_centroid[i], i);
+			if(settings.status){
+				stringstream sta_str;
+				sta_str << "Calculation of cross section for excited state #" << i+1 << " of target #" << target_number+1 << " finished";
+				Status::print(sta_str.str(), true);
+			}
 		}
 	}
 
@@ -196,6 +228,12 @@ void Target::calculateCrossSectionDirectly(const vector<double> &energy_bins){
 			case dopplerModel::phdos:
 				filename << PHONON_DIR << settings.omegaFile[target_number];
 				inputReader.read1ColumnFile(omega_s_file, filename.str());
+		}
+		
+		if(settings.status){
+			stringstream sta_str;
+			sta_str << "Calculation of cross section for excited state #" << i+1 << " of target #" << target_number+1 << " finished";
+			Status::print(sta_str.str(), true);
 		}
 	}
 }
@@ -427,10 +465,7 @@ void Target::calculateTransmission(const double cs_enhancement_factor){
 void Target::write(const vector<double> &energy_bins, const unsigned int n_setting) {
 	
 	stringstream filename;
-
-	// Write energy bins
-	filename << settings.targetNames[target_number] << "_energy_bins_" << n_setting;
-	writer.write1DHistogram(energy_bins, filename.str(), "Energy / eV");
+	stringstream sta_str;
 	
 	// Write cross section at rest
 	
@@ -445,65 +480,96 @@ void Target::write(const vector<double> &energy_bins, const unsigned int n_setti
 		filename << settings.targetNames[target_number] << "_crosssection_at_rest_"  << n_setting << "_" << i;
 
 		writer.write1DHistogram(crosssection_at_rest_histogram[i], filename.str(), "Cross section / fm^2");
-		writer.write1DCalibration(energy_bins, CAL_FILE_NAME, filename.str());
+		if(settings.status){
+			sta_str << "Wrote cross section at rest for excited state #" << i+1 << " of target #" << target_number+1 << " to " << settings.outputfile << "_" << filename.str() << TXT_SUFFIX;
+			Status::print(sta_str.str(), true);
+		}
 	}
 
 	// Write cross section
 	filename.str("");
-	filename.clear();
 
 	filename << settings.targetNames[target_number] << "_crosssection_" << n_setting;
 
 	writer.write1DHistogram(crosssection_histogram, filename.str(), "Cross section / fm^2");
+	if(settings.status){
+		sta_str.str("");
+		sta_str << "Wrote cross section for target #" << target_number+1 << " to " << settings.outputfile << "_" << filename.str() << TXT_SUFFIX;
+		Status::print(sta_str.str(), true);
+	}
 	writer.write1DCalibration(energy_bins, CAL_FILE_NAME, filename.str());
 
 	// Write velocity distribution 
 	// In fact, each resonance has its own binning, but write only the velocity distribution for the first one
 	
 	filename.str("");
-	filename.clear();
 
 	filename << settings.targetNames[target_number] << "_velocity_bins_" << n_setting;
 	writer.write1DHistogram(velocity_distribution_bins[0], filename.str(), "Velocity / c");
+	if(settings.status){
+		sta_str.str("");
+		sta_str << "Wrote velocity distribution bins for target #" << target_number+1 << " to " << settings.outputfile << "_" << filename.str() << TXT_SUFFIX;
+		Status::print(sta_str.str(), true);
+	}
 	writer.write1DCalibration(velocity_distribution_bins[0], CAL_FILE_NAME, filename.str());
 
 	filename.str("");
-	filename.clear();
 
 	filename << settings.targetNames[target_number] << "_velocity_histogram_" << n_setting;
+	if(settings.status){
+		sta_str.str("");
+		sta_str << "Wrote velocity distribution for target #" << target_number+1 << " to " << settings.outputfile << "_" << filename.str() << TXT_SUFFIX;
+		Status::print(sta_str.str(), true);
+	}
 	writer.write1DHistogram(velocity_distribution_histogram[0], filename.str(), "Velocity distribution");
 
 	// Write incident beam
 
 	filename.str("");
-	filename.clear();
 
 	filename << settings.targetNames[target_number] << "_incident_beam_" << n_setting;
 	writer.write1DHistogram(incident_beam_histogram, filename.str(), "Beam intensity distribution / a.u.");
+	if(settings.status){
+		sta_str.str("");
+		sta_str << "Wrote incident beam for target #" << target_number+1 << " to " << settings.outputfile << "_" << filename.str() << TXT_SUFFIX;
+		Status::print(sta_str.str(), true);
+	}
 	writer.write1DCalibration(energy_bins, CAL_FILE_NAME, filename.str());
 
 	// Write mass attenuation
 	filename.str("");
-	filename.clear();
 
 	filename << settings.targetNames[target_number] << "_mass_attenuation_" << n_setting;
 	writer.write1DHistogram(mass_attenuation_histogram, filename.str(), "Mass attenuation / fm^2 / atom");
+	if(settings.status){
+		sta_str.str("");
+		sta_str << "Wrote mass attenuation for target #" << target_number+1 << " to " << settings.outputfile << "_" << filename.str() << TXT_SUFFIX;
+		Status::print(sta_str.str(), true);
+	}
 	writer.write1DCalibration(energy_bins, CAL_FILE_NAME, filename.str());
 	
 	if(settings.write_all){
 		// Write photon flux density if writing of all calculated quantities is requested.
 		filename.str("");
-		filename.clear();
 
 		filename << settings.targetNames[target_number] << "_photon_flux_density_" << n_setting;
 		writer.write2DHistogram(photon_flux_density_histogram, filename.str(), "Phi (z, E = const)", "Phi (z = const, E)");
+		if(settings.status){
+			sta_str.str("");
+			sta_str << "Wrote photon flux density for target #" << target_number+1 << " to " << settings.outputfile << TXT_SUFFIX;
+			Status::print(sta_str.str(), true);
+		}
 		
 		// Write resonance absorption density if writing of all calculated quantities is requested.
 		filename.str("");
-		filename.clear();
 
 		filename << settings.targetNames[target_number] << "_resonance_absorption_density_" << n_setting;
 		writer.write2DHistogram(resonance_absorption_density_histogram, filename.str(), "Alpha (z, E = const) / fm^2", "Alpha (z = const, E) / fm^2");
+		if(settings.status){
+			sta_str.str("");
+			sta_str << "Wrote resonance absorption density for target #" << target_number+1 << " to " << settings.outputfile << "_" << filename.str() << TXT_SUFFIX;
+			Status::print(sta_str.str(), true);
+		}
 	}
 }
 

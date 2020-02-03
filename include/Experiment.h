@@ -35,9 +35,10 @@ private:
 	vector<Target> targets;
 
 	Settings settings;
+	Writer writer;
 
 public:
-	Experiment(){};
+	//Experiment(){};
 	Experiment(Settings &s);
 	~Experiment(){
 //		for(unsigned int i = 0; i < targets.size(); ++i){
@@ -63,5 +64,3 @@ private:
 	void createEnergyBins(double emin, double emax);
 	void createTargets();
 };
-
-#endif

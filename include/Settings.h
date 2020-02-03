@@ -117,5 +117,3 @@ struct Settings{
 	void writeExperiment() const;
 	void writeTarget(unsigned int i) const;
 };
-
-#endif

@@ -24,6 +24,7 @@
 
 #include "Experiment.h"
 #include "Config.h"
+#include "Status.h"
 
 using std::cout;
 using std::endl;
@@ -34,14 +35,11 @@ using std::regex;
 using std::regex_replace;
 using std::stringstream;
 
-Experiment::Experiment(Settings &s){
+Experiment::Experiment(Settings &s):writer(s){
 	settings = s;
 }
 
 void Experiment::initialize(){
-	if(settings.status){
-		cout << STATUS_MESSAGE_PREFIX << "" << endl;
-	}
 	createEnergyBins(settings.emin, settings.emax);
 	createTargets();
 }
@@ -92,6 +90,12 @@ void Experiment::transmission(){
 			targets[i].calculateIncidentBeam(targets[i-1].getPhotonFluxDensity());
 			targets[i].calculateTransmission();
 		}
+
+		if(settings.status){
+			stringstream sta_str;
+			sta_str << "Calculation of transmission through target #" << i+1 << " finished.";
+			Status::print(sta_str.str(), true);
+		}
 	}
 }
 
@@ -104,6 +108,11 @@ void Experiment::resonant_scattering(){
 		if(settings.uncertainty){
 			targets[i].calculateTransmission(targets[i].get_ana_num_ratio());
 			targets[i].calculateResonantScattering(energy_bins);
+		}
+		if(settings.status){
+			stringstream sta_str;
+			sta_str << "Calculation of resonant scattering on target #" << i+1 << " finished.";
+			Status::print(sta_str.str(), true);
 		}
 	}
 }
@@ -161,10 +170,27 @@ void Experiment::plot(unsigned int n_setting) {
 
 void Experiment::write(unsigned int n_setting) {
 
-	unsigned int ntargets = (unsigned int) settings.targetNames.size();	
+	stringstream filename;
+	stringstream sta_str;
+
+	// Write energy bins
+	filename << "energy_bins";
+	writer.write1DHistogram(energy_bins, filename.str(), "Energy / eV");
+	if(settings.status){
+		sta_str << "Wrote energy bins to " << settings.outputfile << "_" << filename.str() << TXT_SUFFIX;
+		Status::print(sta_str.str(), true);
+	}
+	writer.write1DCalibration(energy_bins, CAL_FILE_NAME, filename.str());
+
+	unsigned int ntargets = (unsigned int) settings.targetNames.size();
 
 	for(unsigned int i = 0; i < ntargets; ++i){
 		targets[i].write(energy_bins, n_setting);
+	}
+	if(settings.status){
+		sta_str.str("");
+		sta_str << "Wrote energy calibration to " << settings.outputfile << "_" << CAL_FILE_NAME << CAL_SUFFIX;
+		Status::print(sta_str.str(), true);
 	}
 }
 

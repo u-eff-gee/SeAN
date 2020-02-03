@@ -87,5 +87,3 @@ const 	unsigned int NIST_ENERGY_LENGTH = 11;
 const 	unsigned int NIST_MU = 16;
 const 	unsigned int NIST_MU_LENGTH = 9;
 };
-
-#endif

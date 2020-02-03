@@ -18,27 +18,46 @@
 #pragma once 
 
 #include <chrono>
+#include <iomanip>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 using std::chrono::high_resolution_clock;
 using std::cout;
+using std::chrono::duration;
+using std::chrono::duration_cast;
 using std::endl;
+using std::scientific;
+using std::setprecision;
+using std::setw;
 using std::string;
+using std::stringstream;
 
 class Status{
 
 public:
-    Status(){};
-    ~Status(){};
+    Status() = default;
+    ~Status() = default;
 
-    void start_timer(){ t_start = high_resolution_clock::now(); };
+    static void start_timer(){ t_start = high_resolution_clock::now(); };
 
-    static string status_prefix(){
-        return "> STATUS ";
+    static void print(const string status_message, const bool print_elapsed_time) {
+        cout << status_prefix(print_elapsed_time) << status_message << endl;
     }
 
 protected:
     static high_resolution_clock::time_point t_start;
+
+    static string status_prefix(const bool print_elapsed_time){
+        duration<double> delta_t = duration_cast<duration<double>>(high_resolution_clock::now() - t_start);
+        stringstream sta_pre;
+        sta_pre << "> STATUS ";
+        if(print_elapsed_time){
+            sta_pre << "( " << scientific << setprecision(4) << delta_t.count() << " s )";
+        }
+        sta_pre << " : ";
+        return sta_pre.str();
+    }
 
 };
