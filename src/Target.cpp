@@ -34,6 +34,14 @@ using std::regex;
 using std::scientific;
 using std::stringstream;
 
+void Target::copyCrossSection(Target &t) {
+	vector<double> cs_hist = t.getCrossSection();
+
+	for(unsigned int i = 0; i < crosssection_histogram.size(); ++i){
+		crosssection_histogram[i] = cs_hist[i];
+	}
+}
+
 void Target::initialize(const vector<double> &energy_bins){
 	unsigned int nenergies = (unsigned int) settings.energy[target_number].size();
 
@@ -581,8 +589,10 @@ string Target::result_string() const{
 	stringstream resss;	
 	resss << settings.targetNames[target_number] << ":\t" << n_resonantly_scattered;
 	if(settings.uncertainty){
-		resss << " +- " << fabs(n_resonantly_scattered - n_resonantly_scattered_scaled) << " +- " << 0.5*(n_resonantly_scattered_limits[0].second - n_resonantly_scattered_limits[0].first) << "\n";
-		resss << "\t\t\t" << "100 % +- " << fabs(n_resonantly_scattered - n_resonantly_scattered_scaled)/n_resonantly_scattered_scaled*100. << " % +- " << 0.5*(n_resonantly_scattered_limits[0].second - n_resonantly_scattered_limits[0].first)/n_resonantly_scattered_scaled*100. << " %";
+		if(copied_from == -1){
+			resss << " +- " << fabs(n_resonantly_scattered - n_resonantly_scattered_scaled) << " +- " << 0.5*(n_resonantly_scattered_limits[0].second - n_resonantly_scattered_limits[0].first) << "\n";
+			resss << "\t\t\t" << "100 % +- " << fabs(n_resonantly_scattered - n_resonantly_scattered_scaled)/n_resonantly_scattered_scaled*100. << " % +- " << 0.5*(n_resonantly_scattered_limits[0].second - n_resonantly_scattered_limits[0].first)/n_resonantly_scattered_scaled*100. << " %";
+		}
 	}
 	resss << "\n";
 
@@ -592,10 +602,14 @@ string Target::result_string() const{
 string Target::uncertainty_string() const{
 	stringstream unss;
 
-	unss << "CS ANALYTICAL:\t" << crosssection_integral_analytical << "\n";
-	unss << "CS NUMERICAL:\t" << crosssection_integral_numerical_limits.first << " <= " << crosssection_integral_numerical << " <= " << crosssection_integral_numerical_limits.second << "\n";
-	unss << "             \t100 % - " << (1.-crosssection_integral_numerical_limits.first/crosssection_integral_numerical)*100. << " % <= 100 % <= 100 % + " << (crosssection_integral_numerical_limits.second/crosssection_integral_numerical-1.)*100. << " %\n";
-	unss << "CS_DEVIATION:\t" << (crosssection_integral_numerical_limits.first - crosssection_integral_analytical)/crosssection_integral_analytical*100. << " % | " << (crosssection_integral_numerical - crosssection_integral_analytical)/crosssection_integral_analytical*100. << " % | "<< (crosssection_integral_numerical_limits.second - crosssection_integral_analytical)/crosssection_integral_analytical*100. << " % \n\n";
+	if(copied_from > -1){
+		unss << "Cross section copied from target #" << copied_from+1 << "\n";
+	} else{
+		unss << "CS ANALYTICAL:\t" << crosssection_integral_analytical << "\n";
+		unss << "CS NUMERICAL:\t" << crosssection_integral_numerical_limits.first << " <= " << crosssection_integral_numerical << " <= " << crosssection_integral_numerical_limits.second << "\n";
+		unss << "             \t100 % - " << (1.-crosssection_integral_numerical_limits.first/crosssection_integral_numerical)*100. << " % <= 100 % <= 100 % + " << (crosssection_integral_numerical_limits.second/crosssection_integral_numerical-1.)*100. << " %\n";
+		unss << "CS_DEVIATION:\t" << (crosssection_integral_numerical_limits.first - crosssection_integral_analytical)/crosssection_integral_analytical*100. << " % | " << (crosssection_integral_numerical - crosssection_integral_analytical)/crosssection_integral_analytical*100. << " % | "<< (crosssection_integral_numerical_limits.second - crosssection_integral_analytical)/crosssection_integral_analytical*100. << " % \n";
+	}
 
 /*	if(!settings.multi){
 		unss << "RS_TRAPEZOID:\t" << n_resonantly_scattered_limits[0].first << " <= " << n_resonantly_scattered[0] << " <= " << n_resonantly_scattered_limits[0].second << "\n";

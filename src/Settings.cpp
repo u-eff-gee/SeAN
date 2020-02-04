@@ -37,6 +37,36 @@ string Settings::bool_string(const bool b) const {
 		if(b) return "true"; else return "false";
 }
 
+bool Settings::equal_resonances(const unsigned int n1, const unsigned int n2) const {
+
+	// Compare properties of excited states	
+	if(energy[n1].size() != energy[n2].size())
+		return false;
+
+	for(unsigned int i = 0; i < energy[n1].size(); ++i){
+		if(
+			energy[n1][i] != energy[n2][i]
+			|| gamma0[n1][i] != gamma0[n2][i]
+			|| gamma[n1][i] != gamma[n2][i]
+			|| jj[n1][i] != jj[n2][i]
+		)
+			return false;
+	}
+	if(ji[n1] != ji[n2])
+		return false;
+
+	// Compare models for Doppler broadening
+	if(dopplerBroadening[n1] != dopplerBroadening[n2])
+		return false;
+
+	for(unsigned int i = 0; i < dopplerParams[n1].size(); ++i){
+		if(dopplerParams[n1][i] != dopplerParams[n2][i])
+			return false;
+	}
+
+	return true;
+}
+
 void Settings::print(){
 
 	printOptions();

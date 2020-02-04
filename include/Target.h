@@ -15,7 +15,6 @@
     along with SeAN.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #pragma once 
 
 #include <string>
@@ -103,12 +102,13 @@ public:
 		phononDensity(s),
 		crosssection_integral_analytical(0.),
 		crosssection_integral_numerical(0.),
-		crosssection_integral_numerical_limits({0., 0.})
-	{ 
+		crosssection_integral_numerical_limits({0., 0.}),
+		copied_from(-1)
+	{
 		settings = s; 
 		target_number = n;
 	};
-	
+
 	~Target(){};
 
 	// The order of the following functions represents the order in which they are called in a normal calculation. Indented functions are called by the function above.
@@ -118,6 +118,7 @@ public:
 		void calculateCrossSectionAtRest(const vector<double> &energy_bins);
 		void calculateVelocityDistribution(const vector<double> &energy_bins);
 		void calculateMassAttenuation(const vector<double> &energy_bins);
+	void copyCrossSection(Target &t);
 	void calculateCrossSection(const vector<double> &energy_bins);
 	void calculateCrossSectionDirectly(const vector<double> &energy_bins);
 	void calculateIncidentBeam(const vector<double> &energy_bins);
@@ -136,7 +137,6 @@ public:
 	void plot(vector<double> &energy_bins, unsigned int n_setting) ;
 
 	// Functions to calculate histograms
-
 	void calculateTransmittedBeam();
 	void calculateZBins();
 	void calculateZBins(double z0, double z1);
@@ -149,8 +149,10 @@ public:
 	void write_results(string outputfile) const;
 
 	// Function to return the photon flux density. The incident beam on the subsequent target will be read off from this.
-	
 	vector< vector<double> >& getPhotonFluxDensity(){ return photon_flux_density_histogram; };
+
+	// Function to return the Doppler-shifted cross section.
+	vector<double> &getCrossSection() { return crosssection_histogram; };
 
 	// Functions to integrate over 2D histograms
 	double integrateEZHistogram(vector<double> &energy_bins, vector<double> &z_bins, vector<vector<double> > &ezhist);
@@ -163,4 +165,7 @@ public:
 	// iteration over the calculation to improve the results or estimate uncertainties.
 	double get_ana_num_ratio() const { return crosssection_integral_analytical/
 		crosssection_integral_numerical; };
+
+	int copied_from;
+
 };

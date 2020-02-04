@@ -99,6 +99,11 @@ struct Settings{
 	vector<double> thickness;
 	vector<double> velocity;
 
+	// Method to compare settings
+	// Checks whether the properties of the excited states of two targets are identical.
+	// If yes, a lot of calculations can be skipped.
+	bool equal_resonances(const unsigned int n1, const unsigned int n2) const;
+
 	// Methods to create output strings
 	string bool_string(const bool b) const;
 	string option_string() const;

@@ -52,7 +52,7 @@ void Experiment::createEnergyBins(double emin, double emax){
 
 	for(unsigned int i = 0; i < settings.nbins_e; ++i)
 		energy_bins.push_back(emin + i*delta_e);
-};
+}
 
 void Experiment::createTargets(){
 
@@ -67,15 +67,36 @@ void Experiment::createTargets(){
 void Experiment::crossSections(){
 
 	unsigned int ntargets = (unsigned int) settings.targetNames.size();	
+	bool skip_calculation = false;
+	stringstream sta_str;
 
 	for(unsigned int i = 0; i < ntargets; ++i){
-		if(settings.direct){
-			targets[i].calculateCrossSectionDirectly(energy_bins);
-		} else{
-			targets[i].calculateCrossSection(energy_bins);
+		
+		// Before calculating the cross section, check whether a target with the same resonances
+		// already exists. If yes, the cross section can simply be copied.
+		if(i > 0){
+			for(unsigned int j = 0; j < i; ++j){
+				if(settings.equal_resonances(i, j)){
+					targets[i].copyCrossSection(targets[j]);
+					skip_calculation = true;
+					targets[i].copied_from = j;
+					sta_str << "Copied cross section for target #" << i+1 << " from target #" << j+1 << ".";
+					Status::print(sta_str.str(), true);
+					break;
+				}
+			}
 		}
+
+		if(!skip_calculation){
+			if(settings.direct){
+				targets[i].calculateCrossSectionDirectly(energy_bins);
+			} else{
+				targets[i].calculateCrossSection(energy_bins);
+			}
+		}
+
 	}
-};
+}
 
 void Experiment::transmission(){
 
@@ -146,7 +167,7 @@ string Experiment::uncertainty_string() const {
 	}
 
 	return unss.str();
-};
+}
 
 void Experiment::print_results(unsigned int n_setting){
 
