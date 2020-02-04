@@ -138,7 +138,7 @@ string Experiment::uncertainty_string() const {
 	
 	for(unsigned int i = 0; i < ntargets; ++i){
 		unss << HORIZONTAL_LINE << "\n";
-		unss << ">>> TARGET #" << i+1 << "\t: NUMERICAL UNCERTAINY ESTIMATES\n";
+		unss << ">>> TARGET #" << i+1 << "\t: NUMERICAL UNCERTAINTY ESTIMATES\n";
 		unss << targets[i].uncertainty_string();
 	}
 

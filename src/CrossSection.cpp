@@ -47,7 +47,7 @@ void CrossSection::breit_wigner(const vector<double> &energy_bins, vector<double
 	}
 }
 
-void CrossSection::calculateVelocityBins(const vector<double> &energy_bins, vector<double> &velocity_distribution_bins, vector<double> &energy_boosted, const unsigned int target_number, const unsigned int resonance_number){
+void CrossSection::calculateVelocityBins(const vector<double> &energy_bins, vector<double> &velocity_distribution_bins, vector<double> &energy_boosted, const unsigned int resonance_number){
 
 	// SeAN uses non-equidistant velocity bins. Here, velocity_bins[i] is the velocity that is needed to shift energy_bins[j] to energy_bins[i].maxwell_
 	double energy_ratio = 1.;
@@ -58,7 +58,7 @@ void CrossSection::calculateVelocityBins(const vector<double> &energy_bins, vect
 	}
 }
 
-void CrossSection::absolute_zero(const vector<double> velocity_distribution_bins, vector<double> &velocity_distribution_histogram, const unsigned int target_number, const unsigned int resonance_number){
+void CrossSection::absolute_zero(const vector<double> velocity_distribution_bins, vector<double> &velocity_distribution_histogram){
 	// At absolute zero (in the classical sense), the nucleus is completely at rest.
 	// I.e., the velocity distribution represents a Dirac delta function.
 	// Find the velocity distribution bin that corresponds to zero, and fill only that histogram bin.
@@ -191,7 +191,7 @@ void CrossSection::fft_input(const vector<double> &energy_bins, const vector<dou
 	}
 }
 
-void CrossSection::dopplershiftFFT(const vector<double> &energy_bins, vector<double> &crosssection_histogram, const vector <double> &crosssection_at_rest_histogram, const vector<double> &velocity_distribution_bins, const vector<double> &velocity_distribution_histogram, const double vdist_norm, const unsigned int vdist_centroid, const unsigned int resonance_number){
+void CrossSection::dopplershiftFFT(vector<double> &crosssection_histogram, const double vdist_norm, const unsigned int vdist_centroid){
 
 	fftw_plan vdist_plan, crosssection_plan, product_fft_plan;
 	vector<fftw_complex> vdist_fft(settings.nbins_e/2 + 1);

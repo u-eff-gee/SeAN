@@ -148,7 +148,7 @@ void Target::calculateCrossSection(const vector<double> &energy_bins){
 	} else{
 		for(unsigned int i = 0; i < crosssection_at_rest_histogram.size(); ++i){
 			crossSection.fft_input(energy_bins, crosssection_at_rest_histogram[i], velocity_distribution_histogram[i], energy_boosted, i);
-			crossSection.dopplershiftFFT(energy_bins, crosssection_histogram, crosssection_at_rest_histogram[i], velocity_distribution_bins[i], velocity_distribution_histogram[i], vdist_norm[i], vdist_centroid[i], i);
+			crossSection.dopplershiftFFT(crosssection_histogram, vdist_norm[i], vdist_centroid[i]);
 			if(settings.status){
 				stringstream sta_str;
 				sta_str << "Calculation of cross section for excited state #" << i+1 << " of target #" << target_number+1 << " finished";
@@ -166,13 +166,13 @@ void Target::calculateCrossSectionDirectly(const vector<double> &energy_bins){
 	for(unsigned int i = 0; i < energy_boosted.size(); ++i){
 		
 		crossSection.breit_wigner(energy_bins, crosssection_at_rest_histogram[0], energy_boosted, target_number, i);
-		crossSection.calculateVelocityBins(energy_bins, velocity_distribution_bins[0], energy_boosted, target_number, i);
+		crossSection.calculateVelocityBins(energy_bins, velocity_distribution_bins[0], energy_boosted, i);
 
 		stringstream filename;
 
 		switch(settings.dopplerBroadening[target_number]){
 			case dopplerModel::zero:
-				crossSection.absolute_zero(velocity_distribution_bins[0], velocity_distribution_histogram[0], target_number, i);
+				crossSection.absolute_zero(velocity_distribution_bins[0], velocity_distribution_histogram[0]);
 				crossSection.no_dopplershift(crosssection_at_rest_histogram[0], crosssection_histogram);
 				break;
 
@@ -211,7 +211,7 @@ void Target::calculateCrossSectionDirectly(const vector<double> &energy_bins){
 					crossSection.dopplershift(energy_bins, crosssection_histogram, velocity_distribution_bins[0], velocity_distribution_histogram[0], energy_boosted, i);
 				} else{
 					crossSection.fft_input(energy_bins, crosssection_at_rest_histogram[0], velocity_distribution_histogram[0], energy_boosted, i);
-					crossSection.dopplershiftFFT(energy_bins, crosssection_histogram, crosssection_at_rest_histogram[0], velocity_distribution_bins[0], velocity_distribution_histogram[0], vdist_norm[0], vdist_centroid[0], i);
+					crossSection.dopplershiftFFT(crosssection_histogram, vdist_norm[0], vdist_centroid[0]);
 				}
 				break;
 
@@ -235,6 +235,9 @@ void Target::calculateCrossSectionDirectly(const vector<double> &energy_bins){
 			sta_str << "Calculation of cross section for excited state #" << i+1 << " of target #" << target_number+1 << " finished";
 			Status::print(sta_str.str(), true);
 		}
+	}
+	if(settings.uncertainty){
+		crossSection.check_crosssection_normalization(energy_bins, crosssection_histogram, energy_boosted, target_number, crosssection_integral_analytical, crosssection_integral_numerical, crosssection_integral_numerical_limits);
 	}
 }
 
@@ -266,7 +269,7 @@ void Target::calculateVelocityDistribution(const vector<double> &energy_bins){
 
 	if(settings.dopplerBroadening[target_number] != dopplerModel::arb_cs){
 		for(unsigned int i = 0; i < energy_boosted.size(); ++i){
-			crossSection.calculateVelocityBins(energy_bins, velocity_distribution_bins[i], energy_boosted, target_number, i);
+			crossSection.calculateVelocityBins(energy_bins, velocity_distribution_bins[i], energy_boosted, i);
 		}
 	}
 
@@ -275,7 +278,7 @@ void Target::calculateVelocityDistribution(const vector<double> &energy_bins){
 	switch(settings.dopplerBroadening[target_number]){
 		case dopplerModel::zero:
 			for(unsigned int i = 0; i < velocity_distribution_bins.size(); ++i){
-				crossSection.absolute_zero(velocity_distribution_bins[i], velocity_distribution_histogram[i], target_number, i);
+				crossSection.absolute_zero(velocity_distribution_bins[i], velocity_distribution_histogram[i]);
 			}
 			break;
 
@@ -469,7 +472,7 @@ void Target::write(const vector<double> &energy_bins, const unsigned int n_setti
 	
 	// Write cross section at rest
 	
-	unsigned int n_crosssection_histograms = energy_boosted.size();
+	size_t n_crosssection_histograms = energy_boosted.size();
 	if(settings.direct)
 		n_crosssection_histograms = 1;
 
@@ -650,7 +653,7 @@ void Target::vDistInfo(const unsigned int resonance_number){
 	}
 
 	vdist_norm[resonance_number] = fabs(norm);
-	vdist_centroid[resonance_number] = weightedsum/sum;
+	vdist_centroid[resonance_number] = (unsigned int) (weightedsum/sum);
 }
 
 void Target::calculateResonantScattering(const vector<double> energy_bins){

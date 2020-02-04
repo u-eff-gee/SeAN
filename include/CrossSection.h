@@ -54,9 +54,9 @@ public:
 
 	// Velocity distribution calculators
 	// Calculator for the velocity bins that correspond to the energy bins
-	void calculateVelocityBins(const vector<double> &energy_bins, vector<double> &velocity_distribution_bins, vector<double> &energy_boosted, const unsigned int target_number, const unsigned int resonance_number);
+	void calculateVelocityBins(const vector<double> &energy_bins, vector<double> &velocity_distribution_bins, vector<double> &energy_boosted, const unsigned int resonance_number);
 
-	void absolute_zero(const vector<double> velocity_distribution_bins, vector<double> &velocity_distribution_histogram, const unsigned int target_number, const unsigned int resonance_number);
+	void absolute_zero(const vector<double> velocity_distribution_bins, vector<double> &velocity_distribution_histogram);
 
 	void maxwell_boltzmann(const vector<double> &velocity_distribution_bins, vector<double> &velocity_distribution_histogram, const unsigned int target_number);
 
@@ -73,7 +73,7 @@ public:
 	// Using FFT
 	void fft_input(const vector<double> &energy_bins, const vector<double> &crosssection_at_rest_histogram, const vector<double> &velocity_distribution_histogram, vector<double> energy_boosted, const unsigned int resonance_number);
 
-	void dopplershiftFFT(const vector<double> &energy_bins, vector<double> &crosssection_histogram, const vector <double> &crosssection_at_rest_histogram, const vector<double> &velocity_distribution_bins, const vector<double> &velocity_distribution_histogram, const double vdist_norm, const unsigned int vdist_centroid, const unsigned int resonance_number);
+	void dopplershiftFFT(vector<double> &crosssection_histogram, const double vdist_norm, const unsigned int vdist_centroid);
 
 	// Using trapezoidal rule
 	void integration_input(const vector<double> &crosssection_bins);
