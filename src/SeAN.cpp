@@ -44,7 +44,7 @@ static struct argp_option options[] = {
 	{ "output", 'o', "OUTPUTFILENAME", 0, "Write input and results to a file called OUTPUTFILENAME (default: no output writing). If OUTPUTFILENAME already exists, it will be overwritten.", 0 },
 	{ "plot", 'p', 0, 0, "Create plots of all calculated quantities (default: false).", 0 },
 	{ "recoil", 'r', 0, 0, "Include nuclear recoil in the calculation of the cross section maximum (default: false).", 0 },
-	{ "status", 's', 0, 0, "Print information about the status of the calculation (default: false). This information will not be written to an output file."},
+	{ "status", 's', 0, 0, "Print information about the status of the calculation (default: false). This information will not be written to an output file.", 0 },
 	{ "uncertainty", 'u', 0, 0, "Estimate the uncertainty of the numerical evaluations (default: false). Note that this causes SeAN to perform more calculations.", 0 },
 	{ "verbosity", 'v', "VERBOSITY", 0, "Set command line verbosity (0 = print nothing, 1 = print results, 2 [default] = print input and results)", 0 },
 	{ "write", 'w', 0, 0, "Create text output files for all calculated quantities except cross sections at rest and 2D functions (default: false).", 0 },

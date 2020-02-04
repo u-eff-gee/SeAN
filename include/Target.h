@@ -86,8 +86,9 @@ private:
 	double crosssection_integral_analytical;
 	double crosssection_integral_numerical;
 	pair<double, double> crosssection_integral_numerical_limits;
-	vector<double> n_resonantly_scattered;
-	vector<double> n_resonantly_scattered_n2lo;
+	double n_resonantly_scattered;
+	double n_resonantly_scattered_scaled;
+	double n_resonantly_scattered_n2lo;
 	vector<pair<double, double>> n_resonantly_scattered_limits;
 	unsigned int target_number;
 
@@ -123,7 +124,7 @@ public:
 	void calculateIncidentBeam(const vector<vector<double> > &photon_flux_density_histogram);
 	void calculateTransmission();
 	void calculateTransmission(const double cs_enhancement_factor);
-	void calculateResonantScattering(const vector<double> energy_bins);
+	void calculateResonantScattering(const vector<double> energy_bins, const bool uncertainty_estimate);
 
 	// Function to print information to the command line
 	string result_string() const;

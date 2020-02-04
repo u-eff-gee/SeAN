@@ -104,10 +104,13 @@ void Experiment::resonant_scattering(){
 	unsigned int ntargets = (unsigned int) settings.targetNames.size();	
 
 	for(unsigned int i = 0; i < ntargets; ++i){
-		targets[i].calculateResonantScattering(energy_bins);
+		targets[i].calculateResonantScattering(energy_bins, false);
 		if(settings.uncertainty){
+			// For the uncertainty estimate, recalculate the transmission with a cross section
+			// scaled by the relative deviation of the integral of the calculated cross section
+			// from the analytically integrated cross section.
 			targets[i].calculateTransmission(targets[i].get_ana_num_ratio());
-			targets[i].calculateResonantScattering(energy_bins);
+			targets[i].calculateResonantScattering(energy_bins, true);
 		}
 		if(settings.status){
 			stringstream sta_str;
