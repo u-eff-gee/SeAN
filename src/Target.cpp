@@ -607,7 +607,7 @@ string Target::result_string() const{
 		}
 	}
 	if(settings.thin_target){
-		resss << "\t[ " << n_resonantly_scattered_thin_target << " ( " << n_resonantly_scattered_thin_target/n_resonantly_scattered*100. << " % )" << " ]";
+		resss << "\t[ " << n_resonantly_scattered_thin_target << " ( " << n_resonantly_scattered/n_resonantly_scattered_thin_target*100. << " % )" << " ]";
 	}
 	resss << "\n";
 

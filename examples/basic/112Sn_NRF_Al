@@ -1,0 +1,127 @@
+# NRF experiment on 112Sn using a multilayer target. Details can be found in:
+# [1] M. Berger, Dissertation, Technische Universität Darmstadt, Darmstadt (2020) https://doi.org/10.25534/tuprints-00012852
+# [2] https://www.nndc.bnl.gov/nudat2/
+# [3] http://www.knowledgedoor.com/2/elements_handbook/debye_temperature.html
+# This input file simulates scattering on the 2.212 MeV level of 27Al
+#
+# Minimum and maximum energy for the calculation in eV
+2.2119950000e+06, 2.2120250000e+06
+# Primary beam intensity distribution
+const, 1.
+# Number of bins on the energy axis
+10000
+# Number of bins on the z axis
+2
+# 0) Identifier of the target layer (string)
+al_up
+# 1) Resonance energy in eV [1]
+2.212010e+06
+# 2) Transition width to the ground state in eV [2]
+2.474481e-02
+# 3) Total transition width in eV [2]
+2.474481e-02
+# 4) Angular momentum of the ground state [2]
+2.500000
+# 5) Angular momentum of the excited state [2]
+3.500000
+# 6) Model for the velocity distribution with temperature parameters in K. Debye temperature from [3]
+maxwell_boltzmann_debye, 293.000000, 390.000000
+# 7) Nuclear mass in atomic mass units
+27Al
+# 8) Mass attenuation coefficient
+nist, Al.dat
+# 9) Target thickness in atoms/fm^2. Calculated from the mass, radius, and isotopic composition of the target which are given in [1].
+1.211675e-04
+# 10) Velocity of the target along the beam direction in m/s
+0.
+# 0) Identifier of the target layer (string)
+co_up
+# The resonance of this target layer is very far away from the resonance of 27Al. Since SeAN cannot handle resonances with a centroid outside the energy range, create an extremely weak artificial resonance to be able to simulate at least the nonresonant attenuation in this layer.
+# 1) Resonance energy in eV
+2.212010e+06
+# 2) Transition width to the ground state in eV
+1.750564e-08
+# 3) Total transition width in eV
+1.750564e-08
+# 4) Angular momentum of the ground state [2]
+3.500000
+# 5) Angular momentum of the excited state [2]
+4.500000
+# 6) Model for the velocity distribution with temperature parameters in K. Debye temperature from [3]
+maxwell_boltzmann_debye, 293.000000, 386.000000
+# 7) Nuclear mass in atomic mass units
+59Co
+# 8) Mass attenuation coefficient
+nist, Co.dat
+# 9) Target thickness in atoms/fm^2. Calculated from the mass, radius, and isotopic composition of the target which are given in [1].
+2.500984e-05
+# 10) Velocity of the target along the beam direction in m/s
+0.
+# 0) Identifier of the target layer (string)
+sn
+# The resonance of this target layer is very far away from the resonance of 27Al. Since SeAN cannot handle resonances with a centroid outside the energy range, create an extremely weak artificial resonance to be able to simulate at least the nonresonant attenuation in this layer.
+# 1) Resonance energy in eV
+2.212010e+06
+# 2) Transition width to the ground state in eV
+1.750564e-08
+# 3) Total transition width in eV
+1.750564e-08
+# 4) Angular momentum of the ground state [2]
+0.000000
+# 5) Angular momentum of the excited state [2]
+2.000000
+# 6) Model for the velocity distribution with temperature parameters in K. Debye temperature from [3]
+maxwell_boltzmann_debye, 293.000000, 254.000000
+# 7) Nuclear mass in atomic mass units
+112Sn
+# 8) Mass attenuation coefficient
+nist, Sn.dat
+# 9) Target thickness in atoms/fm^2. Calculated from the mass, radius, and isotopic composition of the target which are given in [1].
+7.207908e-05
+# 10) Velocity of the target along the beam direction in m/s
+0.
+# 0) Identifier of the target layer (string)
+co_do
+# The resonance of this target layer is very far away from the resonance of 27Al. Since SeAN cannot handle resonances with a centroid outside the energy range, create an extremely weak artificial resonance to be able to simulate at least the nonresonant attenuation in this layer.
+# 1) Resonance energy in eV
+2.212010e+06
+# 2) Transition width to the ground state in eV
+1.750564e-08
+# 3) Total transition width in eV
+1.750564e-08
+# 4) Angular momentum of the ground state [2]
+3.500000
+# 5) Angular momentum of the excited state [2]
+4.500000
+# 6) Model for the velocity distribution with temperature parameters in K. Debye temperature from [3]
+maxwell_boltzmann_debye, 293.000000, 386.000000
+# 7) Nuclear mass in atomic mass units
+59Co
+# 8) Mass attenuation coefficient
+nist, Co.dat
+# 9) Target thickness in atoms/fm^2. Calculated from the mass, radius, and isotopic composition of the target which are given in [1].
+2.443086e-05
+# 10) Velocity of the target along the beam direction in m/s
+0.
+# 0) Identifier of the target layer (string)
+al_do
+# 1) Resonance energy in eV [1]
+2.212010e+06
+# 2) Transition width to the ground state in eV [2]
+2.474481e-02
+# 3) Total transition width in eV [2]
+2.474481e-02
+# 4) Angular momentum of the ground state [2]
+2.500000
+# 5) Angular momentum of the excited state [2]
+3.500000
+# 6) Model for the velocity distribution with temperature parameters in K. Debye temperature from [3]
+maxwell_boltzmann_debye, 293.000000, 390.000000
+# 7) Nuclear mass in atomic mass units
+27Al
+# 8) Mass attenuation coefficient
+nist, Al.dat
+# 9) Target thickness in atoms/fm^2. Calculated from the mass, radius, and isotopic composition of the target which are given in [1].
+1.212527e-04
+# 10) Velocity of the target along the beam direction in m/s
+0.

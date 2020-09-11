@@ -192,7 +192,7 @@ string Experiment::result_string(unsigned int n_setting) const {
 	if(settings.uncertainty)
 		resss << " +- CS_UNCERTAINTY +- SCATTERING_UNCERTAINTY";
 	if(settings.thin_target)
-		resss << "\t[THIN TARGET (THIN / THICK)]";
+		resss << "\t[THIN TARGET (THICK / THIN)]";
 	resss << "\n";
 
 	return resss.str();
