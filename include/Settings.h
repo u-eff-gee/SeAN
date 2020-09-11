@@ -59,6 +59,7 @@ struct Settings{
 	bool status = false;
 	bool write = false;
 	bool write_all = false;
+	bool thin_target = false;
 	bool uncertainty = false;
 	bool multi = false;
 

@@ -45,6 +45,7 @@ static struct argp_option options[] = {
 	{ "plot", 'p', 0, 0, "Create plots of all calculated quantities (default: false).", 0 },
 	{ "recoil", 'r', 0, 0, "Include nuclear recoil in the calculation of the cross section maximum (default: false).", 0 },
 	{ "status", 's', 0, 0, "Print information about the status of the calculation (default: false). This information will not be written to an output file.", 0 },
+	{ "thin_target", 't', 0, 0, "In addition to the normal calculation, calculate resonant scattering under the assumption that self-absorption and nonresonant attenuation of the photon beam is negligible (default: false).", 0 },
 	{ "uncertainty", 'u', 0, 0, "Estimate the uncertainty of the numerical evaluations (default: false). Note that this causes SeAN to perform more calculations.", 0 },
 	{ "verbosity", 'v', "VERBOSITY", 0, "Set command line verbosity (0 = print nothing, 1 = print results, 2 [default] = print input and results)", 0 },
 	{ "write", 'w', 0, 0, "Create text output files for all calculated quantities except cross sections at rest and 2D functions (default: false).", 0 },
@@ -66,6 +67,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
 		case 'p': settings->plot = true; break;
 		case 'r': settings->recoil = true; break;
 		case 's': settings->status = true; break;
+		case 't': settings->thin_target = true; break;
 		case 'u': settings->uncertainty=true; break;
 		case 'v': settings->verbosity = atoi(arg); break;
     	case 'w': settings->write = true; break;
@@ -113,6 +115,9 @@ int main(int argc, char* argv[]){
 		experiment.initialize();
 		experiment.crossSections();
 		experiment.transmission();
+		if(settings[0].thin_target){
+			experiment.transmission_thin_target();
+		}
 		if(settings[0].plot){
 			experiment.plot(i);
 		}
@@ -120,6 +125,9 @@ int main(int argc, char* argv[]){
 			experiment.write(i);
 		}
 		experiment.resonant_scattering();
+		if(settings[0].thin_target){
+			experiment.resonant_scattering_thin_target();
+		}
 		if(settings[0].verbosity > 0){
 			experiment.print_results(i);
 		}

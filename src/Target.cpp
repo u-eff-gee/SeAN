@@ -68,7 +68,12 @@ void Target::initialize(const vector<double> &energy_bins){
 
 	for(unsigned int i = 0; i < settings.nbins_z; ++i){
 		photon_flux_density_histogram.push_back(vector<double>(settings.nbins_e, 0.));
+		if(settings.thin_target)
+			photon_flux_density_histogram_thin_target.push_back(vector<double>(settings.nbins_e, 0.));
 		resonance_absorption_density_histogram.push_back(vector<double>(settings.nbins_e, 0.));
+		if(settings.thin_target)
+			resonance_absorption_density_histogram_thin_target.push_back(vector<double>(settings.nbins_e, 0.));
+
 	}
 
 	energy_boosted.reserve(nenergies);
@@ -466,6 +471,13 @@ void Target::calculateTransmission(){
 	absorption.resonance_absorption_density(crosssection_histogram, photon_flux_density_histogram, resonance_absorption_density_histogram);
 }
 
+void Target::calculateTransmissionThinTarget(){
+	
+	absorption.photon_flux_density_thin_target(incident_beam_histogram, photon_flux_density_histogram_thin_target);
+
+	absorption.resonance_absorption_density(crosssection_histogram, photon_flux_density_histogram_thin_target, resonance_absorption_density_histogram_thin_target);
+}
+
 void Target::calculateTransmission(const double cs_enhancement_factor){
 	
 	absorption.photon_flux_density(crosssection_histogram, mass_attenuation_histogram, z_bins, incident_beam_histogram, photon_flux_density_histogram, cs_enhancement_factor);
@@ -594,6 +606,9 @@ string Target::result_string() const{
 			resss << "\t\t\t" << "100 % +- " << fabs(n_resonantly_scattered - n_resonantly_scattered_scaled)/n_resonantly_scattered_scaled*100. << " % +- " << 0.5*(n_resonantly_scattered_limits[0].second - n_resonantly_scattered_limits[0].first)/n_resonantly_scattered_scaled*100. << " %";
 		}
 	}
+	if(settings.thin_target){
+		resss << "\t[ " << n_resonantly_scattered_thin_target << " ( " << n_resonantly_scattered_thin_target/n_resonantly_scattered*100. << " % )" << " ]";
+	}
 	resss << "\n";
 
 	return resss.str();
@@ -700,6 +715,17 @@ void Target::calculateResonantScattering(const vector<double> energy_bins, const
 			n_resonantly_scattered = integrator.trapezoidal_rule(energy_bins, integrand);
 		}
 	}
+}
+
+void Target::calculateResonantScatteringThinTarget(const vector<double> energy_bins){
+
+	vector<double> integrand(settings.nbins_e, 0.);
+
+	for(unsigned int i = 0; i < settings.nbins_e; ++i){
+		integrand[i] = crosssection_histogram[i]*photon_flux_density_histogram_thin_target[0][i]*settings.thickness[target_number];
+	}
+
+	n_resonantly_scattered_thin_target = integrator.trapezoidal_rule(energy_bins, integrand);
 }
 
 void Target::print_results(){

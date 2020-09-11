@@ -79,8 +79,8 @@ void Experiment::crossSections(){
 				if(settings.equal_resonances(i, j)){
 					targets[i].copyCrossSection(targets[j]);
 					skip_calculation = true;
-					targets[i].copied_from = j;
-					sta_str << "Copied cross section for target #" << i+1 << " from target #" << j+1 << ".";
+					targets[i].copied_from = (int) j;
+					sta_str << "Copied cross section for target #" << i+1 << " from target #" << j+1 << ". ";
 					Status::print(sta_str.str(), true);
 					break;
 				}
@@ -120,6 +120,33 @@ void Experiment::transmission(){
 	}
 }
 
+void Experiment::transmission_thin_target(){
+
+	unsigned int ntargets = (unsigned int) settings.targetNames.size();	
+
+	for(unsigned int i = 0; i < ntargets; ++i){
+		// In the thin-target approximation, it is assumed that the impact of every single target
+		// on the photon intensity distribution of the beam is negligible.
+		// Consequently, each target uses the original incident beam.
+		// Furthermore, it is assumed that the attenuation of the beam within every single target
+		// is negligible, so that the number of reactions is simply given by the product of the 
+		// cross section and the area density of the target.
+		if(i == 0){
+			targets[0].calculateIncidentBeam(energy_bins);
+			targets[0].calculateTransmissionThinTarget();
+		} else{
+			targets[i].calculateIncidentBeam(energy_bins);
+			targets[i].calculateTransmissionThinTarget();
+		}
+
+		if(settings.status){
+			stringstream sta_str;
+			sta_str << "Calculation of transmission through target #" << i+1 << " finished.";
+			Status::print(sta_str.str(), true);
+		}
+	}
+}
+
 void Experiment::resonant_scattering(){
 
 	unsigned int ntargets = (unsigned int) settings.targetNames.size();	
@@ -141,6 +168,21 @@ void Experiment::resonant_scattering(){
 	}
 }
 
+void Experiment::resonant_scattering_thin_target(){
+
+	unsigned int ntargets = (unsigned int) settings.targetNames.size();	
+
+	for(unsigned int i = 0; i < ntargets; ++i){
+		targets[i].calculateResonantScatteringThinTarget(energy_bins);
+
+		if(settings.status){
+			stringstream sta_str;
+			sta_str << "Calculation of resonant scattering in thin-target approximation on target #" << i+1 << " finished.";
+			Status::print(sta_str.str(), true);
+		}
+	}
+}
+
 string Experiment::result_string(unsigned int n_setting) const {
 
 	stringstream resss;
@@ -149,6 +191,8 @@ string Experiment::result_string(unsigned int n_setting) const {
 	resss << "TARGET NAME\tRESONANT SCATTERING";
 	if(settings.uncertainty)
 		resss << " +- CS_UNCERTAINTY +- SCATTERING_UNCERTAINTY";
+	if(settings.thin_target)
+		resss << "\t[THIN TARGET (THIN / THICK)]";
 	resss << "\n";
 
 	return resss.str();

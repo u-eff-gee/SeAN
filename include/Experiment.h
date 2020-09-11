@@ -40,17 +40,15 @@ private:
 public:
 	//Experiment(){};
 	Experiment(Settings &s);
-	~Experiment(){
-//		for(unsigned int i = 0; i < targets.size(); ++i){
-//			delete targets[i];
-//		}
-	};
+	~Experiment() = default;
 
 	// Functions to manage the calculation process
 	void initialize();
 	void crossSections();
 	void transmission();
+	void transmission_thin_target();
 	void resonant_scattering();
+	void resonant_scattering_thin_target();
 
 	// Functions for output
 	string result_string(unsigned int n_setting) const;

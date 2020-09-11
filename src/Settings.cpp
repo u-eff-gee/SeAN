@@ -95,6 +95,7 @@ string Settings::option_string() const {
 	opss << "\tWRITE       :\t" << bool_string(write);
 	if(write_all) opss << " ( ALL )" << "\n"; else opss << "\n";
 	opss << "\tRECOIL      :\t" << bool_string(recoil) << "\n" ;
+	opss << "\tTHIN TARGET :\t" << bool_string(thin_target) << "\n" ;
 	opss << "\tUNCERTAINTY :\t" << bool_string(uncertainty) << "\n" ;
 	opss << "\tVERBOSITY   :\t" << verbosity << "\n";
 	opss << "\tOUTPUT      :\t" << bool_string(output);

@@ -61,6 +61,7 @@ public:
 
 	// Transmission calculators
 	void photon_flux_density(const vector<double> &crosssection_histogram, const vector<double> &mass_attenuation_histogram, const vector<double> &z_bins, const vector<double> &incident_beam_histogram, vector<vector<double> > &photon_flux_density_histogram);
+	void photon_flux_density_thin_target(const vector<double> &incident_beam_histogram, vector<vector<double> > &photon_flux_density_histogram);
 
 	void resonance_absorption_density(const vector<double> &crosssection_histogram, const vector<vector<double> > &photon_flux_density_histogram, vector< vector<double> > &resonance_absorption_density_histogram);
 

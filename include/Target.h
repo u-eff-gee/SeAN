@@ -68,7 +68,9 @@ private:
 	vector<double> incident_beam_histogram;
 
 	vector<vector <double> > photon_flux_density_histogram;
+	vector<vector <double> > photon_flux_density_histogram_thin_target;
 	vector<vector <double> > resonance_absorption_density_histogram;
+	vector<vector <double> > resonance_absorption_density_histogram_thin_target;
 
 	vector< vector<double> > mass_attenuation_file;
 	vector<double> mass_attenuation_histogram;
@@ -88,6 +90,7 @@ private:
 	double n_resonantly_scattered;
 	double n_resonantly_scattered_scaled;
 	double n_resonantly_scattered_n2lo;
+	double n_resonantly_scattered_thin_target;
 	vector<pair<double, double>> n_resonantly_scattered_limits;
 	unsigned int target_number;
 
@@ -95,7 +98,7 @@ public:
 	Target(unsigned int n, Settings &s): 
 		crossSection(s), 
 		absorption(s),
-       		inputReader(),
+       	inputReader(),
 		plotter(s),
 		writer(s),
 		integrator(),
@@ -124,8 +127,10 @@ public:
 	void calculateIncidentBeam(const vector<double> &energy_bins);
 	void calculateIncidentBeam(const vector<vector<double> > &photon_flux_density_histogram);
 	void calculateTransmission();
+	void calculateTransmissionThinTarget();
 	void calculateTransmission(const double cs_enhancement_factor);
 	void calculateResonantScattering(const vector<double> energy_bins, const bool uncertainty_estimate);
+	void calculateResonantScatteringThinTarget(const vector<double> energy_bins);
 
 	// Function to print information to the command line
 	string result_string() const;

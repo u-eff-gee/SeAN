@@ -105,6 +105,17 @@ void Absorption::photon_flux_density(const vector<double> &crosssection_histogra
 	}
 }
 
+
+void Absorption::photon_flux_density_thin_target(const vector<double> &incident_beam_histogram, vector<vector<double> > &photon_flux_density_histogram){
+
+	#pragma omp parallel for
+	for(unsigned int i = 0; i < settings.nbins_z; ++i){
+		for(unsigned int j = 0; j < settings.nbins_e; ++j){
+			photon_flux_density_histogram[i][j] = incident_beam_histogram[j];
+		}
+	}
+}
+
 void Absorption::resonance_absorption_density(const vector<double> &crosssection_histogram, const vector<vector<double> > &photon_flux_density_histogram, vector< vector<double> > &resonance_absorption_density_histogram){
 
 	#pragma omp parallel for
